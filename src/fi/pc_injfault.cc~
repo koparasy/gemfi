@@ -1,0 +1,56 @@
+#include "fi/faultq.hh"
+#include "fi/pc_injfault.hh"
+#include "fi/fi_system.hh"
+#ifdef ALPHA_ISA
+#include "arch/utility.hh"
+#endif
+using namespace std;
+
+
+PCInjectedFault::PCInjectedFault( std::ifstream &os)
+	:CPUInjectedFault(os){
+	 setFaultType(InjectedFault::PCInjectedFault);
+	 fi_system->mainInjectedFaultQueue.insert(this);
+}
+
+PCInjectedFault::~PCInjectedFault()
+{
+}
+
+
+const char *
+PCInjectedFault::description() const
+{
+    return "PCInjectedFault";
+}
+
+
+void 
+PCInjectedFault::dump() const
+{
+  if (DTRACE(FaultInjection)) {
+    std::cout << "===PCInjectedFault::dump()===\n";
+    CPUInjectedFault::dump();
+    std::cout << "~==PCInjectedFault::dump()===\n";
+  }
+}
+
+
+
+int
+PCInjectedFault::process()
+{
+  DPRINTF(FaultInjection, "===PCInjectedFault::process()===\n");
+  dump();
+  uint64_t pcval = getCPU()->getContext(getTContext())->pcState().instAddr();
+  DPRINTF(FaultInjection, "\tPC value before FI: PCAddr:%lx\n", pcval);
+  uint64_t mask = manifest(pcval, getValue(), getValueType());
+  getCPU()->getContext(getTContext())->pcState(TheISA::PCState(mask));
+  
+  check4reschedule();
+
+  DPRINTF(FaultInjection, "~==PCInjectedFault::process()===\n");
+
+  return 0;
+}
+

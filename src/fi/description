@@ -1,0 +1,32 @@
+GeneralFetchInjectedFault WHEN WHAT THREAD WHERE OCC REL TCONTEXT 
+IEWStageInjectedFault WHEN WHAT THREAD WHERE OCC REL TCONTEXT
+MemoryInjectedFault WHEN WHAT THREAD WHERE OCC REL TCONTEXT ADDR
+OpCodeInjectedFault WHEN WHAT THREAD WHERE OCC REL TCONTEXT
+PCInjectedFault WHEN WHAT THREAD WHERE OCC REL TCONTEXT
+RegisterInjectedFault WHEN WHAT THREAD WHERE OCC REL TCONTEXT REGTYPE REG
+RegisterDecodingInjectedFault WHEN WHAT THREAD WHERE OCC REL TCONTEXT src/Dst
+CPUInjectedFault WHEN WHAT THREAD WHERE OCC REL TCONTEXT
+InjectedFault WHEN WHAT THREAD WHERE OCC REL TCONTEXT
+
+when :Inst:
+      Tick:
+      Addr:
+
+what: Flip:
+      Mask:
+      Immd:
+      All1
+      All0
+
+where:all
+      system.cpuID
+
+Thread: ID
+Occ : Int
+Rel : Bool
+Tcontext :int (0);
+
+SrcREG:REG / DstReg:Reg
+
+ADDR : Addr
+

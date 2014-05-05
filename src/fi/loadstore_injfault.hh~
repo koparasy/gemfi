@@ -1,0 +1,50 @@
+#ifndef __LOAD_STORE_INJECTED_FAULT_HH__
+#define __LOAD_STORE_INJECTED_FAULT_HH__
+
+#include "base/types.hh"
+#include "fi/faultq.hh"
+#include "cpu/o3/cpu.hh"
+#include "fi/o3cpu_injfault.hh"
+
+
+class LoadStoreInjectedFault : public O3CPUInjectedFault
+{
+public:
+  
+  LoadStoreInjectedFault(std::ifstream &os);
+  ~LoadStoreInjectedFault();
+  
+  virtual TheISA::MachInst process(TheISA::MachInst inst) { std::cout << "O3CPUInjectedFault::manifest() -- virtual\n"; assert(0); return inst;};
+  
+  virtual StaticInstPtr process(StaticInstPtr inst) { std::cout << "O3CPUInjectedFault::manifest() -- virtual\n"; assert(0); return inst;};
+  virtual StaticInstPtr process(StaticInstPtr inst , int regNum) { std::cout << "O3CPUInjectedFault::manifest() -- virtual\n"; assert(0); return inst;};
+  
+  
+  virtual const char *description() const;
+  void dump() const;
+  
+  template <class T> 
+  T process(T v){
+    DPRINTF(FaultInjection,"===LoadStoreFault::Process(T)==\n");
+    
+    T retval = v;
+#ifdef ALPHA_ISA
+    if(getValueType() == InjectedFault::FlipBit && getValue() > sizeof(T)*8){ //Make sure that the flipped bit is inside the affected structure!
+      setValue(getValue()%(sizeof(T)*8) +1);
+      DPRINTF(FaultInjection,"Altered Flip bit location\n");
+      dump();
+    }
+    retval = manifest(v,getValue(),getValueType());
+#else
+    assert(0);
+#endif
+    
+    check4reschedule();
+    
+    DPRINTF(FaultInjection,"~===LoadStoreFault::Process(T)===\n");
+    return retval;
+  }
+};
+
+
+#endif // __LOAD_STORE_INJECTED_FAULT_HH__
