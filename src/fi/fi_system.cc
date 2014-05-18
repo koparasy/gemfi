@@ -560,3 +560,82 @@ Fi_System::scheduleswitch(ThreadContext *tc){
     setswitchcpu(false);
   }
 }
+
+
+void Fi_System::start_fi(ThreadContext *tc, uint64_t id){
+Addr _tmpAddr  = TheISA::getFiThread(tc);
+  DPRINTF(FaultInjection, "\t Process Control Block(PCB) Addressx: %llx ####%d#####\n",_tmpAddr,threadid);  
+  fi_system->fi_activation_iter = fi_system->fi_activation.find(_tmpAddr);
+  if (fi_system->fi_activation_iter == fi_system->fi_activation.end()) {
+    std::string _name = tc->getCpuPtr()->name();
+    gettimeofday(&tim, NULL); 
+    t1=tim.tv_sec+(tim.tv_usec/1000000.0);  
+    if(DTRACE(FaultInjection))
+    {
+	std::cout<<"==Fault Injection Activation Instruction===\n";
+    }
+    fi_system->fi_activation[_tmpAddr] = fi_system->vectorpos;
+    fi_system->threadList.push_back(new ThreadEnabledFault(threadid,_name));
+    tc->setEnabledFIThread( fi_system->threadList[ fi_system->vectorpos ] );
+    (*(fi_system->threadList[ fi_system->vectorpos ] )).dump();
+	(*(fi_system->threadList[fi_system->vectorpos])).setMode(START);
+    fi_system->vectorpos++;
+    tc->setEnabledFI(true);
+    fi_system->fi_enable++;
+    fi_system->fi_execute = fi_system->fi_enable & (!fi_system->iewStageInjectedFaultQueue.empty());
+    fi_system->fi_decode= fi_system->fi_enable & (!fi_system->decodeStageInjectedFaultQueue.empty());
+    fi_system->fi_fetch= fi_system->fi_enable & (!fi_system->fetchStageInjectedFaultQueue.empty());
+    fi_system->fi_loadstore= fi_system->fi_enable & (!fi_system->LoadStoreInjectedFaultQueue.empty());
+    fi_system->fi_main= fi_system->fi_enable & (!fi_system->mainInjectedFaultQueue.empty() );
+    
+    if(DTRACE(FaultInjection))
+    {
+	std::cout<<"~==Fault Injection Activation Instruction===\n";
+    }
+  }
+	else{
+		DPRINTF(FaultInjection,"I have already enabled fault injection I am going to ignore this request\n");
+	}
+}
+
+
+void Fi_System::pause_fi(ThreadContext *tc,uint64_t threadid)
+{
+  Addr _tmpAddr  = TheISA::getFiThread(tc);
+  DPRINTF(FaultInjection, "\t Process Control Block(PCB) Addressx: %llx ####%d#####\n",_tmpAddr,threadid);  
+  fi_system->fi_activation_iter = fi_system->fi_activation.find(_tmpAddr);
+  if (fi_system->fi_activation_iter == fi_system->fi_activation.end()) {
+ 	DPRINTF(FaultInjection,"I have not enabled fault injection going to ignore stop request\n");
+  }
+  else{ 
+	(*(fi_system->threadList[fi_system->fi_activation_iter->second])).setMode(PAUSE);
+    tc->setEnabledFI(false);
+    tc->setEnabledFIThread(NULL);
+  }
+}
+
+void Fi_System:: stop_fi(ThreadContext *tc, uint64_t req){
+  if(DTRACE(FaultInjection))
+    {
+      std::cout<<"==Fault Injection Deactivation Instruction===\n";
+    }
+  
+Addr _tmpAddr  = TheISA::getFiThread(tc);
+  DPRINTF(FaultInjection, "\t Process Control Block(PCB) Addressx: %llx ####%d#####\n",_tmpAddr,threadid);  
+  fi_system->fi_activation_iter = fi_system->fi_activation.find(_tmpAddr);
+ 
+  if (fi_system->fi_activation_iter != fi_system->fi_activation.end()) {
+    (*(fi_system->threadList[ fi_system->fi_activation[_tmpAddr] ] )).print_time();
+    tc->setEnabledFI(false);
+    tc->setEnabledFIThread(NULL);
+    fi_system->fi_activation.erase(fi_system->fi_activation_iter);
+    if(DTRACE(FaultInjection))
+      std::cout<<"~===Fault Injection Deactivation Instruction===\n";
+    
+    if(fi_system->getswitchcpu())
+      fi_system->scheduleswitch(tc);
+    
+    fi_system->fi_enable--;
+  }
+
+}

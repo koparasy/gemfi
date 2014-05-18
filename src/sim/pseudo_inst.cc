@@ -713,7 +713,7 @@ workend(ThreadContext *tc, uint64_t workid, uint64_t threadid)
 
 
 //ALTERCODE
-void fi_activate_inst(ThreadContext *tc, uint64_t threadid)
+void fi_activate_inst(ThreadContext *tc, uint64_t threadid, uint64_t req)
 {
   struct timeval tim;
   static double t1;
@@ -721,16 +721,24 @@ void fi_activate_inst(ThreadContext *tc, uint64_t threadid)
   if(!FullSystem)
     panicFsOnlyPseudoInst("fi_activate_inst");
   
-  if(fi_system->allthreads==NULL){
-    std::string _name = tc->getCpuPtr()->name();
-    fi_system->allthreads = new ThreadEnabledFault(-1,_name);
-    fi_system->threadList.push_back(fi_system->allthreads);
-    fi_system->vectorpos++;
-  }
-  
+  switch (req){
+	case STOP:
+		fi_system->stop_fi(tc,threadid);
+		break;
+	case START:
+		fi_system->start_fi(tc,threadid);
+		break;
+	case PAUSE:
+		fi_system->pause_fi(tc,threadid);
+		break;
+	default:
+		assert(0);
+		break;
+
+
+} 
   uint64_t MagicInstVirtualAddr = tc->readIntReg(TheISA::ReturnAddressReg);
   Addr _tmpAddr  = TheISA::getFiThread(tc);
- /* Addr _tmpAddr = _metemp.treadAddr;*/ /*tc->readMiscReg(AlphaISA::IPR_PALtemp23);*/
   DPRINTF(FaultInjection, "\t Process Control Block(PCB) Addressx: %llx ####%d#####\n",_tmpAddr,threadid);  
   fi_system->fi_activation_iter = fi_system->fi_activation.find(_tmpAddr);
   if (fi_system->fi_activation_iter == fi_system->fi_activation.end()) {
