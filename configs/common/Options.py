@@ -151,6 +151,14 @@ def addCommonOptions(parser):
     parser.add_option("--simpoint-interval", type="int", default=10000000,
                       help="SimPoint interval in num of instructions")
 
+                      
+                      #fault Injection Options
+    parser.add_option("--fi-in",action="store",type="string",dest="fi_input",default=None,
+    help="file to read input for fi_system")
+    parser.add_option("-M","--exit-on-first-checkpoint",action="store",type="int",dest="exit_on_checkpoint",default=0,
+    help="Exit simulation after first checkpoint")
+    parser.add_option("--switch-on-fault",action="store",type="int",dest="switch_on_fault",default=1,
+    help="Switch cpu from detailed to atomic after fault Injection")
     # Checkpointing options
     ###Note that performing checkpointing via python script files will override
     ###checkpoint instructions built into binaries.
@@ -265,3 +273,5 @@ def addFSOptions(parser):
     # Disk Image Options
     parser.add_option("--disk-image", action="store", type="string", default=None,
                       help="Path to the disk image to use.")
+
+                      

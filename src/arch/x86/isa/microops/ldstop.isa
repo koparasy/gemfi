@@ -99,7 +99,7 @@ def template MicroLoadExecute {{
         DPRINTF(X86, "%s : %s: The address is %#x\n", instMnem, mnemonic, EA);
 
         fault = readMemAtomic(xc, traceData, EA, Mem, dataSize, memFlags);
-
+	fi_system ->lds_fault(xc,xc->tcBase(),&Mem);
         if (fault == NoFault) {
             %(code)s;
         } else if (memFlags & Request::PREFETCH) {
@@ -129,7 +129,7 @@ def template MicroLoadInitiateAcc {{
         DPRINTF(X86, "%s : %s: The address is %#x\n", instMnem, mnemonic, EA);
 
         fault = readMemTiming(xc, traceData, EA, Mem, dataSize, memFlags);
-
+	fi_system ->lds_fault(xc,xc->tcBase(),&Mem);
         return fault;
     }
 }};
@@ -145,7 +145,7 @@ def template MicroLoadCompleteAcc {{
         %(op_rd)s;
 
         Mem = getMem(pkt, dataSize, traceData);
-
+	fi_system ->lds_fault(xc,xc->tcBase(),&Mem);
         %(code)s;
 
         if(fault == NoFault)
@@ -176,6 +176,7 @@ def template MicroStoreExecute {{
 
         if(fault == NoFault)
         {
+	  fi_system ->lds_fault(xc,xc->tcBase(),&Mem);
             fault = writeMemAtomic(xc, traceData, Mem, dataSize, EA,
                     memFlags, NULL);
             if(fault == NoFault)
@@ -205,6 +206,7 @@ def template MicroStoreInitiateAcc {{
 
         if(fault == NoFault)
         {
+	  fi_system ->lds_fault(xc,xc->tcBase(),&Mem);
             fault = writeMemTiming(xc, traceData, Mem, dataSize, EA,
                     memFlags, NULL);
         }

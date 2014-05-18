@@ -66,6 +66,8 @@ class SysConfig:
 # The first defined machine is the test system, the others are driving systems
 
 Benchmarks = {
+	'test':  [SysConfig('test.rcS', '512MB')],
+
     'PovrayBench':  [SysConfig('povray-bench.rcS', '512MB', 'povray.img')],
     'PovrayAutumn': [SysConfig('povray-autumn.rcS', '512MB', 'povray.img')],
 

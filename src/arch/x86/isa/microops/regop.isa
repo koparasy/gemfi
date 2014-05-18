@@ -1662,9 +1662,9 @@ let {{
             super(Wrval, self).__init__(dest, src1, \
                     "InstRegIndex(NUM_INTREGS)", flags, dataSize)
         code = '''
+	    fi_temp = SrcReg1;
 	    fi_system->iew_fault(xc,xc->tcBase(), &fi_temp);
-	    DestReg= fi_temp;
-            MiscRegDest = fi_temp;
+	    MiscRegDest= fi_temp;
         '''
 
     class Chks(RegOp):
