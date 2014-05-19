@@ -715,9 +715,6 @@ workend(ThreadContext *tc, uint64_t workid, uint64_t threadid)
 //ALTERCODE
 void fi_activate_inst(ThreadContext *tc, uint64_t threadid, uint64_t req)
 {
-  struct timeval tim;
-  static double t1;
-  static double t2;
   if(!FullSystem)
     panicFsOnlyPseudoInst("fi_activate_inst");
   
@@ -736,60 +733,8 @@ void fi_activate_inst(ThreadContext *tc, uint64_t threadid, uint64_t req)
 		break;
 
 
-} 
-  uint64_t MagicInstVirtualAddr = tc->readIntReg(TheISA::ReturnAddressReg);
-  Addr _tmpAddr  = TheISA::getFiThread(tc);
-  DPRINTF(FaultInjection, "\t Process Control Block(PCB) Addressx: %llx ####%d#####\n",_tmpAddr,threadid);  
-  fi_system->fi_activation_iter = fi_system->fi_activation.find(_tmpAddr);
-  if (fi_system->fi_activation_iter == fi_system->fi_activation.end()) {
-    std::string _name = tc->getCpuPtr()->name();
-    gettimeofday(&tim, NULL); 
-    t1=tim.tv_sec+(tim.tv_usec/1000000.0);  
-    if(DTRACE(FaultInjection))
-    {
-	std::cout<<"==Fault Injection Activation Instruction===\n";
-    }
-    fi_system->fi_activation[_tmpAddr] = fi_system->vectorpos;
-    fi_system->threadList.push_back(new ThreadEnabledFault(threadid,_name));
-    tc->setEnabledFIThread( fi_system->threadList[ fi_system->vectorpos ] );
-//     (*(fi_system->threadList[ fi_system->vectorpos ] )).setMagicInstVirtualAddr(MagicInstVirtualAddr);
-    (*(fi_system->threadList[ fi_system->vectorpos ] )).dump();
-    fi_system->vectorpos++;
-    tc->setEnabledFI(true);
-    fi_system->fi_enable++;
-    fi_system->fi_execute = fi_system->fi_enable & (!fi_system->iewStageInjectedFaultQueue.empty());
-    fi_system->fi_decode= fi_system->fi_enable & (!fi_system->decodeStageInjectedFaultQueue.empty());
-    fi_system->fi_fetch= fi_system->fi_enable & (!fi_system->fetchStageInjectedFaultQueue.empty());
-    fi_system->fi_loadstore= fi_system->fi_enable & (!fi_system->LoadStoreInjectedFaultQueue.empty());
-    fi_system->fi_main= fi_system->fi_enable & (!fi_system->mainInjectedFaultQueue.empty() );
-    
-    if(DTRACE(FaultInjection))
-    {
-	std::cout<<"~==Fault Injection Activation Instruction===\n";
-    }
-  }
-  else{
-    if(DTRACE(FaultInjection))
-    {
-      std::cout<<"==Fault Injection Deactivation Instruction===\n";
-      std::cout << "Pc Address:" << MagicInstVirtualAddr << "\n";
-    }
-    (*(fi_system->threadList[ fi_system->fi_activation[_tmpAddr] ] )).print_time();
-    tc->setEnabledFI(false);
-    tc->setEnabledFIThread(NULL);
-    fi_system->fi_activation.erase(fi_system->fi_activation_iter);
-    if(DTRACE(FaultInjection))
-      std::cout<<"~===Fault Injection Deactivation Instruction===\n";
-    gettimeofday(&tim, NULL);  
-    t2=tim.tv_sec+(tim.tv_usec/1000000.0);  
-    
-    DPRINTF(FaultInjection,"%.6lf seconds elapsed\n", t2-t1);
-    
-    if(fi_system->getswitchcpu())
-      fi_system->scheduleswitch(tc);
-    
-    fi_system->fi_enable--;
-  }
+  } 
+
 }
 
 void init_fi_system()
