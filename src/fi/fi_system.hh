@@ -270,7 +270,10 @@ class Fi_System : public MemObject
 
 			GeneralFetchInjectedFault *fetchfault = NULL;
 			std::string _name = tc->getCpuPtr()->name();
-
+			
+			if(thread->getMode() != START)
+			  return cur_instr;
+			
 			thread->increaseFetchedInstr(_name);
 			allthreads->increaseFetchedInstr(_name);
 
@@ -288,6 +291,9 @@ class Fi_System : public MemObject
 			std::string _name = tc->getCpuPtr()->name();
 			RegisterDecodingInjectedFault *decodefault = NULL;
 
+			if(thread->getMode() != START)
+			  return cur_instr;
+			
 			while ((decodefault = reinterpret_cast<RegisterDecodingInjectedFault *>(decodeStageInjectedFaultQueue.scan(_name, *thread, pcaddr))) != NULL){
 				cur_instr = decodefault->process(cur_instr);
 				DPRINTF(FaultInjection,"PCAddr:%llx Fault Inserted %s \n",pcaddr,cur_instr->getName());

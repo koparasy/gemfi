@@ -266,8 +266,14 @@ ISA::setMiscReg(int miscReg, MiscReg val, ThreadContext * tc)
 	//ALTERCODE
 	fi_system->fi_activation_iter = fi_system->fi_activation.find(val);
 	if(fi_system->fi_activation_iter != fi_system->fi_activation.end()){
-	  tc->setEnabledFI(true);
-	  tc->setEnabledFIThread(fi_system->threadList[fi_system->fi_activation_iter->second]);
+	  if((fi_system->threadList[fi_system->fi_activation_iter->second])->getMode() == START){
+	    tc->setEnabledFI(true);
+	    tc->setEnabledFIThread(fi_system->threadList[fi_system->fi_activation_iter->second]);
+	  }
+	  else{
+	    tc->setEnabledFI(false);
+	    tc->setEnabledFIThread(NULL);
+	  }
 	}else{
 	  tc->setEnabledFI(false);
 	  tc->setEnabledFIThread(NULL);

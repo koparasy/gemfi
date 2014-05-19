@@ -41,7 +41,7 @@ class cpuExecutedTicks {
 		 * a thread owns the pipeline even if only one instruction is inside the pipeline
 		 */
 		uint64_t _ticks; // how many ticks has a thread been executing on this core
-		uint64_t mode; 
+
 		std::string _name; // The name of this core (e.g. system.cpu1)
 	public:
 
@@ -64,8 +64,6 @@ class cpuExecutedTicks {
 
 		std::string getName() {return _name;}
 
-		uint64_t getMode() {return mode;}
-		void setMode(uint64_t mod) {mode = mod;}
 		void increaseFetchInstr() { instrFetched++;}
 		void increaseExecInstr() {instrExexuted++;}
 		void increaseLoadStoreInstr(){instrLoadStore++;}
@@ -85,7 +83,7 @@ class cpuExecutedTicks {
 class ThreadEnabledFault {
 	friend class InjectedFault;
 	private :
-
+	uint64_t mode; 
 	Addr MagicInstVirtualAddr;  // Store the value of the Pc address when the framework is activated
 	int threadId; // Given when fi_activate_inst is executed 
 	int myId; // different for all threads something like hash id used only for debugging purposes.
@@ -131,6 +129,10 @@ class ThreadEnabledFault {
 	void CalculateLoadStoreTime(std:: string curCpu , uint64_t *exec_instr ,uint64_t *exec_time);
 
 	void print_time();
+	
+	
+	uint64_t getMode() {return mode;}
+	void setMode(uint64_t mod) {mode = mod;}
 
 };
 
