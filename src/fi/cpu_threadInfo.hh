@@ -90,7 +90,6 @@ class ThreadEnabledFault {
 	protected :
 	std::map<string,cpuExecutedTicks*> cores; // Store all cores which this thread as ever execute an instruction
 	std::map<string,cpuExecutedTicks*>::iterator itcores;
-	cpuExecutedTicks *currentcore;
 	cpuExecutedTicks *all;
 	public:
 	ThreadEnabledFault( int threadId , std::string name );
