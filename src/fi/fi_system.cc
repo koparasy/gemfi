@@ -619,13 +619,13 @@ void Fi_System:: stop_fi(ThreadContext *tc, uint64_t req){
   fi_activation_iter = fi_activation.find(_tmpAddr);
  
   if (fi_activation_iter != fi_activation.end()) {
-    ThreadEnabledFault *temp = fi_activation[_tmpAddr];
+   // ThreadEnabledFault *temp = fi_activation[_tmpAddr];
     fi_activation[_tmpAddr]->print_time();
     tc->setEnabledFI(false);
     tc->setEnabledFIThread(NULL);
     fi_activation.erase(fi_activation_iter);
     DPRINTF(FaultInjection,"~===Fault Injection Deactivation Instruction===\n");
-    delete temp;
+    //delete temp;
     
     if(getswitchcpu())
       scheduleswitch(tc);
