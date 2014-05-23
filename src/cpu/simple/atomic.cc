@@ -530,8 +530,16 @@ AtomicSimpleCPU::tick()
     Tick latency = 0;
 
     if(FullSystem && (TheISA::inUserMode(curr_tc))){
-      enabled_fi = curr_tc->getEnabledFI() ;
-      curr_thread = curr_tc->getEnabledFIThread();
+	Addr _tmpAddr = TheISA::getFiThread(curr_tc);
+	fi_system->fi_activation_iter = fi_system->fi_activation.find(_tmpAddr);           
+	if( fi_system->fi_activation_iter != fi_system->fi_activation.end()){
+		enabled_fi = true;
+		curr_thread = fi_system->threadList[fi_system->fi_activation_iter->second];
+	}
+	else{
+		enabled_fi =false; 
+		curr_thread = NULL;
+	}
     }
     
     for (int i = 0; i < width || locked; ++i) {
