@@ -604,23 +604,29 @@ AtomicSimpleCPU::tick()
                     // ifetch_req is initialized to read the instruction directly
                     // into the CPU object's inst field.
                 //}
+		    
+		    //ALTERCODE
+		//fetch faults
+		if( enabled_fi)
+		  inst = fi_system->fetch_fault(curr_tc,curr_thread,inst,pcState.instAddr());
+		//~ALTERCODE
+		    
             }
             
-            //ALTERCODE
-            //fetch faults
-            if( enabled_fi)
-	      inst = fi_system->fetch_fault(curr_tc,curr_thread,inst,pcState.instAddr());
-	    //~ALTERCODE
+            
 	      
 	      
             preExecute();
 
-	    //decode faults
-	    if( enabled_fi )
-	      curStaticInst = fi_system ->decode_fault(curr_tc,curr_thread,curStaticInst,pcState.instAddr());
-	    //ALTERCODE
 	    
             if (curStaticInst) {
+	      
+		 //decode faults
+		//ALTERCODE
+		if( enabled_fi )
+		  curStaticInst = fi_system ->decode_fault(curr_tc,curr_thread,curStaticInst,pcState.instAddr());
+		//ALTERCODE
+
                 fault = curStaticInst->execute(this, traceData);
 
                 // keep an instruction count
