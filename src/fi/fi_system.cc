@@ -311,10 +311,10 @@ Fi_System:: get_fi_fetch_counters( InjectedFault *p , ThreadEnabledFault &thread
   *fetch_instr=0;
   
   // Case :: specific cpu ---- specific thread
-  if((p->getWhere().compare(curCpu))==0 && (p->getThread()).compare("all") != 0 && thread.getThreaId() == atoi( (p->getThread()).c_str() ) ){ // case thread_id - cpu_id
+  if((p->getWhere().compare(curCpu))==0 && (p->getThread()).compare("all") != 0 && thread.getThreadId() == atoi( (p->getThread()).c_str() ) ){ // case thread_id - cpu_id
       thread.CalculateFetchedTime(curCpu,fetch_instr,fetch_time);
   }//Case :: ALL cores --- specific Thread
-  else if((p->getWhere().compare("all") == 0) && (p->getThread()).compare("all") != 0 && thread.getThreaId() == atoi( (p->getThread()).c_str() )){// case thread_id - all
+  else if((p->getWhere().compare("all") == 0) && (p->getThread()).compare("all") != 0 && thread.getThreadId() == atoi( (p->getThread()).c_str() )){// case thread_id - all
       thread.CalculateFetchedTime("all",fetch_instr,fetch_time);
   }//Case :: Specific Cpu --- All threads
   else if( ( (p->getWhere().compare(curCpu)) == 0  ) && (((p->getThread()).compare("all")) == 0)  ){ //case cpu_id - all
@@ -346,10 +346,10 @@ Fi_System:: get_fi_exec_counters( InjectedFault *p , ThreadEnabledFault &thread,
   
   *exec_time=0;
   *exec_instr=0;
-  if((p->getWhere().compare(curCpu))==0 && (p->getThread()).compare("all") != 0 && thread.getThreaId() == atoi( (p->getThread()).c_str() ) ){ // case thread_id - cpu_id
+  if((p->getWhere().compare(curCpu))==0 && (p->getThread()).compare("all") != 0 && thread.getThreadId() == atoi( (p->getThread()).c_str() ) ){ // case thread_id - cpu_id
       thread.CalculateExecutedTime(curCpu,exec_instr,exec_time);
   }
-  else if((p->getWhere().compare("all") == 0) && (p->getThread()).compare("all") != 0 && thread.getThreaId() == atoi( (p->getThread()).c_str() )){// case thread_id - all
+  else if((p->getWhere().compare("all") == 0) && (p->getThread()).compare("all") != 0 && thread.getThreadId() == atoi( (p->getThread()).c_str() )){// case thread_id - all
       thread.CalculateExecutedTime("all",exec_instr,exec_time);
   }
   else if( ( (p->getWhere().compare(curCpu)) == 0  ) && (((p->getThread()).compare("all")) == 0)  ){ //case cpu_id - all
@@ -379,10 +379,10 @@ Fi_System:: get_fi_loadstore_counters( InjectedFault *p , ThreadEnabledFault &th
   
   *exec_time=0;
   *exec_instr=0;
-  if((p->getWhere().compare(curCpu))==0 && (p->getThread()).compare("all") != 0 && thread.getThreaId() == atoi( (p->getThread()).c_str() ) ){ // case thread_id - cpu_id
+  if((p->getWhere().compare(curCpu))==0 && (p->getThread()).compare("all") != 0 && thread.getThreadId() == atoi( (p->getThread()).c_str() ) ){ // case thread_id - cpu_id
       thread.CalculateLoadStoreTime(curCpu,exec_instr,exec_time);
   }
-  else if((p->getWhere().compare("all") == 0) && (p->getThread()).compare("all") != 0 && thread.getThreaId() == atoi( (p->getThread()).c_str() )){// case thread_id - all
+  else if((p->getWhere().compare("all") == 0) && (p->getThread()).compare("all") != 0 && thread.getThreadId() == atoi( (p->getThread()).c_str() )){// case thread_id - all
       thread.CalculateLoadStoreTime("all",exec_instr,exec_time);
   }
   else if( ( (p->getWhere().compare(curCpu)) == 0  ) && (((p->getThread()).compare("all")) == 0)  ){ //case cpu_id - all

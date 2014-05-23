@@ -44,7 +44,7 @@ ThreadEnabledFault::ThreadEnabledFault(int threadId, std::string name)
 
   cores.insert(pair<string,cpuExecutedTicks*>(name, new cpuExecutedTicks(name)));
   
-  setThreaId(threadId);
+  setThreadId(threadId);
   setMyid();
   setMagicInstVirtualAddr(-1);
 }
@@ -63,7 +63,7 @@ void ThreadEnabledFault::dump(){
 
   if (DTRACE(FaultInjection)) {
     std::cout<<"================\t"<<"ThreadEnabledFault "<<getMyId()<<" \t==========================\n"; 
-    std::cout << "ThreadEnabledInfo  MagicInstVirtualAddr : "<<getMagicInstVirtualAddr()<<" ThreadId :"<<getThreaId() <<"\n";
+    std::cout << "ThreadEnabledInfo  MagicInstVirtualAddr : "<<getMagicInstVirtualAddr()<<" ThreadId :"<<getThreadId() <<"\n";
     std::cout<<"================\t~ThreadEnabledFault~\t==========================\n";
   }
 }
@@ -151,8 +151,6 @@ void ThreadEnabledFault:: CalculateFetchedTime(std::string curCpu , uint64_t *fe
   }
 }
 
-
-
 void ThreadEnabledFault:: CalculateExecutedTime(std::string curCpu  , uint64_t *exec_instr , uint64_t *exec_time)
 {
   assert( all != NULL);
@@ -194,7 +192,7 @@ void ThreadEnabledFault:: CalculateLoadStoreTime(std::string curCpu  , uint64_t 
 //The more the info the better the results.
 void ThreadEnabledFault:: print_time(){
   if (DTRACE(FaultInjection)){
-    std::cout<<"THREAD ID: "<<getMyId()<<"\n";
+    std::cout<<"THREAD ID: "<<getThreadId()<<"\n";
     for(itcores = cores.begin(); itcores!=cores.end() ; ++itcores){
       std::cout<<"CORE:"<<itcores->second->getName()<<"\n";
       std::cout<<"Fetched Instr: "<< itcores->second->getInstrFetched() <<"\n";

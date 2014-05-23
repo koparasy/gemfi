@@ -97,7 +97,7 @@ class ThreadEnabledFault {
 
 
 	void setMagicInstVirtualAddr(Addr v){ MagicInstVirtualAddr  = v; }
-	void setThreaId(int v){ threadId  = v; }
+	void setThreadId(int v){ threadId  = v; }
 	void setMyid(){
 		static int my_id_counter = 0;
 		myId = my_id_counter++;
@@ -106,7 +106,7 @@ class ThreadEnabledFault {
 	int getMyId(){return myId ;}
 
 	Addr getMagicInstVirtualAddr() { return MagicInstVirtualAddr; }
-	int getThreaId(){ return threadId; }
+	int getThreadId(){ return threadId; }
 
 	InjectedFault *copyFault(InjectedFault &source);
 	void dump();
