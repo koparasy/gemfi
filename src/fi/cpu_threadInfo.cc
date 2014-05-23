@@ -75,7 +75,7 @@ int ThreadEnabledFault:: increaseTicks(std:: string curCpu, uint64_t ticks)
  
   assert(all != NULL);
   all->increaseTicks(ticks);
-  itcores = cores.begin();
+  itcores = cores.find(curCpu);
   if ( itcores == cores.end())
 	cores[curCpu] = new cpuExecutedTicks(curCpu);
   else
@@ -93,7 +93,7 @@ int ThreadEnabledFault:: increaseFetchedInstr(std:: string curCpu)
 {
   assert( all != NULL);
   all->increaseFetchInstr();
-  itcores = cores.begin();
+  itcores = cores.find(curCpu);
   if ( itcores == cores.end())
 	cores[curCpu] = new cpuExecutedTicks(curCpu);
   else
@@ -110,7 +110,7 @@ int ThreadEnabledFault:: increaseExecutedInstr(std:: string curCpu)
 {
   assert(all != NULL);
   all->increaseExecInstr();
-  itcores = cores.begin();
+  itcores = cores.find(curCpu);
   if ( itcores == cores.end())
 	cores[curCpu] = new cpuExecutedTicks(curCpu);
   else
@@ -123,6 +123,7 @@ int ThreadEnabledFault:: increaseLoadStoreInstr(std:: string curCpu)
 {
   assert(all != NULL);
   all->increaseLoadStoreInstr();
+  itcores = cores.find(curCpu);
   if ( itcores == cores.end())
 	cores[curCpu] = new cpuExecutedTicks(curCpu);
   else
@@ -142,7 +143,7 @@ void ThreadEnabledFault:: CalculateFetchedTime(std::string curCpu , uint64_t *fe
   }
   else{
     itcores = cores.find(curCpu);
-    if(itcores->second != cores.end()){
+    if(itcores != cores.end()){
       *fetched_time = itcores->second->getTicks();
       *fetched_instr = itcores->second->getInstrFetched();
     }
