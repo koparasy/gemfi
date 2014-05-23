@@ -134,6 +134,14 @@ class ThreadEnabledFault {
 	  myfile<<std::endl;
 	}
 	
+	void write_instr_and_name(Addr pcaddr,std::string inst){
+	 myfile<<pcaddr;
+	 myfile<<"\t";
+	 myfile<<inst;
+	 myfile<<std::endl;
+	}
+	
+	
 	uint64_t getMode() {return mode;}
 	void setMode(uint64_t mod) {mode = mod;}
 

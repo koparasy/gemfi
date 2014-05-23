@@ -216,6 +216,7 @@ class Fi_System : public MemObject
 				if( thread->getMode() == START && FullSystem  && (TheISA::inUserMode(tc))  ){
 					Addr pcaddr = ptr->instAddr(); //PC address for this instruction
 					std::string _name = tc->getCpuPtr()->name();
+					thread->write_instr_and_name(pcaddr,ptr->getcurInstr()->getName());
 					while ((loadStoreFault  = reinterpret_cast<LoadStoreInjectedFault *>(LoadStoreInjectedFaultQueue.scan(_name, *thread, pcaddr))) != NULL){
 						value = loadStoreFault->process(value);
 						DPRINTF(FaultInjection,"PCAddr:%llx Fault Inserted in instruction %s\n",pcaddr,ptr->getcurInstr()->getName());
