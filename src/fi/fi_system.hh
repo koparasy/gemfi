@@ -274,9 +274,14 @@ class Fi_System : public MemObject
 			
 			if(thread->getMode() != START)
 			  return cur_instr;
-			
-			thread->increaseFetchedInstr(_name);
-			thread->write_PC_address(pcaddr);
+
+		 	if(FullSystem && TheISA::inUserMode(tc)){	
+				thread->increaseFetchedInstr(_name);
+				thread->write_PC_address(pcaddr);
+			}
+			else
+		 		return cur_instr;	
+
 			allthreads->increaseFetchedInstr(_name);
 			while ((fetchfault = reinterpret_cast<GeneralFetchInjectedFault *>(fetchStageInjectedFaultQueue.scan(_name, *thread, pcaddr))) != NULL){
 				cur_instr = fetchfault->process(cur_instr);

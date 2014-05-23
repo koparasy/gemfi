@@ -131,7 +131,7 @@ class ThreadEnabledFault {
 	void print_time();
 	void write_PC_address(Addr pcaddr){
 	  myfile<<pcaddr;
-	  myfile<<std:endl;
+	  myfile<<std::endl;
 	}
 	
 	uint64_t getMode() {return mode;}
