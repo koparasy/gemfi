@@ -110,7 +110,7 @@ Fi_System:: dump(){
     std::cout << "Input: " << in_name << "\n";
     
     for(fi_activation_iter = fi_activation.begin(); fi_activation_iter != fi_activation.end(); ++fi_activation_iter){
-	    (*threadList[fi_activation_iter->second]).dump();
+	    fi_activation_iter->second.dump();
     }
     
 
@@ -282,7 +282,7 @@ Fi_System:: reset()
   delete_faults();
   
   
-  threadList.erase(threadList.begin(),threadList.end());
+  
   allthreads = NULL;
   
   if(in_name.size() > 1){
@@ -569,12 +569,10 @@ void Fi_System::start_fi(ThreadContext *tc,  uint64_t threadid){
     }
     
     DPRINTF(FaultInjection,"==Fault Injection Activation Instruction===\n");
-   
-    fi_activation[_tmpAddr] = threadlist.size();
-    threadList.push_back(new ThreadEnabledFault(threadid,_name));
-    tc->setEnabledFIThread( threadList[ vectorpos ] );
-    (*(threadList[vectorpos])).setMode(START);
-    vectorpos++;
+    ThreadEnabledFault *thread = new ThreadEnabledFault(threadid,_name);
+    fi_activation[_tmpAddr] = thread;
+    tc->setEnabledFIThread( thread );
+    thread->setMode(START);
     tc->setEnabledFI(true);
     fi_enable++;
     fi_execute = fi_enable & (!iewStageInjectedFaultQueue.empty());
@@ -586,9 +584,9 @@ void Fi_System::start_fi(ThreadContext *tc,  uint64_t threadid){
 	DPRINTF(FaultInjection,"~==Fault Injection Activation Instruction===\n");
   }
   else{
-    if	((*(threadList[fi_activation_iter->second])).getMode() == PAUSE ){
+    if	(fi_activation_iter->second->getMode() == PAUSE ){
 	fi_enable++;
-	(*(threadList[fi_activation_iter->second])).setMode(START);
+	fi_activation_iter->second->setMode(START);
       }
       else{
 	DPRINTF(FaultInjection,"I have already enabled fault injection I am going to ignore this request\n");
@@ -605,7 +603,7 @@ void Fi_System::pause_fi(ThreadContext *tc,uint64_t threadid)
  	DPRINTF(FaultInjection,"I have not enabled fault injection going to ignore stop request\n");
   }
   else{ 
-    (*(threadList[fi_activation_iter->second])).setMode(PAUSE);
+    fi_activation_iter->second->setMode(PAUSE);
     tc->setEnabledFI(false);
     fi_enable--;
     tc->setEnabledFIThread(NULL);
@@ -623,15 +621,16 @@ void Fi_System:: stop_fi(ThreadContext *tc, uint64_t req){
   fi_activation_iter = fi_activation.find(_tmpAddr);
  
   if (fi_activation_iter != fi_activation.end()) {
-    (*(threadList[ fi_activation[_tmpAddr] ] )).print_time();
+    ThreadEnabledFault *temp = fi_activation[_tmpAddr];
+    fi_activation[_tmpAddr]->print_time();
     tc->setEnabledFI(false);
     tc->setEnabledFIThread(NULL);
     fi_activation.erase(fi_activation_iter);
-      DPRINTF(FaultInjection,"~===Fault Injection Deactivation Instruction===\n");
+    DPRINTF(FaultInjection,"~===Fault Injection Deactivation Instruction===\n");
+    delete temp;
     
     if(getswitchcpu())
       scheduleswitch(tc);
-    
     fi_enable--;
   }
 

@@ -260,7 +260,7 @@ ISA::setIpr(int idx, uint64_t val, ThreadContext *tc)
 	fi_system->fi_activation_iter = fi_system->fi_activation.find(val);
 	if(fi_system->fi_activation_iter != fi_system->fi_activation.end()){
 	  tc->setEnabledFI(true);
-	  tc->setEnabledFIThread(fi_system->threadList[fi_system->fi_activation_iter->second]);
+	  tc->setEnabledFIThread(fi_system->fi_activation_iter->second);
 	}else{
 	  tc->setEnabledFI(false);
 	  tc->setEnabledFIThread(NULL);

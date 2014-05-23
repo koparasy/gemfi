@@ -267,9 +267,9 @@ ISA::setMiscReg(int miscReg, MiscReg val, ThreadContext * tc)
 	DPRINTF(FaultInjection,"OLD : %llx --- NEW: %llx\n",regVal[MISCREG_SEG_EFF_BASE(miscReg -MISCREG_SEG_BASE_BASE)],val);
 	fi_system->fi_activation_iter = fi_system->fi_activation.find(val);
 	if(fi_system->fi_activation_iter != fi_system->fi_activation.end()){
-	  if((fi_system->threadList[fi_system->fi_activation_iter->second])->getMode() == START){
+	  if(fi_system->fi_activation_iter->second->getMode() == START){
 	    tc->setEnabledFI(true);
-	    tc->setEnabledFIThread(fi_system->threadList[fi_system->fi_activation_iter->second]);
+	    tc->setEnabledFIThread(fi_systemfi_activation_iter->second);
 	  }
 	  else{
 	    tc->setEnabledFI(false);

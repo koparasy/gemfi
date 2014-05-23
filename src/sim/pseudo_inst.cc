@@ -779,7 +779,7 @@ void get_Pc_address(ThreadContext *tc)
 //   Addr _tmpAddr = _metemp.treadAddr; /*tc->readMiscReg(AlphaISA::IPR_PALtemp23);*/
   fi_system->fi_activation_iter = fi_system->fi_activation.find(_tmpAddr);
   if (fi_system->fi_activation_iter != fi_system->fi_activation.end()) {
-    (*(fi_system->threadList[ fi_system->fi_activation[_tmpAddr] ] )).setMagicInstVirtualAddr(  tc->pcState().instAddr());
+    fi_system->fi_activation[_tmpAddr]->setMagicInstVirtualAddr(  tc->pcState().instAddr());
     DPRINTF(FaultInjection,"Relative point : %llx \n",tc->pcState().instAddr());
   }
   else{
