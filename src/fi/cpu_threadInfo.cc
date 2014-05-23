@@ -41,8 +41,8 @@ ThreadEnabledFault::ThreadEnabledFault(int threadId, std::string name)
 {
   all = new cpuExecutedTicks(allcores);
   cores.insert(pair<string,cpuExecutedTicks*> (allcores,all));
-  currentcore = new cpuExecutedTicks(name);
-  cores.insert(pair<string,cpuExecutedTicks*>(name,currentcore));
+
+  cores.insert(pair<string,cpuExecutedTicks*>(name, new cpuExecutedTicks(name)));
   
   setThreaId(threadId);
   setMyid();
@@ -73,9 +73,14 @@ void ThreadEnabledFault::dump(){
 int ThreadEnabledFault:: increaseTicks(std:: string curCpu, uint64_t ticks)
 {
  
-  assert(currentcore != NULL || all != NULL);
+  assert(all != NULL);
   all->increaseTicks(ticks);
-  currentcore->increaseTicks(ticks);
+  itcores = cores.begin();
+  if ( itcores == cores.end())
+	cores[curCpu] = new cpuExecutedTicks(curCpu);
+  else
+	cores[curCpu]->increaseTicks(ticks);
+
   return 1;
   
 }
@@ -86,7 +91,7 @@ int ThreadEnabledFault:: increaseTicks(std:: string curCpu, uint64_t ticks)
 
 int ThreadEnabledFault:: increaseFetchedInstr(std:: string curCpu)
 {
-  assert(currentcore != NULL || all != NULL);
+  assert( all != NULL);
   all->increaseFetchInstr();
   itcores = cores.begin();
   if ( itcores == cores.end())
@@ -103,7 +108,7 @@ int ThreadEnabledFault:: increaseFetchedInstr(std:: string curCpu)
 
 int ThreadEnabledFault:: increaseExecutedInstr(std:: string curCpu)
 {
-  assert(currentcore != NULL || all != NULL);
+  assert(all != NULL);
   all->increaseExecInstr();
   itcores = cores.begin();
   if ( itcores == cores.end())
@@ -116,7 +121,7 @@ int ThreadEnabledFault:: increaseExecutedInstr(std:: string curCpu)
 
 int ThreadEnabledFault:: increaseLoadStoreInstr(std:: string curCpu)
 {
-  assert(currentcore != NULL || all != NULL);
+  assert(all != NULL);
   all->increaseLoadStoreInstr();
   if ( itcores == cores.end())
 	cores[curCpu] = new cpuExecutedTicks(curCpu);
@@ -130,14 +135,17 @@ int ThreadEnabledFault:: increaseLoadStoreInstr(std:: string curCpu)
 
 void ThreadEnabledFault:: CalculateFetchedTime(std::string curCpu , uint64_t *fetched_instr , uint64_t *fetched_time )
 {
-  assert(currentcore != NULL || all != NULL);
+  assert( all != NULL);
   if(curCpu.compare("all")==0){
       *fetched_time  =  all->getTicks();
       *fetched_instr =  all->getInstrFetched();
   }
   else{
-      *fetched_time = currentcore->getTicks();
-      *fetched_instr = currentcore->getInstrFetched();
+    itcores = cores.find(curCpu);
+    if(itcores->second != cores.end(){
+      *fetched_time = itcores->second->getTicks();
+      *fetched_instr = itcores->second->getInstrFetched();
+    }
       return;
   }
 }
@@ -146,14 +154,17 @@ void ThreadEnabledFault:: CalculateFetchedTime(std::string curCpu , uint64_t *fe
 
 void ThreadEnabledFault:: CalculateExecutedTime(std::string curCpu  , uint64_t *exec_instr , uint64_t *exec_time)
 {
-  assert(currentcore != NULL || all != NULL);
+  assert( all != NULL);
   if(curCpu.compare("all")==0){
       *exec_time  =  all->getTicks();
       *exec_instr =  all->getInstrExecuted();
   }
   else{
-      *exec_time = currentcore->getTicks();
-      *exec_instr = currentcore->getInstrExecuted();
+    itcores = cores.find(curCpu);
+    if(itcores->second != cores.end(){
+      *exec_time = itcores->second->getTicks();
+      *exec_instr = itcores->second->getInstrExecuted();
+    }
   }
   return;
 }
@@ -162,14 +173,17 @@ void ThreadEnabledFault:: CalculateExecutedTime(std::string curCpu  , uint64_t *
 
 void ThreadEnabledFault:: CalculateLoadStoreTime(std::string curCpu  , uint64_t *exec_instr , uint64_t *exec_time)
 {
-  assert(currentcore != NULL || all != NULL);
+  assert( all != NULL);
   if(curCpu.compare("all")==0){
     *exec_time  =  all->getTicks();
     *exec_instr =  all->getInstrLoadStore();
   }
   else{
-    *exec_time = currentcore->getTicks();
-    *exec_instr = currentcore->getInstrLoadStore();
+    itcores = cores.find(curCpu);
+    if(itcores->second != cores.end(){
+      *exec_time = itcores->second->getTicks();
+      *exec_instr = itcores->second->getInstrLoadStore();
+    }
   }
   return;
 }
