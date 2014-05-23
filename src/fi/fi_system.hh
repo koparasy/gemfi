@@ -213,9 +213,8 @@ class Fi_System : public MemObject
 					return value;
 
 				ThreadEnabledFault *thread = tc->getEnabledFIThread();
-
 				LoadStoreInjectedFault *loadStoreFault = NULL;
-				if(  FullSystem  && (TheISA::inUserMode(tc))  ){
+				if( thread->getMode() == START && FullSystem  && (TheISA::inUserMode(tc))  ){
 					Addr pcaddr = ptr->instAddr(); //PC address for this instruction
 					std::string _name = tc->getCpuPtr()->name();
 					while ((loadStoreFault  = reinterpret_cast<LoadStoreInjectedFault *>(LoadStoreInjectedFaultQueue.scan(_name, *thread, pcaddr))) != NULL){
@@ -234,11 +233,9 @@ class Fi_System : public MemObject
 
 				if(!( tc->getEnabledFI()) )
 					return ;
-
 				ThreadEnabledFault *thread = tc->getEnabledFIThread();
-
 				IEWStageInjectedFault *iewFault = NULL;
-				if( FullSystem && (TheISA::inUserMode(tc))   ){
+				if( thread->getMode() == START && FullSystem && (TheISA::inUserMode(tc))   ){
 					Addr pcaddr = ptr->instAddr();
 					std::string _name = tc->getCpuPtr()->name();
 					while ((iewFault = reinterpret_cast<IEWStageInjectedFault *>(iewStageInjectedFaultQueue.scan(_name, *thread, pcaddr))) != NULL){
@@ -246,6 +243,8 @@ class Fi_System : public MemObject
 						DPRINTF(FaultInjection,"PCAddr:%llx Fault Inserted in instruction %s\n",pcaddr,ptr->getcurInstr()->getName());
 						scheduleswitch(tc);
 					}
+//					DPRINTF(FaultInjection,"PCAddr:%llx Fault Inserted in instruction %s\n",pcaddr,ptr->getcurInstr()->getName());
+
 					thread->increaseExecutedInstr(_name);
 					allthreads->increaseExecutedInstr(_name);
 				}
@@ -255,6 +254,9 @@ class Fi_System : public MemObject
 		inline void main_fault(ThreadContext *tc,ThreadEnabledFault *thread, Addr pcaddr){
 			CPUInjectedFault *mainfault = NULL;
 			std::string _name = tc->getCpuPtr()->name();
+
+			if(thread->getMode() != START)
+				return;
 			while ((mainfault = reinterpret_cast<CPUInjectedFault *>(mainInjectedFaultQueue.scan(_name, *thread , pcaddr))) != NULL){
 				mainfault->process();
 				if(string(mainfault->description()).compare("RegisterInjectedFault") != 0){
@@ -276,7 +278,6 @@ class Fi_System : public MemObject
 			
 			thread->increaseFetchedInstr(_name);
 			allthreads->increaseFetchedInstr(_name);
-
 			while ((fetchfault = reinterpret_cast<GeneralFetchInjectedFault *>(fetchStageInjectedFaultQueue.scan(_name, *thread, pcaddr))) != NULL){
 				cur_instr = fetchfault->process(cur_instr);
 				DPRINTF(FaultInjection,"PCAddr:%llx Fault Inserted \n",pcaddr);

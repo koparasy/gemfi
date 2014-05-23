@@ -428,7 +428,6 @@ BaseSimpleCPU::preExecute()
             stayAtPC = true;
             fetchOffset += sizeof(MachInst);
         }
-
         //If we decoded an instruction and it's microcoded, start pulling
         //out micro ops
         if (instPtr && instPtr->isMacroop()) {

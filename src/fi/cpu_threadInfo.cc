@@ -38,7 +38,7 @@ ThreadEnabledFault::ThreadEnabledFault(int threadId, std::string name)
   all = new cpuExecutedTicks(allcores);
   cores.insert(pair<string,cpuExecutedTicks*> (allcores,all));
   currentcore = new cpuExecutedTicks(name);
-  cores.insert(pair<string,cpuExecutedTicks*>(allcores,currentcore));
+  cores.insert(pair<string,cpuExecutedTicks*>(name,currentcore));
   
   setThreaId(threadId);
   setMyid();
@@ -78,7 +78,11 @@ int ThreadEnabledFault:: increaseFetchedInstr(std:: string curCpu)
 {
   assert(currentcore != NULL || all != NULL);
   all->increaseFetchInstr();
-  currentcore->increaseFetchInstr();
+  itcores = cores.begin();
+  if ( itcores == cores.end())
+	cores[curCpu] = new cpuExecutedTicks(curCpu);
+  else
+	cores[curCpu]->increaseFetchInstr();
   return 1;
  
 }
@@ -91,7 +95,11 @@ int ThreadEnabledFault:: increaseExecutedInstr(std:: string curCpu)
 {
   assert(currentcore != NULL || all != NULL);
   all->increaseExecInstr();
-  currentcore->increaseExecInstr();
+  itcores = cores.begin();
+  if ( itcores == cores.end())
+	cores[curCpu] = new cpuExecutedTicks(curCpu);
+  else
+	cores[curCpu]->increaseExecInstr();
   return 1;
 }
 
@@ -100,7 +108,10 @@ int ThreadEnabledFault:: increaseLoadStoreInstr(std:: string curCpu)
 {
   assert(currentcore != NULL || all != NULL);
   all->increaseLoadStoreInstr();
-  currentcore->increaseLoadStoreInstr();
+  if ( itcores == cores.end())
+	cores[curCpu] = new cpuExecutedTicks(curCpu);
+  else
+	cores[curCpu]->increaseLoadStoreInstr();
   return 1;
 }
 

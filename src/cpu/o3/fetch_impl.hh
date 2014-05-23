@@ -1327,7 +1327,6 @@ DefaultFetch<Impl>::fetch(bool &status_change)
             if (!(curMacroop || inRom)) {
                 if (decoder[tid]->instReady()) {
                     staticInst = decoder[tid]->decode(thisPC);
-
                     // Increment stat of fetched instructions.
                     ++fetchedInsts;
 

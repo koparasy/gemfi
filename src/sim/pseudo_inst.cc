@@ -717,10 +717,16 @@ void fi_activate_inst(ThreadContext *tc, uint64_t threadid, uint64_t req)
 {
   if(!FullSystem)
     panicFsOnlyPseudoInst("fi_activate_inst");
-  
+
+DPRINTF(FaultInjection,"FS :%llx \n",tc->readMiscReg(TheISA::MISCREG_FS_BASE));
+DPRINTF(FaultInjection,"DS :%llx \n",tc->readMiscReg(TheISA::MISCREG_GS_BASE));
+DPRINTF(FaultInjection,"SS :%llx \n",tc->readMiscReg(TheISA::MISCREG_SS_BASE));
+DPRINTF(FaultInjection,"DS :%llx \n",tc->readMiscReg(TheISA::MISCREG_DS_BASE));
+
+  /*
   switch (req){
 	case STOP:
-		fi_system->stop_fi(tc,threadid);
+		fi_system->stop_fi(tc,
 		break;
 	case START:
 		fi_system->start_fi(tc,threadid);
@@ -734,7 +740,7 @@ void fi_activate_inst(ThreadContext *tc, uint64_t threadid, uint64_t req)
 
 
   } 
-
+*/
 }
 
 void init_fi_system()

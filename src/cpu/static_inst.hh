@@ -324,7 +324,6 @@ class StaticInst : public RefCounted
      * disassemble()).
      */
     mutable std::string *cachedDisassembly;
-
     /**
      * Internal function to generate disassembly string.
      */

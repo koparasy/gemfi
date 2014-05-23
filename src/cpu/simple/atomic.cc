@@ -528,12 +528,14 @@ AtomicSimpleCPU::tick()
     
     
     Tick latency = 0;
-
-    if(FullSystem && (TheISA::inUserMode(curr_tc))){
+    if(fi_system->fi_enable && FullSystem && (TheISA::inUserMode(curr_tc))){
       enabled_fi = curr_tc->getEnabledFI() ;
       curr_thread = curr_tc->getEnabledFIThread();
     }
     
+      if(enabled_fi)
+      fi_system->increaseTicks(name(),curr_thread, clockEdge(Cycles(1)));
+   
     for (int i = 0; i < width || locked; ++i) {
         numCycles++;
 
