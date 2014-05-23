@@ -276,6 +276,7 @@ class Fi_System : public MemObject
 			  return cur_instr;
 			
 			thread->increaseFetchedInstr(_name);
+			thread->write_PC_address(pcaddr);
 			allthreads->increaseFetchedInstr(_name);
 			while ((fetchfault = reinterpret_cast<GeneralFetchInjectedFault *>(fetchStageInjectedFaultQueue.scan(_name, *thread, pcaddr))) != NULL){
 				cur_instr = fetchfault->process(cur_instr);
