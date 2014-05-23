@@ -106,8 +106,8 @@ class Fi_System : public MemObject
 		static const int RegisterMisc  	= 3;
 
 
-		std::map<Addr, ThreadEnabledFault> fi_activation; //A hash table key : PCB address --- vector position
-		std::map<Addr, ThreadEnabledFault>::iterator fi_activation_iter;
+		std::map<Addr, ThreadEnabledFault*> fi_activation; //A hash table key : PCB address --- vector position
+		std::map<Addr, ThreadEnabledFault*>::iterator fi_activation_iter;
 
 		
 		ThreadEnabledFault *allthreads;
