@@ -531,6 +531,14 @@ AtomicSimpleCPU::tick()
     if(fi_system->fi_enable && FullSystem && (TheISA::inUserMode(curr_tc))){
       enabled_fi = curr_tc->getEnabledFI() ;
       curr_thread = curr_tc->getEnabledFIThread();
+      if(enabled_fi){
+	  Addr _tmpAddr = TheISA::getFiThread(curr_tc);
+	  fi_system->fi_activation_iter = fi_activation.find(_tmpAddr);
+	  if(fi_system->fi_activation_iter->second != curr_thread){
+	    DPRINTF(FaultInjection,"This should never happen\n");
+	    assert(0);
+	  }
+      }
     }
     
       if(enabled_fi)
