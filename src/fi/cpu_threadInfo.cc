@@ -162,7 +162,7 @@ void ThreadEnabledFault:: CalculateExecutedTime(std::string curCpu  , uint64_t *
   }
   else{
     itcores = cores.find(curCpu);
-    if(itcores->second != cores.end()){
+    if(itcores != cores.end()){
       *exec_time = itcores->second->getTicks();
       *exec_instr = itcores->second->getInstrExecuted();
     }
@@ -181,7 +181,7 @@ void ThreadEnabledFault:: CalculateLoadStoreTime(std::string curCpu  , uint64_t 
   }
   else{
     itcores = cores.find(curCpu);
-    if(itcores->second != cores.end()){
+    if(itcores != cores.end()){
       *exec_time = itcores->second->getTicks();
       *exec_instr = itcores->second->getInstrLoadStore();
     }
