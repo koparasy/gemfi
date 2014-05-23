@@ -269,7 +269,7 @@ ISA::setMiscReg(int miscReg, MiscReg val, ThreadContext * tc)
 	if(fi_system->fi_activation_iter != fi_system->fi_activation.end()){
 	  if(fi_system->fi_activation_iter->second->getMode() == START){
 	    tc->setEnabledFI(true);
-	    tc->setEnabledFIThread(fi_systemfi_activation_iter->second);
+	    tc->setEnabledFIThread(fi_system->fi_activation_iter->second);
 	  }
 	  else{
 	    tc->setEnabledFI(false);

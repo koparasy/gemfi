@@ -110,7 +110,7 @@ Fi_System:: dump(){
     std::cout << "Input: " << in_name << "\n";
     
     for(fi_activation_iter = fi_activation.begin(); fi_activation_iter != fi_activation.end(); ++fi_activation_iter){
-	    fi_activation_iter->second.dump();
+	    fi_activation_iter->second->dump();
     }
     
 
@@ -563,11 +563,9 @@ void Fi_System::start_fi(ThreadContext *tc,  uint64_t threadid){
   fi_activation_iter = fi_activation.find(_tmpAddr);
   if (fi_activation_iter == fi_activation.end()  ) {
     std::string _name = tc->getCpuPtr()->name();
-    Thread 
-    if(allthreads == NULL){
+        if(allthreads == NULL){
 	allthreads = new ThreadEnabledFault(-1, _name);
     }
-    
     DPRINTF(FaultInjection,"==Fault Injection Activation Instruction===\n");
     ThreadEnabledFault *thread = new ThreadEnabledFault(threadid,_name);
     fi_activation[_tmpAddr] = thread;

@@ -20,6 +20,10 @@ cpuExecutedTicks:: cpuExecutedTicks(std:: string name)
   setTicks(0);
 }
 
+cpuExecutedTicks::~cpuExecutedTicks()
+{
+  
+}
 
 void cpuExecutedTicks:: dump(){
     if (DTRACE(FaultInjection)) {
@@ -45,7 +49,13 @@ ThreadEnabledFault::ThreadEnabledFault(int threadId, std::string name)
   setMagicInstVirtualAddr(-1);
 }
 
-
+ThreadEnabledFault::~ThreadEnabledFault()
+{
+  delete all;
+  for(itcores = cores.begin(); itcores!=cores.end() ; ++itcores)
+      delete itcores->second;
+  
+}
 
 
 
