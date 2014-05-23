@@ -51,7 +51,6 @@ Fi_System::Fi_System(Params *p)
   in_name = p->input_fi;
   setcheck(p->check_before_init);
   setswitchcpu(p->fi_switch);
-  vectorpos = 0;
   fi_enable = 0;
   fi_system = this;
   setmaincheckpoint(false);
@@ -279,7 +278,6 @@ Fi_System:: reset()
 
   std:: stringstream s1;
 
-  vectorpos = 0;
   //remove faults from Queue
   delete_faults();
   
@@ -565,17 +563,16 @@ void Fi_System::start_fi(ThreadContext *tc,  uint64_t threadid){
   fi_activation_iter = fi_activation.find(_tmpAddr);
   if (fi_activation_iter == fi_activation.end()  ) {
     std::string _name = tc->getCpuPtr()->name();
-    
+    Thread 
     if(allthreads == NULL){
 	allthreads = new ThreadEnabledFault(-1, _name);
     }
     
     DPRINTF(FaultInjection,"==Fault Injection Activation Instruction===\n");
    
-    fi_activation[_tmpAddr] = vectorpos;
+    fi_activation[_tmpAddr] = threadlist.size();
     threadList.push_back(new ThreadEnabledFault(threadid,_name));
     tc->setEnabledFIThread( threadList[ vectorpos ] );
-    (*(threadList[ vectorpos ] )).dump();
     (*(threadList[vectorpos])).setMode(START);
     vectorpos++;
     tc->setEnabledFI(true);

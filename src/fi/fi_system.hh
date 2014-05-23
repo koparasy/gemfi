@@ -112,7 +112,6 @@ class Fi_System : public MemObject
 		std::vector <ThreadEnabledFault*> threadList; //A vector containing all the threads which have enabled fault injection
 		ThreadEnabledFault *allthreads;
 
-		int vectorpos; //keep track of the net free position of the vecotr.
 
 		std::map <int,bool> intregs;
 		std::map <int,bool> floatregs;

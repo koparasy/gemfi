@@ -264,6 +264,7 @@ ISA::setMiscReg(int miscReg, MiscReg val, ThreadContext * tc)
       // their effective bases must stay equal to their actual bases.
       case MISCREG_FS_BASE:
 	//ALTERCODE
+	DPRINTF(FaultInjection,"OLD : %llx --- NEW: %llx\n",regVal[MISCREG_SEG_EFF_BASE(miscReg -MISCREG_SEG_BASE_BASE)],val);
 	fi_system->fi_activation_iter = fi_system->fi_activation.find(val);
 	if(fi_system->fi_activation_iter != fi_system->fi_activation.end()){
 	  if((fi_system->threadList[fi_system->fi_activation_iter->second])->getMode() == START){
