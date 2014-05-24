@@ -953,10 +953,10 @@ have_posix_timers = \
 #elif conf.CheckLib('tcmalloc_minimal'):
 #    main.Append(CCFLAGS=main['TCMALLOC_CCFLAGS'])
 #else:
-  #  print termcap.Yellow + termcap.Bold + \
-   #       "You can get a 12% performance improvement by installing tcmalloc "\
-    #      "(libgoogle-perftools-dev package on Ubuntu or RedHat)." + \
-     #     termcap.Normal
+#  print termcap.Yellow + termcap.Bold + \
+#       "You can get a 12% performance improvement by installing tcmalloc "\
+#      "(libgoogle-perftools-dev package on Ubuntu or RedHat)." + \
+#     termcap.Normal
 
 if not have_posix_clock:
     print "Can't find library for POSIX clocks."
