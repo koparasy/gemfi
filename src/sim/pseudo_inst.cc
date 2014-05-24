@@ -76,7 +76,7 @@
 #include "sim/vptr.hh"
 
 #include "fi/fi_system.hh"
-#include <dmtcp.h>
+#include <dmtcpaware.h>
 
 using namespace std;
 
@@ -748,21 +748,23 @@ DPRINTF(FaultInjection,"DS :%llx \n",tc->readMiscReg(TheISA::MISCREG_DS_BASE));
 void init_fi_system()
 {
   
-  
+  DPRINTF(FaultInjection,"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~REAdy For checkpoint\n"); 
   
   if(!FullSystem)
     panicFsOnlyPseudoInst("init_fi_system");
   
      if(fi_system->getCheck()){
-	int succeed = dmtcp_checkpoint();
+	DPRINTF(FaultInjection,"IN HERE MTFU\n");
+	int succeed = dmtcpCheckpoint();
+	DPRINTF(FaultInjection,"Val Of checkpoint %d\n",succeed);
         if(succeed == 1){
           std::cout<<"!!!FI_SYSTEM!!! Internal checkpoint successfully created terminating...\n";
           exit(1);
         }
         else if(succeed == 2){
-	  int num_checkpoints,num_restarts;
-	 dmtcp_get_local_status(&num_checkpoints,&num_restarts);
-	 std::cout<<"Succesfuuly restored just before Initializing fault Injection " <<num_restarts<<"\n";        }
+	  //int num_checkpoints,num_restarts;
+	 //dmtcp_get_local_status(&num_checkpoints,&num_restarts);
+	 std::cout<<"Succesfuuly restored just before Initializing fault Injection \n";        }
       }
       fi_system->reset();
       

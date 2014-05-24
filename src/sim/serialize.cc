@@ -55,8 +55,8 @@
 
 // For stat reset hack
 #include "sim/stat_control.hh"
-#include <dmtcp.h>
-
+//#include <dmtcp.h>
+#include <dmtcpaware.h>
 using namespace std;
 
 extern SimObject *resolveSimObject(const string &);
@@ -516,14 +516,14 @@ Serializable::serializeAll(const string &cpt_dir)
 //     SimObject::serializeAll(outstream);
 
 //ALTERCODE
-  int succeed = dmtcp_checkpoint();
+  int succeed = dmtcpCheckpoint(); 
   if(succeed == 1){
     std::cout<<"Internal checkpoint successfully created \n";
   }
   else if(succeed == 2){
-    int num_checkpoints,num_restarts;
-    dmtcp_get_local_status(&num_checkpoints,&num_restarts); 
-    std::cout<<"Succesfuuly restored from checkpoint: " <<num_checkpoints<<"\n";
+    //int num_checkpoints,num_restarts;
+    //dmtcp_get_local_status(&num_checkpoints,&num_restarts); 
+    std::cout<<"Succesfuuly restored from checkpoint: \n";
   }
 //~ALTERCODE
 

@@ -195,17 +195,11 @@
                             panic("M5 panic instruction called at pc = %#x.\n",
                                   RIP);
                         }}, IsNonSpeculative);
-                        0x55: fi_activate_inst({{
+                        0x57: fi_activate_inst({{
 			  PseudoInst::fi_activate_inst(xc->tcBase(), Rdi, Rsi);
                         }}, IsNonSpeculative);
-			0x56: init_fi_system({{
+			0x58: init_fi_system({{
 			  PseudoInst::init_fi_system();
-                        }}, IsNonSpeculative);
-                        0x57: m5reserved3({{
-                            warn("M5 reserved opcode 3 ignored.\n");
-                        }}, IsNonSpeculative);
-                        0x58: m5reserved4({{
-                            warn("M5 reserved opcode 4 ignored.\n");
                         }}, IsNonSpeculative);
                         0x59: m5reserved5({{
                             warn("M5 reserved opcode 5 ignored.\n");

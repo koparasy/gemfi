@@ -238,6 +238,8 @@ class Fi_System : public MemObject
 				if( thread->getMode() == START && FullSystem && (TheISA::inUserMode(tc))   ){
 					Addr pcaddr = ptr->instAddr();
 					std::string _name = tc->getCpuPtr()->name();
+//					thread->write_instr_and_name(pcaddr,ptr->getcurInstr()->getName());
+
 					while ((iewFault = reinterpret_cast<IEWStageInjectedFault *>(iewStageInjectedFaultQueue.scan(_name, *thread, pcaddr))) != NULL){
 						*value = iewFault->process(*value);
 						DPRINTF(FaultInjection,"PCAddr:%llx Fault Inserted in instruction %s\n",pcaddr,ptr->getcurInstr()->getName());
