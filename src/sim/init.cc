@@ -183,10 +183,10 @@ initSignals()
     signal(SIGTRAP, SIG_IGN);
 
     // Dump intermediate stats
-    installSignalHandler(SIGUSR1, dumpStatsHandler);
+//    installSignalHandler(SIGUSR1, dumpStatsHandler);
 
     // Dump intermediate stats and reset them
-    installSignalHandler(SIGUSR2, dumprstStatsHandler);
+//    installSignalHandler(SIGUSR2, dumprstStatsHandler);
 
     // Exit cleanly on Interrupt (Ctrl-C)
     installSignalHandler(SIGINT, exitNowHandler);
@@ -349,6 +349,14 @@ m5Main(int argc, char **argv)
     // import the main m5 module
     PyObject *result;
     const char **command = m5MainCommands;
+
+ 	if(dmtcp_is_enabled()){
+		dmtcp_install_hooks(before,after,NULL);
+	}
+	else
+		std::cout<<"Cannot connect to dmtcp\n";
+
+
 
     // evaluate each command in the m5MainCommands array (basically a
     // bunch of python statements.
