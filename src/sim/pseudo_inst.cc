@@ -76,7 +76,8 @@
 #include "sim/vptr.hh"
 
 #include "fi/fi_system.hh"
-#include <dmtcpaware.h>
+//#include <dmtcpaware.h>
+#include <dmtcp.h>
 
 using namespace std;
 
@@ -736,6 +737,10 @@ DPRINTF(FaultInjection,"DS :%llx \n",tc->readMiscReg(TheISA::MISCREG_DS_BASE));
 	case PAUSE:
 		fi_system->pause_fi(tc,threadid);
 		break;
+	case DUMP:
+		DPRINTF(FaultInjection,"GOT DUMP MESSAGE\n");
+		fi_system->dump_fi(tc);
+		break;
 	default:
 		assert(0);
 		break;
@@ -754,8 +759,7 @@ void init_fi_system()
     panicFsOnlyPseudoInst("init_fi_system");
   
      if(fi_system->getCheck()){
-	DPRINTF(FaultInjection,"IN HERE MTFU\n");
-	int succeed = dmtcpCheckpoint();
+	int succeed = dmtcp_checkpoint();
 	DPRINTF(FaultInjection,"Val Of checkpoint %d\n",succeed);
         if(succeed == 1){
           std::cout<<"!!!FI_SYSTEM!!! Internal checkpoint successfully created terminating...\n";

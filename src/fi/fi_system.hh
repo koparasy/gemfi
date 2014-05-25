@@ -40,7 +40,7 @@
 #define START 1
 #define STOP 2
 #define PAUSE 3
-
+#define DUMP 4
 
 using namespace std;
 using namespace TheISA;
@@ -185,6 +185,7 @@ class Fi_System : public MemObject
 		void stop_fi(ThreadContext *tc, uint64_t id);
 		void start_fi(ThreadContext *tc, uint64_t id);
 		void pause_fi(ThreadContext *tc, uint64_t id);
+		void dump_fi(ThreadContext *tc);
 
 		/* 
 		   void monitor_propagation(const int type, ThreadContext *tc,StaticInst *si, int idx,const Addr addr);

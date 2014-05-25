@@ -633,3 +633,16 @@ void Fi_System:: stop_fi(ThreadContext *tc, uint64_t req){
   }
 
 }
+
+
+void Fi_System::dump_fi(ThreadContext *tc){
+	for( fi_activation_iter = fi_activation.begin(); fi_activation_iter!=fi_activation.end() ; ++fi_activation_iter){
+		DPRINTF(FaultInjection, " Thread ID : %llx\n",fi_activation_iter->first);
+		fi_activation_iter->second->print_time();
+	}
+	fi_activation.clear();
+	tc->setEnabledFIThread(NULL);
+	tc->setEnabledFI(false);
+	fi_enable = 0;
+
+}

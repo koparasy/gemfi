@@ -65,8 +65,8 @@
 
 
 //ALTERCODE
-//#include <dmtcp.h>
-#include <dmtcpaware.h>
+#include <dmtcp.h>
+//#include <dmtcpaware.h>
 #include <fi/fi_system.hh>
 //ALTERCODE
 
@@ -354,7 +354,7 @@ m5Main(int argc, char **argv)
        cout<<"I am going to continue Hoping to restart from a checkpoint\n";
      }
      else{
-      int dmtcp_attach = dmtcpInstallHooks(before,after,NULL);    
+      int dmtcp_attach = dmtcp_install_hooks(before,after,NULL);    
        cout<<"DMTCP:Hooks installed successfully "<<dmtcp_attach<<"\n";
      }
 
