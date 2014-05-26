@@ -316,7 +316,6 @@ InjectedFault *InjectedFaultQueue::scan(std::string s , ThreadEnabledFault &this
 	    {
 	      if(exec_instr == p->getTiming() ){
 		p->setServicedAt(exec_instr);
-		DPRINTF(FaultInjection,"In here %d %d\n",exec_instr,exec_time);
 		return(p);
 	      }
 	      else if(exec_instr > p->getTiming())

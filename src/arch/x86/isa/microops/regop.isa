@@ -1663,7 +1663,7 @@ let {{
                     "InstRegIndex(NUM_INTREGS)", flags, dataSize)
         code = '''
 	    fi_temp = SrcReg1;
-	    fi_system->iew_fault(xc,xc->tcBase(), &fi_temp);
+//	    fi_system->iew_fault(xc,xc->tcBase(), &fi_temp);
 	    MiscRegDest= fi_temp;
         '''
 
@@ -1810,19 +1810,19 @@ let {{
                 fault = new GenericISA::M5PanicFault(
                         "Wrdh used with wrong descriptor type!\\n");
             }
-            fi_system->iew_fault(xc,xc->tcBase(),&target);
+  //          fi_system->iew_fault(xc,xc->tcBase(),&target);
 	    DestReg = target;
         '''
 
     class Wrtsc(WrRegOp):
         code = '''
-        fi_system->iew_fault(xc,xc->tcBase(),&psrc1);
+    //    fi_system->iew_fault(xc,xc->tcBase(),&psrc1);
 	TscOp = psrc1;
         '''
 
     class Rdtsc(RdRegOp):
         code = '''
-        fi_system->iew_fault(xc,xc->tcBase(),&TscOp);
+      //  fi_system->iew_fault(xc,xc->tcBase(),&TscOp);
 	DestReg = TscOp;
         '''
 
