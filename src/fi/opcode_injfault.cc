@@ -50,7 +50,6 @@ OpCodeInjectedFault::process(TheISA::MachInst inst)
     DPRINTF(FaultInjection, "\n");
   }
 
-#ifdef ALPHA_ISA
 
   switch (getValueType()) {
   case (InjectedFault::ImmediateValue): 
@@ -85,10 +84,6 @@ OpCodeInjectedFault::process(TheISA::MachInst inst)
     }
   }
 
-#endif
-#ifndef ALPHA_ISA
-  assert(0);
-#endif
 
   check4reschedule();
 

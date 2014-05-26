@@ -289,7 +289,6 @@ InjectedFault *InjectedFaultQueue::scan(std::string s , ThreadEnabledFault &this
     if(!p->isManifested()){
       exec_time = 0;
       exec_instr = 0;
-      DPRINTF(FaultInjection,"In here\n");
       //find how much time do I run.
       if(name().compare("IEWStageFaultQueue") == 0 ){
 	i = fi_system->get_fi_exec_counters( p , thisThread, s , &exec_instr , &exec_time );
