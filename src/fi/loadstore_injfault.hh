@@ -27,16 +27,12 @@ public:
     DPRINTF(FaultInjection,"===LoadStoreFault::Process(T)==\n");
     
     T retval = v;
-#ifdef ALPHA_ISA
     if(getValueType() == InjectedFault::FlipBit && getValue() > sizeof(T)*8){ //Make sure that the flipped bit is inside the affected structure!
       setValue(getValue()%(sizeof(T)*8) +1);
       DPRINTF(FaultInjection,"Altered Flip bit location\n");
       dump();
     }
     retval = manifest(v,getValue(),getValueType());
-#else
-    assert(0);
-#endif
     
     check4reschedule();
     

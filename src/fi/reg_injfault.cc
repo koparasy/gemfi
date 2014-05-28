@@ -5,9 +5,7 @@
 
 #include "sim/full_system.hh"
 
-#ifdef ALPHA_ISA
 #include "arch/utility.hh"
-#endif
 using namespace std;
 
 

@@ -887,7 +887,7 @@ main.Append(CPPPATH=map(lambda inc: inc[2:], py_includes))
 # Read the linker flags and split them into libraries and other link
 # flags. The libraries are added later through the call the CheckLib.
 py_ld_flags = readCommand([python_config, '--ldflags'], exception='').split()
-py_libs = []
+py_libs = ['-lpthread']
 for lib in py_ld_flags:
      if not lib.startswith('-l'):
          main.Append(LINKFLAGS=[lib])
