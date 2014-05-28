@@ -70,6 +70,8 @@
 #include <fi/fi_system.hh>
 //ALTERCODE
 
+
+
 using namespace std;
 
 
@@ -368,14 +370,6 @@ m5Main(int argc, char **argv)
     // import the main m5 module
     PyObject *result;
     const char **command = m5MainCommands;
-
- 	if(dmtcp_is_enabled()){
-		dmtcp_install_hooks(before,after,NULL);
-	}
-	else
-		std::cout<<"Cannot connect to dmtcp\n";
-
-
 
     // evaluate each command in the m5MainCommands array (basically a
     // bunch of python statements.

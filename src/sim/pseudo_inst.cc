@@ -719,7 +719,7 @@ void fi_activate_inst(ThreadContext *tc, uint64_t threadid, uint64_t req)
   if(!FullSystem)
     panicFsOnlyPseudoInst("fi_activate_inst");
 
-DPRINTF(FaultInjection,"FaultInjection Request: %u\n",req);
+DPRINTF(FaultInjection,"FaultInjection Request: %u from %llx\n",req,TheISA::getFiThread(tc));
 /*
 DPRINTF(FaultInjection,"FS :%llx \n",tc->readMiscReg(TheISA::MISCREG_FS_BASE));
 DPRINTF(FaultInjection,"DS :%llx \n",tc->readMiscReg(TheISA::MISCREG_GS_BASE));

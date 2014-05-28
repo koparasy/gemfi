@@ -1029,6 +1029,8 @@ if env['GCC']:
     for target in ['opt', 'fast', 'prof', 'perf']:
         ccflags[target] += ['-O3']
         ldflags[target] += ['-O3']
+	ccflags[target] += ['-fPIC']
+	ldflags[target] += ['-fPIC']
 
     ccflags['fast'] += env['LTO_CCFLAGS']
     ldflags['fast'] += env['LTO_LDFLAGS']
