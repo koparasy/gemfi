@@ -86,9 +86,9 @@ void before(){
 
 
 void after(){
-/*  
-//int num_checkpoints,num_restored;
-  //dmtcp_get_local_status(&num_checkpoints,&num_restored);
+ 
+  int num_checkpoints,num_restored;
+  dmtcp_get_local_status(&num_checkpoints,&num_restored);
   const char *path = dmtcp_get_ckpt_filename();
   std::string new_path(path);
   int count = new_path.find_last_of("/");
@@ -112,7 +112,7 @@ void after(){
     else
 	    cout<<"Error \n";
 }
-*/
+
 }
 
 //~ALTERCODE

@@ -585,6 +585,8 @@ void Fi_System::start_fi(ThreadContext *tc,  uint64_t threadid){
     if	(fi_activation_iter->second->getMode() == PAUSE ){
 	fi_enable++;
 	fi_activation_iter->second->setMode(START);
+	tc->setEnabledFIThread(fi_activation_iter->second);
+	tc->setEnabledFI(true);
       }
       else{
 	DPRINTF(FaultInjection,"I have already enabled fault injection I am going to ignore this request\n");
