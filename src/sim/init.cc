@@ -92,7 +92,7 @@ void after(){
   const char *path = dmtcp_get_ckpt_filename();
   std::string new_path(path);
   int count = new_path.find_last_of("/");
-  if(!fi_system->getMainCheckpoint()){
+  if(fi_system->getMainCheckpoint()==false){
     if(!(rename(new_path.substr(count+1).c_str(),"maincheckpoint.dmtcp")))
       DPRINTF(FaultInjection,"Created New Maincheckpoint\n");
     else
