@@ -751,7 +751,7 @@ void init_fi_system()
   
   if(!FullSystem)
     panicFsOnlyPseudoInst("init_fi_system");
-  if(fi_system->getmaincheckpoint())
+  if(fi_system->getmaincheckpoint() == true)
      panic("M5 panic instruction called at %s\n", tc->pcState());
   
      if(fi_system->getCheck()){
