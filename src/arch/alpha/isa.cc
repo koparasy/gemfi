@@ -171,3 +171,9 @@ AlphaISAParams::create()
 {
     return new AlphaISA::ISA(this);
 }
+
+
+Fi_PCB
+getFiThread(ThreadContext *tc){
+  return tc->readMiscReg(TheISA::threadid);
+}
