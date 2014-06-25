@@ -96,7 +96,7 @@ const int NumIntRegs = NumIntArchRegs + NumPALShadowRegs;
 const int NumFloatRegs = NumFloatArchRegs;
 const int NumCCRegs = 0;
 const int NumMiscRegs = NUM_MISCREGS;
-
+const int threadid = IPR_PALtemp23;
 const int TotalNumRegs =
     NumIntRegs + NumFloatRegs + NumMiscRegs;
 

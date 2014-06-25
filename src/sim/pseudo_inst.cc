@@ -720,13 +720,7 @@ void fi_activate_inst(ThreadContext *tc, uint64_t threadid, uint64_t req)
     panicFsOnlyPseudoInst("fi_activate_inst");
 
 DPRINTF(FaultInjection,"FaultInjection Request: %u from %llx\n",req,TheISA::getFiThread(tc));
-/*
-DPRINTF(FaultInjection,"FS :%llx \n",tc->readMiscReg(TheISA::MISCREG_FS_BASE));
-DPRINTF(FaultInjection,"DS :%llx \n",tc->readMiscReg(TheISA::MISCREG_GS_BASE));
-DPRINTF(FaultInjection,"SS :%llx \n",tc->readMiscReg(TheISA::MISCREG_SS_BASE));
-DPRINTF(FaultInjection,"DS :%llx \n",tc->readMiscReg(TheISA::MISCREG_DS_BASE));
-*/
-  
+
   switch (req){
 	case STOP:
 		fi_system->stop_fi(tc,threadid);
@@ -757,6 +751,8 @@ void init_fi_system()
   
   if(!FullSystem)
     panicFsOnlyPseudoInst("init_fi_system");
+  if(fi_system->getmaincheckpoint() == true)
+     panic("M5 panic instruction called at %s\n", tc->pcState());
   
      if(fi_system->getCheck()){
 	int succeed = dmtcp_checkpoint();

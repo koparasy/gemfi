@@ -164,6 +164,11 @@ ISA::setMiscReg(int misc_reg, const MiscReg &val, ThreadContext *tc,
     }
 }
 
+Fi_PCB getFiThread(ThreadContext *tc){
+  return tc->readMiscReg(TheISA::threadid);
+}
+
+
 }
 
 AlphaISA::ISA *
@@ -171,3 +176,4 @@ AlphaISAParams::create()
 {
     return new AlphaISA::ISA(this);
 }
+

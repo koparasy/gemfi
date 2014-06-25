@@ -49,6 +49,13 @@ class ThreadContext;
 
 namespace AlphaISA
 {
+    //ALTERCODE
+    typedef Addr Fi_PCB;
+    
+
+    Fi_PCB getFiThread(ThreadContext *tc);
+    //~ALTERCODE
+  
     class ISA : public SimObject
     {
       public:
@@ -129,12 +136,6 @@ namespace AlphaISA
         /// Explicitly import the otherwise hidden startup
         using SimObject::startup;
     };
-    //ALTERCODE
-    typedef Addr Fi_PCB;
-    
-//     bool operator < (const Fi_PCB &a, const Fi_PCB &b);
-    Fi_PCB getFiThread(ThreadContext *tc);
-    //~ALTERCODE
 }
 
 #endif
