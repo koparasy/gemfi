@@ -1,0 +1,7 @@
+all: final_create_exp.c mtwist.c randistrs.c
+	gcc -I. -Wall -g mtwist.c -o mtwist.o -c
+	gcc -I. -Wall -g randistrs.c -o randistrs.o -c
+	gcc -I. -Wall -g final_create_exp.c -o final_create_exp.o -c
+	gcc final_create_exp.o randistrs.o  mtwist.o -o generator
+clean:
+	rm -f mtwist.o final_create_exp.o generator
