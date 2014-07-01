@@ -497,7 +497,7 @@ def LoadStoreBase(name, Name, ea_code, memacc_code, mem_flags, inst_flags,
             + completeAccTemplate.subst(iop))
 }};
 
-def format LoadOrNop(memacc_code, ea_code = {{ EA = Rb + disp; if(fi_system->fi_execute) fi_system->iew_fault(xc, xc->tcBase(),&EA); }},
+def format LoadOrNop(memacc_code, ea_code = {{ EA = Rb + disp; if(true) fi_system->iew_fault(xc, xc->tcBase(),&EA); }},
                      mem_flags = [], inst_flags = []) {{
     (header_output, decoder_output, decode_block, exec_output) = \
         LoadStoreBase(name, Name, ea_code, memacc_code, mem_flags, inst_flags,
@@ -507,7 +507,7 @@ def format LoadOrNop(memacc_code, ea_code = {{ EA = Rb + disp; if(fi_system->fi_
 
 
 // Note that the flags passed in apply only to the prefetch version
-def format LoadOrPrefetch(memacc_code, ea_code = {{ EA = Rb + disp;  if(fi_system->fi_execute) fi_system->iew_fault(xc, xc->tcBase(),&EA);}},
+def format LoadOrPrefetch(memacc_code, ea_code = {{ EA = Rb + disp;  if(true) fi_system->iew_fault(xc, xc->tcBase(),&EA);}},
                           mem_flags = [], pf_flags = [], inst_flags = []) {{
     # declare the load instruction object and generate the decode block
     (header_output, decoder_output, decode_block, exec_output) = \
@@ -535,7 +535,7 @@ def format LoadOrPrefetch(memacc_code, ea_code = {{ EA = Rb + disp;  if(fi_syste
 }};
 
 
-def format Store(memacc_code, ea_code = {{ EA = Rb + disp; if(fi_system->fi_execute) fi_system->iew_fault(xc, xc->tcBase(),&EA); }},
+def format Store(memacc_code, ea_code = {{ EA = Rb + disp; if(true) fi_system->iew_fault(xc, xc->tcBase(),&EA); }},
                  mem_flags = [], inst_flags = []) {{
     (header_output, decoder_output, decode_block, exec_output) = \
         LoadStoreBase(name, Name, ea_code, memacc_code, mem_flags, inst_flags,
@@ -544,7 +544,7 @@ def format Store(memacc_code, ea_code = {{ EA = Rb + disp; if(fi_system->fi_exec
 
 
 def format StoreCond(memacc_code, postacc_code,
-		     ea_code = {{ EA = Rb + disp; if(fi_system->fi_execute) fi_system->iew_fault(xc, xc->tcBase(),&EA);}},
+		     ea_code = {{ EA = Rb + disp; if(true) fi_system->iew_fault(xc, xc->tcBase(),&EA);}},
                      mem_flags = [], inst_flags = []) {{
     (header_output, decoder_output, decode_block, exec_output) = \
         LoadStoreBase(name, Name, ea_code, memacc_code, mem_flags, inst_flags,

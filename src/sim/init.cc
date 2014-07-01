@@ -78,10 +78,10 @@ using namespace std;
 
 //ALTERCODE
 void before(){
-  if(fi_system->getMainCheckpoint())
-    DPRINTF(FaultInjection,"Creating New Maincheckpoint\n");
-  else
-    cout<<"DMTCP:: Starting Checkpointing Process\n";
+//   if(fi_system->getMainCheckpoint() == false)
+//     DPRINTF(FaultInjection,"Creating New Maincheckpoint\n");
+//   else
+//     cout<<"DMTCP:: Starting Checkpointing Process\n";
 }
 
 
@@ -90,11 +90,14 @@ void after(){
   int num_checkpoints,num_restored;
   dmtcp_get_local_status(&num_checkpoints,&num_restored);
   const char *path = dmtcp_get_ckpt_filename();
+  if (path == NULL)
+    DPRINTF(FaultInjection,"PATH IS NULL\n");
   std::string new_path(path);
   int count = new_path.find_last_of("/");
+//   DPRINTF(FaultInjection,"NAME of path is: %s\n",path);
   if(fi_system->getMainCheckpoint()==false){
     if(!(rename(new_path.substr(count+1).c_str(),"maincheckpoint.dmtcp")))
-      DPRINTF(FaultInjection,"Created New Maincheckpoint\n");
+      cout<<"Created New Maincheckpoint\n";
     else
       cout<<"Error \n"; 
     fi_system->setmaincheckpoint(true);
@@ -112,7 +115,7 @@ void after(){
 	    cout<<"Renamed File\n";
     else
 	    cout<<"Error \n";
-}
+  }
 
 }
 

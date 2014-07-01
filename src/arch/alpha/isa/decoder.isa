@@ -37,14 +37,14 @@ decode OPCODE default Unknown::unknown() {
 
     format LoadAddress {
       0x08: lda({{ uint64_t tmp  = Rb + disp; 
-		    if(fi_system->fi_execute){
+		    if(true){
 			fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		    }
 		    Ra = tmp;
 	
       }});
       0x09: ldah({{ uint64_t tmp = Rb + (disp << 16); 
-		    if(fi_system->fi_execute){
+		    if(true){
 		      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		    }
 		    Ra=tmp;
@@ -54,7 +54,7 @@ decode OPCODE default Unknown::unknown() {
     format LoadOrNop {
         0x0a: ldbu({{ Ra_uq = Mem_ub; }});
         0x0c: ldwu({{ Ra_uq = Mem_uw; }});
-	0x0b: ldq_u({{ Ra = Mem_uq; }}, ea_code = {{ EA = (Rb + disp) & ~7; if(fi_system->fi_execute) fi_system->iew_fault(xc, xc->tcBase(),&EA); }});
+	0x0b: ldq_u({{ Ra = Mem_uq; }}, ea_code = {{ EA = (Rb + disp) & ~7; if(true) fi_system->iew_fault(xc, xc->tcBase(),&EA); }});
         0x23: ldt({{ Fa = Mem_df; }});
         0x2a: ldl_l({{ Ra_sl = Mem_sl; }}, mem_flags = LLSC);
         0x2b: ldq_l({{ Ra_uq = Mem_uq; }}, mem_flags = LLSC);
@@ -74,7 +74,7 @@ decode OPCODE default Unknown::unknown() {
         0x0d: stw({{ Mem_uw = Ra<15:0>; }});
         0x2c: stl({{ Mem_ul = Ra<31:0>; }});
         0x2d: stq({{ Mem_uq = Ra_uq; }});
-	0x0f: stq_u({{ Mem_uq = Ra_uq; }}, {{ EA = (Rb + disp) & ~7; if(fi_system->fi_execute) fi_system->iew_fault(xc, xc->tcBase(),&EA); }});
+	0x0f: stq_u({{ Mem_uq = Ra_uq; }}, {{ EA = (Rb + disp) & ~7; if(true) fi_system->iew_fault(xc, xc->tcBase(),&EA); }});
         0x26: sts({{ Mem_ul = t_to_s(Fa_uq); }});
         0x27: stt({{ Mem_df = Fa; }});
     }
@@ -114,7 +114,7 @@ decode OPCODE default Unknown::unknown() {
         0x10: decode INTFUNC {  // integer arithmetic operations
 
         0x00: addl({{ int32_t tmp = Ra_sl + Rb_or_imm_sl; 
-	      if(fi_system->fi_execute)
+	      if(true)
 		fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	      Rc_sl = tmp;
 	}});
@@ -124,23 +124,23 @@ decode OPCODE default Unknown::unknown() {
                 // and sign of result does not match.
                 if (Ra_sl<31:> == Rb_or_imm_sl<31:> && tmp<31:> != Ra_sl<31:>)
                     fault = new IntegerOverflowFault;
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
                 Rc_sl = tmp;
             }});
             0x02: s4addl({{ int32_t tmp = (Ra_sl << 2) + Rb_or_imm_sl;
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc_sl=tmp;
 	    }});
 	    0x12: s8addl({{ int32_t tmp = (Ra_sl << 3) + Rb_or_imm_sl;
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc_sl = tmp;
 	    }});
 
 	    0x20: addq({{ uint64_t tmp = Ra + Rb_or_imm;
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
@@ -150,23 +150,23 @@ decode OPCODE default Unknown::unknown() {
                 // and sign of result does not match.
                 if (Ra<63:> == Rb_or_imm<63:> && tmp<63:> != Ra<63:>)
                     fault = new IntegerOverflowFault;
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
                 Rc = tmp;
             }});
 	    0x22: s4addq({{ uint64_t tmp = (Ra << 2) + Rb_or_imm;
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
             0x32: s8addq({{ uint64_t tmp = (Ra << 3) + Rb_or_imm; 
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
 
 	    0x09: subl({{ int32_t tmp = Ra_sl - Rb_or_imm_sl;
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc_sl = tmp;
 	    }});
@@ -178,23 +178,23 @@ decode OPCODE default Unknown::unknown() {
                 // signs are the *same* then no overflow can occur
                 if (Ra_sl<31:> != Rb_or_imm_sl<31:> && tmp<31:> != Ra_sl<31:>)
                     fault = new IntegerOverflowFault;
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
                 Rc_sl = tmp;
             }});
 	    0x0b: s4subl({{ int32_t tmp = (Ra_sl << 2) - Rb_or_imm_sl;
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc_sl = tmp;
 	    }});
 	    0x1b: s8subl({{ int32_t tmp = (Ra_sl << 3) - Rb_or_imm_sl;
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc_sl = tmp;
 	    }});
 
 	    0x29: subq({{ uint64_t tmp = Ra - Rb_or_imm;
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
@@ -206,43 +206,43 @@ decode OPCODE default Unknown::unknown() {
                 // signs are the *same* then no overflow can occur
                 if (Ra<63:> != Rb_or_imm<63:> && tmp<63:> != Ra<63:>)
                     fault = new IntegerOverflowFault;
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		Rc = tmp;
             }});
 	    0x2b: s4subq({{ uint64_t tmp  = (Ra << 2) - Rb_or_imm;
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	     Rc = tmp;
 	    }});
 	    0x3b: s8subq({{ uint64_t tmp  = (Ra << 3) - Rb_or_imm;
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	     Rc = tmp;
 	    }});
 
 	    0x2d: cmpeq({{ uint64_t tmp = (Ra == Rb_or_imm);
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
 	    0x6d: cmple({{ uint64_t tmp = (Ra_sq <= Rb_or_imm_sq);
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
 	    0x4d: cmplt({{ uint64_t tmp = (Ra_sq <  Rb_or_imm_sq);
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
 	    0x3d: cmpule({{ uint64_t tmp = (Ra_uq <= Rb_or_imm_uq);
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
 	    0x1d: cmpult({{ uint64_t tmp = (Ra_uq <  Rb_or_imm_uq);
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
@@ -256,7 +256,7 @@ decode OPCODE default Unknown::unknown() {
                     hi += 8;
                     lo += 8;
                 }
-                if(fi_system->fi_execute)
+                if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
                 Rc = tmp;
             }});
@@ -265,74 +265,74 @@ decode OPCODE default Unknown::unknown() {
         0x11: decode INTFUNC {  // integer logical operations
 
         0x00: and({{ uint64_t tmp  = Ra & Rb_or_imm;
-	if(fi_system->fi_execute)
+	if(true)
 	  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	Rc = tmp;
 	}});
 	0x08: bic({{ uint64_t tmp  = Ra & ~Rb_or_imm;
-	if(fi_system->fi_execute)
+	if(true)
 	  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	Rc = tmp;
 	}});
 	0x20: bis({{ uint64_t tmp  = Ra | Rb_or_imm;
-	if(fi_system->fi_execute)
+	if(true)
 	  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	Rc = tmp;
 	}});
 	0x28: ornot({{ uint64_t tmp  = Ra | ~Rb_or_imm;
-	if(fi_system->fi_execute)
+	if(true)
 	  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	Rc = tmp;  
 	}});
 	0x40: xor({{ uint64_t tmp  = Ra ^ Rb_or_imm;
-	if(fi_system->fi_execute)
+	if(true)
 	  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	Rc = tmp;
 	}});
 	0x48: eqv({{ uint64_t tmp  = Ra ^ ~Rb_or_imm;
-	if(fi_system->fi_execute)
+	if(true)
 	  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	Rc = tmp;
 	}});
 
             // conditional moves
 	0x14: cmovlbs({{ uint64_t tmp = ((Ra & 1) == 1) ? Rb_or_imm : Rc;
-// 	    if(fi_system->fi_execute)
+// 	    if(true)
 // 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
 	0x16: cmovlbc({{ uint64_t tmp = ((Ra & 1) == 0) ? Rb_or_imm : Rc; 
-// 	    if(fi_system->fi_execute)
+// 	    if(true)
 // 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
 	0x24: cmoveq({{ uint64_t tmp = (Ra == 0) ? Rb_or_imm : Rc; 
-// 	    if(fi_system->fi_execute)
+// 	    if(true)
 // 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
 	0x26: cmovne({{ uint64_t tmp = (Ra != 0) ? Rb_or_imm : Rc;
-// 	    if(fi_system->fi_execute)
+// 	    if(true)
 // 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
 	0x44: cmovlt({{ uint64_t tmp = (Ra_sq <  0) ? Rb_or_imm : Rc; 
-// 	    if(fi_system->fi_execute)
+// 	    if(true)
 // 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
 	0x46: cmovge({{ uint64_t tmp = (Ra_sq >= 0) ? Rb_or_imm : Rc; 
-// 	    if(fi_system->fi_execute)
+// 	    if(true)
 // 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
 	0x64: cmovle({{ uint64_t tmp = (Ra_sq <= 0) ? Rb_or_imm : Rc; 
-// 	    if(fi_system->fi_execute)
+// 	    if(true)
 // 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
 	0x66: cmovgt({{ uint64_t tmp = (Ra_sq >  0) ? Rb_or_imm : Rc; 
-// 	    if(fi_system->fi_execute)
+// 	    if(true)
 // 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
@@ -340,7 +340,7 @@ decode OPCODE default Unknown::unknown() {
             // For AMASK, RA must be R31.
             0x61: decode RA {
 	      31: amask({{ uint64_t tmp = Rb_or_imm & ~ULL(0x17);
-	      if(fi_system->fi_execute)
+	      if(true)
 		fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	      Rc = tmp;
 	      }});
@@ -353,7 +353,7 @@ decode OPCODE default Unknown::unknown() {
                     1: decode INTIMM {
                         // return EV5 for FullSystem and EV6 otherwise
                         1: implver({{ uint64_t tmp = FullSystem ? 1 : 2; 
-                        if(fi_system->fi_execute)
+                        if(true)
 			  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 			Rc = tmp;
 			}});
@@ -367,38 +367,38 @@ decode OPCODE default Unknown::unknown() {
 
         0x12: decode INTFUNC {
 	  0x39: sll({{ uint64_t tmp = Ra << Rb_or_imm<5:0>;
-	  if(fi_system->fi_execute)
+	  if(true)
 	    fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	  Rc = tmp;
 	  }});
 	  0x34: srl({{ uint64_t tmp = Ra_uq >> Rb_or_imm<5:0>;
-	  if(fi_system->fi_execute)
+	  if(true)
 	    fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	  Rc = tmp;
 	  }});
 	  0x3c: sra({{ uint64_t tmp = Ra_sq >> Rb_or_imm<5:0>;
-	  if(fi_system->fi_execute)
+	  if(true)
 	    fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	  Rc = tmp;
 	  }});
 
 	  0x02: mskbl({{ uint64_t tmp = Ra & ~(mask( 8) << (Rb_or_imm<2:0> * 8));
-	  if(fi_system->fi_execute)
+	  if(true)
 	    fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	  Rc = tmp;
 	  }});
 	  0x12: mskwl({{ uint64_t tmp = Ra & ~(mask(16) << (Rb_or_imm<2:0> * 8));
-	  if(fi_system->fi_execute)
+	  if(true)
 	    fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	  Rc = tmp;
 	  }});
 	  0x22: mskll({{ uint64_t tmp = Ra & ~(mask(32) << (Rb_or_imm<2:0> * 8));
-	  if(fi_system->fi_execute)
+	  if(true)
 	    fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	  Rc = tmp;
 	  }});
 	  0x32: mskql({{ uint64_t tmp = Ra & ~(mask(64) << (Rb_or_imm<2:0> * 8));
-	  if(fi_system->fi_execute)
+	  if(true)
 	    fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	  Rc = tmp;
 	  }});
@@ -406,81 +406,81 @@ decode OPCODE default Unknown::unknown() {
             0x52: mskwh({{
                 int bv = Rb_or_imm<2:0>;
 		uint64_t tmp =  bv ? (Ra & ~(mask(16) >> (64 - 8 * bv))) : Ra;
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		Rc = tmp;
             }});
             0x62: msklh({{
                 int bv = Rb_or_imm<2:0>;
 		uint64_t tmp =  bv ? (Ra & ~(mask(32) >> (64 - 8 * bv))) : Ra;
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		Rc = tmp;
             }});
             0x72: mskqh({{
                 int bv = Rb_or_imm<2:0>;
 		uint64_t tmp =  bv ? (Ra & ~(mask(64) >> (64 - 8 * bv))) : Ra;
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		Rc = tmp;
             }});
 	    0x06: extbl({{ uint64_t tmp = (Ra_uq >> (Rb_or_imm<2:0> * 8))< 7:0>; 
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
 	    0x16: extwl({{ uint64_t tmp = (Ra_uq >> (Rb_or_imm<2:0> * 8))<15:0>; 
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
 	    0x26: extll({{ uint64_t tmp = (Ra_uq >> (Rb_or_imm<2:0> * 8))<31:0>; 
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
 	    0x36: extql({{ uint64_t tmp = (Ra_uq >> (Rb_or_imm<2:0> * 8)); 
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
 
             0x5a: extwh({{
 	      uint64_t tmp = (Ra << (64 - (Rb_or_imm<2:0> * 8))<5:0>)<15:0>; 
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		Rc = tmp;
 	    }});
             0x6a: extlh({{
 	      uint64_t tmp = (Ra << (64 - (Rb_or_imm<2:0> * 8))<5:0>)<31:0>; 
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		Rc = tmp;
 	    }});
             0x7a: extqh({{
 	      uint64_t tmp = (Ra << (64 - (Rb_or_imm<2:0> * 8))<5:0>); 
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		Rc = tmp;
 	    }});
 
 	    0x0b: insbl({{ uint64_t tmp = Ra< 7:0> << (Rb_or_imm<2:0> * 8);
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
 	    0x1b: inswl({{ uint64_t tmp = Ra<15:0> << (Rb_or_imm<2:0> * 8); 
-	      if(fi_system->fi_execute)
+	      if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		Rc = tmp;
 	    }});
 	    0x2b: insll({{ uint64_t tmp = Ra<31:0> << (Rb_or_imm<2:0> * 8);
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
 	    0x3b: insql({{ uint64_t tmp = Ra       << (Rb_or_imm<2:0> * 8);
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc = tmp;
 	    }});
@@ -488,21 +488,21 @@ decode OPCODE default Unknown::unknown() {
             0x57: inswh({{
                 int bv = Rb_or_imm<2:0>;
 		uint64_t tmp = bv ? (Ra_uq<15:0> >> (64 - 8 * bv)) : 0;
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		Rc = tmp;
             }});
             0x67: inslh({{
                 int bv = Rb_or_imm<2:0>;
 		uint64_t tmp = bv ? (Ra_uq<31:0> >> (64 - 8 * bv)) : 0;
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		Rc = tmp;
             }});
             0x77: insqh({{
                 int bv = Rb_or_imm<2:0>;
 		uint64_t tmp = bv ? (Ra_uq       >> (64 - 8 * bv)) : 0;
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		Rc = tmp;
             }});
@@ -514,7 +514,7 @@ decode OPCODE default Unknown::unknown() {
                         zapmask |= (mask(8) << (i * 8));
                 }
                 uint64_t tmp = Ra & ~zapmask;
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		Rc = tmp;
             }});
@@ -525,7 +525,7 @@ decode OPCODE default Unknown::unknown() {
                         zapmask |= (mask(8) << (i * 8));
                 }
                 uint64_t tmp = Ra & ~zapmask;
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		Rc = tmp;
             }});
@@ -533,19 +533,19 @@ decode OPCODE default Unknown::unknown() {
 
         0x13: decode INTFUNC {  // integer multiplies
         0x00: mull({{ int32_t tmp = Ra_sl * Rb_or_imm_sl;
-		      if(fi_system->fi_execute)
+		      if(true)
 			fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		      Rc_sl = tmp;
 	}}, IntMultOp);
 	0x20: mulq({{ uint64_t tmp = Ra    * Rb_or_imm;  
-		    if(fi_system->fi_execute)
+		    if(true)
 		      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		    Rc   =tmp;
 	}}, IntMultOp);
             0x30: umulh({{
                 uint64_t hi, lo;
                 mul128(Ra, Rb_or_imm, hi, lo);
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&hi);
                 Rc = hi;
             }}, IntMultOp);
@@ -561,7 +561,7 @@ decode OPCODE default Unknown::unknown() {
                 if (sign_bits != 0 && sign_bits != mask(33))
                     fault = new IntegerOverflowFault;
 		int32_t tmp1 = tmp<31:0>;
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp1);
                 Rc_sl = tmp1;
             }}, IntMultOp);
@@ -574,7 +574,7 @@ decode OPCODE default Unknown::unknown() {
                 if (!((hi == 0 && lo<63:> == 0) ||
                       (hi == mask(64) && lo<63:> == 1)))
                     fault = new IntegerOverflowFault;
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&lo);
                 Rc = lo;
             }}, IntMultOp);
@@ -582,12 +582,12 @@ decode OPCODE default Unknown::unknown() {
 
         0x1c: decode INTFUNC {
             0x00: decode RA { 31: sextb({{ int8_t tmp = Rb_or_imm< 7:0>;
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc_sb = tmp;
 	    }}); }
             0x01: decode RA { 31: sextw({{ int16_t tmp = Rb_or_imm<15:0>;
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Rc_sw = tmp;
 	    }}); }
@@ -598,7 +598,7 @@ decode OPCODE default Unknown::unknown() {
                                  if (Rb<i:i> == 0x1)
                                      ++count;
                              }
-                             if(fi_system->fi_execute)
+                             if(true)
 			       fi_system->iew_fault(xc, xc->tcBase(),&count);
                              Rc = count;
                            }}, IntAluOp);
@@ -615,7 +615,7 @@ decode OPCODE default Unknown::unknown() {
                                  hi += 8;
                                  lo += 8;
                              }
-                             if(fi_system->fi_execute)
+                             if(true)
 			       fi_system->iew_fault(xc, xc->tcBase(),&temp);
                              Rc = temp;
                            }});
@@ -630,7 +630,7 @@ decode OPCODE default Unknown::unknown() {
                              if (temp<3:2>) temp >>= 2; else count += 2;
                              if (temp<1:1>) temp >>= 1; else count += 1;
                              if ((temp<0:0>) != 0x1) count += 1;
-		       if(fi_system->fi_execute)
+		       if(true)
 			 fi_system->iew_fault(xc, xc->tcBase(),&count);
                              Rc = count;
                            }}, IntAluOp);
@@ -647,7 +647,7 @@ decode OPCODE default Unknown::unknown() {
                                  temp >>= 1; count += 1; 
                              }
                              if (!(temp<0:0> & ULL(0x1))) count += 1;
-		       if(fi_system->fi_execute)
+		       if(true)
 			 fi_system->iew_fault(xc, xc->tcBase(),&count);
                              Rc = count;
                            }}, IntAluOp);
@@ -658,14 +658,14 @@ decode OPCODE default Unknown::unknown() {
                                    | (Rb_uq<15:8> << 16)
                                    | (Rb_uq<23:16> << 32)
                                    | (Rb_uq<31:24> << 48));
-			     if(fi_system->fi_execute)
+			     if(true)
 			       fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 			     Rc = tmp;
                            }}, IntAluOp);
 
             0x35: unpkbl({{
 			    uint64_t tmp = (Rb_uq<7:0> | (Rb_uq<15:8> << 32));
-			    if(fi_system->fi_execute)
+			    if(true)
 			      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 			    Rc = tmp;
                            }}, IntAluOp);
@@ -675,14 +675,14 @@ decode OPCODE default Unknown::unknown() {
                                    | (Rb_uq<23:16> << 8)
                                    | (Rb_uq<39:32> << 16)
                                    | (Rb_uq<55:48> << 24));
-			     if(fi_system->fi_execute)
+			     if(true)
 			       fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 			     Rc = tmp;
                            }}, IntAluOp);
 
             0x37: pklb({{
 	      uint64_t tmp  = (Rb_uq<7:0> | (Rb_uq<39:32> << 8));
-			     if(fi_system->fi_execute)
+			     if(true)
 			       fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 			     Rc = tmp;
                            }}, IntAluOp);
@@ -700,7 +700,7 @@ decode OPCODE default Unknown::unknown() {
                                  hi -= 8;
                                  lo -= 8;
                              }
-                             if(fi_system->fi_execute)
+                             if(true)
 			       fi_system->iew_fault(xc, xc->tcBase(),&temp);
                              Rc = temp;
                           }});
@@ -718,7 +718,7 @@ decode OPCODE default Unknown::unknown() {
                                  hi -= 16;
                                  lo -= 16;
                              }
-                             if(fi_system->fi_execute)
+                             if(true)
 			       fi_system->iew_fault(xc, xc->tcBase(),&temp);
                              Rc = temp;
                           }});
@@ -736,7 +736,7 @@ decode OPCODE default Unknown::unknown() {
                                  hi -= 8;
                                  lo -= 8;
                              }
-                             if(fi_system->fi_execute)
+                             if(true)
 			       fi_system->iew_fault(xc, xc->tcBase(),&temp);
                              Rc = temp;
                           }});
@@ -754,7 +754,7 @@ decode OPCODE default Unknown::unknown() {
                                  hi -= 16;
                                  lo -= 16;
                              }
-                             if(fi_system->fi_execute)
+                             if(true)
 			       fi_system->iew_fault(xc, xc->tcBase(),&temp);
                              Rc = temp;
                           }});
@@ -772,7 +772,7 @@ decode OPCODE default Unknown::unknown() {
                                  hi -= 8;
                                  lo -= 8;
                              }
-                             if(fi_system->fi_execute)
+                             if(true)
 			       fi_system->iew_fault(xc, xc->tcBase(),&temp);
                              Rc = temp;
                           }});
@@ -790,7 +790,7 @@ decode OPCODE default Unknown::unknown() {
                                  hi -= 16;
                                  lo -= 16;
                              }
-                             if(fi_system->fi_execute)
+                             if(true)
 			       fi_system->iew_fault(xc, xc->tcBase(),&temp);
                              Rc = temp;
                           }});
@@ -808,7 +808,7 @@ decode OPCODE default Unknown::unknown() {
                                  hi -= 8;
                                  lo -= 8;
                              }
-                             if(fi_system->fi_execute)
+                             if(true)
 			       fi_system->iew_fault(xc, xc->tcBase(),&temp);
                              Rc = temp;
                           }});
@@ -826,7 +826,7 @@ decode OPCODE default Unknown::unknown() {
                                  hi -= 16;
                                  lo -= 16;
                              }
-                             if(fi_system->fi_execute)
+                             if(true)
 			       fi_system->iew_fault(xc, xc->tcBase(),&temp);
                              Rc = temp;
                           }});
@@ -834,14 +834,14 @@ decode OPCODE default Unknown::unknown() {
             format BasicOperateWithNopCheck {
                 0x70: decode RB {
                     31: ftoit({{ uint64_t temp = Fa_uq;
-		    if(fi_system->fi_execute)
+		    if(true)
 		      fi_system->iew_fault(xc, xc->tcBase(),&temp);
 		    Rc = temp;
 		    }}, FloatCvtOp);
                 }
                 0x78: decode RB {
                     31: ftois({{ int32_t temp = t_to_s(Fa_uq);
-		    if(fi_system->fi_execute)
+		    if(true)
 		      fi_system->iew_fault(xc, xc->tcBase(),&temp);
 		    Rc_sl = temp;
 		    }},FloatCvtOp);
@@ -892,12 +892,12 @@ decode OPCODE default Unknown::unknown() {
             31: decode FP_FULLFUNC {
                 format BasicOperateWithNopCheck {
                     0x004: itofs({{ uint64_t tmp = s_to_t(Ra_ul);
-		    if(fi_system->fi_execute)
+		    if(true)
 		      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		    Fc_uq = tmp;
 		    }}, FloatCvtOp);
 		    0x024: itoft({{ uint64_t tmp = Ra_uq;
-		    if(fi_system->fi_execute)
+		    if(true)
 		      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		    Fc_uq = tmp;
 		    }}, FloatCvtOp);
@@ -915,7 +915,7 @@ decode OPCODE default Unknown::unknown() {
                         if (Fb < 0.0)
                             fault = new ArithmeticFault;
                         double tmp = sqrt(Fb);
-			if(fi_system->fi_execute)
+			if(true)
 			  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 			Fc = tmp;
                     }}, FloatSqrtOp);
@@ -925,7 +925,7 @@ decode OPCODE default Unknown::unknown() {
                             fault = new ArithmeticFault;
 			float tmp;
                         tmp = sqrt(Fb_sf);
-			if(fi_system->fi_execute)
+			if(true)
 			  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 			Fc_sf = tmp;
                     }}, FloatSqrtOp);
@@ -935,7 +935,7 @@ decode OPCODE default Unknown::unknown() {
                             fault = new ArithmeticFault;
 			double tmp;
 			tmp = sqrt(Fb);
-			if(fi_system->fi_execute)
+			if(true)
 			  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
                         Fc = tmp;
                     }}, FloatSqrtOp);
@@ -967,65 +967,65 @@ decode OPCODE default Unknown::unknown() {
                    format FloatingPointOperate {
 #if SS_COMPATIBLE_FP
                        0x00: adds({{ double tmp = Fa + Fb;
-		       if(fi_system->fi_execute)
+		       if(true)
 			 fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		       Fc = tmp;
 		      }});
 		       0x01: subs({{ double tmp = Fa - Fb;
-		       if(fi_system->fi_execute)
+		       if(true)
 			 fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		       Fc = tmp;
 		      }});
 		       0x02: muls({{ double tmp = Fa * Fb;
-		       if(fi_system->fi_execute)
+		       if(true)
 			 fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		       Fc = tmp;
 		      }}, FloatMultOp);
 		       0x03: divs({{ double tmp = Fa / Fb;
-		       if(fi_system->fi_execute)
+		       if(true)
 			 fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		       Fc = tmp;
 		      }}, FloatDivOp);
 #else
                        0x00: adds({{ float temp = Fa_sf + Fb_sf;
-		       if(fi_system->fi_execute)
+		       if(true)
 			 fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		       Fc_sf = temp;
 		      }});
 		       0x01: subs({{ float temp =  Fa_sf - Fb_sf;
-		       if(fi_system->fi_execute)
+		       if(true)
 			 fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		       Fc_sf =tmp;
 		      }});
 		       0x02: muls({{ float temp = Fa_sf * Fb_sf;
-		       if(fi_system->fi_execute)
+		       if(true)
 			 fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 			  Fc_sf = tmp;
 		      }}, FloatMultOp);
 		       0x03: divs({{ float temp =Fa_sf / Fb_sf;
-		       if(fi_system->fi_execute)
+		       if(true)
 			 fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		       Fc_sf = tmp;
 		      }}, FloatDivOp);
 #endif
 
 		       0x20: addt({{ double tmp = Fa + Fb;
-		       if(fi_system->fi_execute)
+		       if(true)
 			 fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		       Fc = tmp;
 		      }});
 		       0x21: subt({{ double tmp = Fa - Fb;
-		       if(fi_system->fi_execute)
+		       if(true)
 			 fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		       Fc = tmp;
 		      }});
 		       0x22: mult({{ double tmp = Fa * Fb;
-		       if(fi_system->fi_execute)
+		       if(true)
 			 fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		       Fc = tmp;
 		      }}, FloatMultOp);
 		       0x23: divt({{ double tmp = Fa / Fb;
-		       if(fi_system->fi_execute)
+		       if(true)
 			 fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		       Fc = tmp;
 		      }}, FloatDivOp);
@@ -1043,26 +1043,26 @@ decode OPCODE default Unknown::unknown() {
         1: decode FP_FULLFUNC {
             format BasicOperateWithNopCheck {
 	      0x0a5, 0x5a5: cmpteq({{ double tmp = (Fa == Fb) ? 2.0 : 0.0;
-	      if(fi_system->fi_execute)
+	      if(true)
 		fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	      Fc = tmp;
 	      }},
                                      FloatCmpOp);
 	      0x0a7, 0x5a7: cmptle({{ double tmp = (Fa <= Fb) ? 2.0 : 0.0;
-	      if(fi_system->fi_execute)
+	      if(true)
 		fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	      Fc = tmp;
 	      }},
                                      FloatCmpOp);
 	      0x0a6, 0x5a6: cmptlt({{ double tmp = (Fa <  Fb) ? 2.0 : 0.0;
-	      if(fi_system->fi_execute)
+	      if(true)
 		fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	      Fc = tmp;
 	      }},
                                      FloatCmpOp);
                 0x0a4, 0x5a4: cmptun({{ // unordered
                 double tmp = (!(Fa < Fb) && !(Fa == Fb) && !(Fa > Fb)) ? 2.0 : 0.0;
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		Fc = tmp;
                 }}, FloatCmpOp);
@@ -1078,21 +1078,21 @@ decode OPCODE default Unknown::unknown() {
                         format FPFixedRounding {
                             // "chopped" i.e. round toward zero
                             0: cvttq({{ int64_t tmp  = (int64_t)trunc(Fb);
-			    if(fi_system->fi_execute)
+			    if(true)
 			      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 			    Fc_sq = tmp;
 			    }},
                                      Chopped);
                             // round to minus infinity
 			    1: cvttq({{ int64_t tmp  = (int64_t)floor(Fb);
-			    if(fi_system->fi_execute)
+			    if(true)
 			      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 			    Fc_sq = tmp;
 			    }},
                                      MinusInfinity);
                         }
                         default: cvttq({{ int64_t tmp = (int64_t)nearbyint(Fb);
-				     if(fi_system->fi_execute)
+				     if(true)
 				       fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 				     Fc_sq = tmp;
 		      }});
@@ -1105,13 +1105,13 @@ decode OPCODE default Unknown::unknown() {
                             // trap on denorm version "cvtst/s" is
                             // simulated same as cvtst
                             0x2ac, 0x6ac: cvtst({{ double tmp = Fb_sf;
-			    if(fi_system->fi_execute)
+			    if(true)
 			      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 			    Fc = tmp;
 			    }});
                         }
                       default: cvtts({{ float tmp =  Fb;
-				     if(fi_system->fi_execute)
+				     if(true)
 				       fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 				     Fc_sf = tmp;
 		      }});
@@ -1123,14 +1123,14 @@ decode OPCODE default Unknown::unknown() {
                     // supported though.
                     0x3c: decode FP_TRAPMODE {
 		      0,7: cvtqs({{ float tmp = Fb_sq;
-		      if(fi_system->fi_execute)
+		      if(true)
 			fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		      Fc_sf = tmp;
 		      }});
                     }
                     0x3e: decode FP_TRAPMODE {
                         0,7: cvtqt({{ double tmp    = Fb_sq;
-			if(fi_system->fi_execute)
+			if(true)
 			  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 			Fc = tmp;
 			}});
@@ -1145,13 +1145,13 @@ decode OPCODE default Unknown::unknown() {
         format BasicOperateWithNopCheck {
             0x010: cvtlq({{
 		int32_t tmp = (Fb_uq<63:62> << 30) | Fb_uq<58:29>;
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		Fc_sl = tmp;
             }});
             0x030: cvtql({{
                 uint64_t tmp = (Fb_uq<31:30> << 62) | (Fb_uq<29:0> << 29);
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		Fc_uq = tmp;
             }});
@@ -1166,68 +1166,68 @@ decode OPCODE default Unknown::unknown() {
                 if (sign_bits != 0 && sign_bits != mask(33))
                     fault = new IntegerOverflowFault;
 		uint64_t tmp =  (Fb_uq<31:30> << 62) | (Fb_uq<29:0> << 29);
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		Fc_uq = tmp;
             }});
 
             0x020: cpys({{  // copy sign
             uint64_t tmp = (Fa_uq<63:> << 63) | Fb_uq<62:0>;
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		Fc_uq = tmp;
             }});
             0x021: cpysn({{ // copy sign negated
             uint64_t tmp = (~Fa_uq<63:> << 63) | Fb_uq<62:0>;
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Fc_uq = tmp;
             }});
             0x022: cpyse({{ // copy sign and exponent
 		uint64_t tmp =(Fa_uq<63:52> << 52) | Fb_uq<51:0>;
-		if(fi_system->fi_execute)
+		if(true)
 		  fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 		Fc_uq = tmp;
             }});
 
             0x02a: fcmoveq({{ double tmp = (Fa == 0) ? Fb : Fc;
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Fc = tmp;
 	    }});
 	    0x02b: fcmovne({{ double tmp = (Fa != 0) ? Fb : Fc; 
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Fc = tmp;
 	    }});
 	    0x02c: fcmovlt({{ double tmp = (Fa <  0) ? Fb : Fc; 
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Fc = tmp;
 	    }});
 	    0x02d: fcmovge({{ double tmp = (Fa >= 0) ? Fb : Fc;
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Fc = tmp;
 	    }});
 	    0x02e: fcmovle({{ double tmp = (Fa <= 0) ? Fb : Fc;
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Fc = tmp;
 	    }});
 	    0x02f: fcmovgt({{ double tmp = (Fa >  0) ? Fb : Fc; 
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Fc = tmp;
 	    }});
 
 	    0x024: mt_fpcr({{ uint64_t tmp = Fa_uq;
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    FPCR = tmp;
 	    }}, IsIprAccess);
 	    0x025: mf_fpcr({{ uint64_t tmp = FPCR;
-	    if(fi_system->fi_execute)
+	    if(true)
 	      fi_system->iew_fault(xc, xc->tcBase(),&tmp);
 	    Fa_uq = tmp;
 	    }}, IsIprAccess);
@@ -1535,7 +1535,7 @@ decode OPCODE default Unknown::unknown() {
 	    PseudoInst::fi_activate_inst(xc->tcBase(),  R16, R17);
 		      }}, IsNonSpeculative);
 	    0x58: init_fi_system({{
-			PseudoInst::init_fi_system();
+	      PseudoInst::init_fi_system(xc->tcBase());
 		      }}, IsNonSpeculative);
             0x59: m5reserved5({{
                 warn("M5 reserved opcode ignored");

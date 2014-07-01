@@ -139,7 +139,7 @@ class Fi_System : public MemObject
 
 		void setcheck(bool v){check_before_init=v;};
 		void setswitchcpu(bool v) {switchcpu = v;}
-		void setmaincheckpoint(bool v){maincheckpoint = v;}
+		
 
 		void delete_faults();
 
@@ -175,7 +175,7 @@ class Fi_System : public MemObject
 		bool getCheck(){return check_before_init;}
 		bool getswitchcpu(){return switchcpu;}
 		bool getMainCheckpoint(){return maincheckpoint;}
-
+		void setmaincheckpoint(bool v){maincheckpoint = v;}
 		void reset();
 		virtual Port* getPort(const std::string &if_name, int idx = 0);
 		virtual void init();

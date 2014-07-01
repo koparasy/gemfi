@@ -744,14 +744,14 @@ DPRINTF(FaultInjection,"FaultInjection Request: %u from %llx\n",req,TheISA::getF
 
 }
 
-void init_fi_system()
+void init_fi_system(ThreadContext *tc)
 {
   
   DPRINTF(FaultInjection,"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~REAdy For checkpoint\n"); 
   
   if(!FullSystem)
     panicFsOnlyPseudoInst("init_fi_system");
-  if(fi_system->getmaincheckpoint() == true)
+  if(fi_system->getMainCheckpoint() == true)
      panic("M5 panic instruction called at %s\n", tc->pcState());
   
      if(fi_system->getCheck()){
@@ -762,8 +762,6 @@ void init_fi_system()
           exit(1);
         }
         else if(succeed == 2){
-	  //int num_checkpoints,num_restarts;
-	 //dmtcp_get_local_status(&num_checkpoints,&num_restarts);
 	 std::cout<<"Succesfuuly restored just before Initializing fault Injection \n";        }
       }
       fi_system->reset();
