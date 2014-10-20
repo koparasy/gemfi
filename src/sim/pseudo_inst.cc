@@ -714,6 +714,13 @@ workend(ThreadContext *tc, uint64_t workid, uint64_t threadid)
 
 
 //ALTERCODE
+
+void fi_metadata_start(ThreadContext *tc, uint64_t offset)
+{
+	DPRINTF(FaultInjection,"FaultInjection defines meta data start offset\n");
+}
+
+
 void fi_activate_inst(ThreadContext *tc, uint64_t threadid, uint64_t req)
 {
   if(!FullSystem)

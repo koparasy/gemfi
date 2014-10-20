@@ -51,105 +51,107 @@
 using namespace std;
 
 ObjectFile::ObjectFile(const string &_filename, int _fd,
-                       size_t _len, uint8_t *_data,
-                       Arch _arch, OpSys _opSys)
-    : filename(_filename), descriptor(_fd), fileData(_data), len(_len),
-      arch(_arch), opSys(_opSys), globalPtr(0)
+		size_t _len, uint8_t *_data,
+		Arch _arch, OpSys _opSys)
+: filename(_filename), descriptor(_fd), fileData(_data), len(_len),
+	arch(_arch), opSys(_opSys), globalPtr(0)
 {
 }
 
 
 ObjectFile::~ObjectFile()
 {
-    close();
+	close();
 }
 
 
-bool
+	bool
 ObjectFile::loadSection(Section *sec, PortProxy& memProxy, Addr addrMask, Addr offset)
 {
-    if (sec->size != 0) {
-        Addr addr = (sec->baseAddr & addrMask) + offset;
-        if (sec->fileImage) {
-            memProxy.writeBlob(addr, sec->fileImage, sec->size);
-        }
-        else {
-            // no image: must be bss
-            memProxy.memsetBlob(addr, 0, sec->size);
-        }
-    }
-    return true;
+	if (sec->size != 0) {
+		Addr addr = (sec->baseAddr & addrMask) + offset;
+		if (sec->fileImage) {
+			memProxy.writeBlob(addr, sec->fileImage, sec->size);
+		}
+		else {
+			// no image: must be bss
+			memProxy.memsetBlob(addr, 0, sec->size);
+		}
+	}
+	return true;
 }
 
 
-bool
+	bool
 ObjectFile::loadSections(PortProxy& memProxy, Addr addrMask, Addr offset)
 {
-    return (loadSection(&text, memProxy, addrMask, offset)
-            && loadSection(&data, memProxy, addrMask, offset)
-            && loadSection(&bss, memProxy, addrMask, offset));
+	return (loadSection(&text, memProxy, addrMask, offset)
+			&& loadSection(&data, memProxy, addrMask, offset)
+			&& loadSection(&bss, memProxy, addrMask, offset));
 }
 
 
-void
+	void
 ObjectFile::close()
 {
-    if (descriptor >= 0) {
-        ::close(descriptor);
-        descriptor = -1;
-    }
+	if (descriptor >= 0) {
+		::close(descriptor);
+		descriptor = -1;
+	}
 
-    if (fileData) {
-        ::munmap((char*)fileData, len);
-        fileData = NULL;
-    }
+	if (fileData) {
+		::munmap((char*)fileData, len);
+		fileData = NULL;
+	}
 }
 
 
-ObjectFile *
+	ObjectFile *
 createObjectFile(const string &fname, bool raw)
 {
-    // open the file
-    int fd = open(fname.c_str(), O_RDONLY);
-    if (fd < 0) {
-        return NULL;
-    }
+	// open the file
+	int fd = open(fname.c_str(), O_RDONLY);
 
-    // find the length of the file by seeking to the end
-    size_t len = (size_t)lseek(fd, 0, SEEK_END);
+	std::cout<<"I am trying to open "<<fname<<std::endl; 
+		if (fd < 0) {
+			return NULL;
+		}
 
-    // mmap the whole shebang
-    uint8_t *fileData =
-        (uint8_t *)mmap(NULL, len, PROT_READ, MAP_SHARED, fd, 0);
-    if (fileData == MAP_FAILED) {
-        close(fd);
-        return NULL;
-    }
+	// find the length of the file by seeking to the end
+	size_t len = (size_t)lseek(fd, 0, SEEK_END);
 
-    ObjectFile *fileObj = NULL;
+	// mmap the whole shebang
+	uint8_t *fileData =
+		(uint8_t *)mmap(NULL, len, PROT_READ, MAP_SHARED, fd, 0);
+	if (fileData == MAP_FAILED) {
+		close(fd);
+		return NULL;
+	}
 
-    // figure out what we have here
-    if ((fileObj = EcoffObject::tryFile(fname, fd, len, fileData)) != NULL) {
-        return fileObj;
-    }
+	ObjectFile *fileObj = NULL;
 
-    if ((fileObj = AoutObject::tryFile(fname, fd, len, fileData)) != NULL) {
-        return fileObj;
-    }
+	// figure out what we have here
+	if ((fileObj = EcoffObject::tryFile(fname, fd, len, fileData)) != NULL) {
+		return fileObj;
+	}
 
-    if ((fileObj = ElfObject::tryFile(fname, fd, len, fileData)) != NULL) {
-        return fileObj;
-    }
+	if ((fileObj = AoutObject::tryFile(fname, fd, len, fileData)) != NULL) {
+		return fileObj;
+	}
 
-    if ((fileObj = DtbObject::tryFile(fname, fd, len, fileData)) != NULL) {
-        return fileObj;
-    }
+	if ((fileObj = ElfObject::tryFile(fname, fd, len, fileData)) != NULL) {
+		return fileObj;
+	}
 
-    if (raw)
-        return RawObject::tryFile(fname, fd, len, fileData);
+	if ((fileObj = DtbObject::tryFile(fname, fd, len, fileData)) != NULL) {
+		return fileObj;
+	}
 
-    // don't know what it is
-    close(fd);
-    munmap((char*)fileData, len);
-    return NULL;
+	if (raw)
+		return RawObject::tryFile(fname, fd, len, fileData);
+
+	// don't know what it is
+	close(fd);
+	munmap((char*)fileData, len);
+	return NULL;
 }

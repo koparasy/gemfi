@@ -92,6 +92,7 @@ func:
 #define AN_GETID INST(m5_op, an_getid, 0, annotate_func)
 
 #define FI_ACTIVATE(r1, r2) INST(m5_op, r1, r2, fi_activate_func)
+#define FI_METADATA(r1) INST(m5_op,r1,0,fi_metadata)
 #define INIT_FI(m5_op, 0, 0, init_fi_system)
 
         .set noreorder

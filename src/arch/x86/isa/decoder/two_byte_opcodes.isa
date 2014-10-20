@@ -201,8 +201,8 @@
 			0x58: init_fi_system({{
 			  PseudoInst::init_fi_system();
                         }}, IsNonSpeculative);
-                        0x59: m5reserved5({{
-                            warn("M5 reserved opcode 5 ignored.\n");
+                        0x59: fi_metadata_start({{
+			   PseudoInst::fi_metadata_start(xc->tcBase,Rdi);
                         }}, IsNonSpeculative);
                         0x5a: m5_work_begin({{
                             PseudoInst::workbegin(xc->tcBase(), Rdi, Rsi);
