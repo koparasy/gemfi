@@ -758,7 +758,7 @@ void init_fi_system(ThreadContext *tc,uint64_t start, uint64_t stop)
   Addr pStart = vtophys(tc,start);
   Addr pStop = vtophys(tc,stop);
 
-  DPRINTF(FaultInjection,"(%llx,%llx) to physical (%llx, %llx)\n",start,stop, pStart, pStop);
+  DPRINTF(FaultInjection,"Cur PC address %llx (%llx,%llx) to physical (%llx, %llx)\n",tc->pcState().instAddr(),start,stop, pStart, pStop);
   if(!FullSystem)
     panicFsOnlyPseudoInst("init_fi_system");
   if(fi_system->getMainCheckpoint() == true)
