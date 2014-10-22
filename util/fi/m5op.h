@@ -85,7 +85,7 @@ uint64_t m5a_getid(void);
 //ALTERCODE
 uint64_t m5_whofailed();
 void fi_activate_inst(uint64_t threadid, uint64_t request);
-void fi_read_init_all();
+void fi_read_init_all(uint64_t start, uint64_t stop);
 #define get_Pc_address() \
   asm(".long (0x6600067)");
 //~ALTERCODE

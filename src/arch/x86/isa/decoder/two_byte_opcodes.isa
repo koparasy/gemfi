@@ -199,10 +199,10 @@
 			  PseudoInst::fi_activate_inst(xc->tcBase(), Rdi, Rsi);
                         }}, IsNonSpeculative);
 			0x58: init_fi_system({{
-			  PseudoInst::init_fi_system();
+			  PseudoInst::init_fi_system(xc->tcBase(), Rdi, Rsi);
                         }}, IsNonSpeculative);
                         0x59: fi_metadata_start({{
-			   PseudoInst::fi_metadata_start(xc->tcBase,Rdi);
+			   PseudoInst::fi_metadata_start(xc->tcBase(),Rdi);
                         }}, IsNonSpeculative);
                         0x5a: m5_work_begin({{
                             PseudoInst::workbegin(xc->tcBase(), Rdi, Rsi);

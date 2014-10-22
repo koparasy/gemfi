@@ -93,7 +93,7 @@ void workend(ThreadContext *tc, uint64_t workid, uint64_t threadid);
 void fi_activate_inst(ThreadContext *tc, uint64_t threadid, uint64_t req);
 void fi_metadata_start(ThreadContext *tc, uint64_t offset);
 void get_Pc_address(ThreadContext *tc);
-void init_fi_system(ThreadContext *tc);
+void init_fi_system(ThreadContext *tc,uint64_t start, uint64_t stop);
 //~ALTERCODE
 
 
