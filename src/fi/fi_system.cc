@@ -49,6 +49,8 @@ Fi_System::Fi_System(Params *p)
 
   std:: stringstream s1;
   in_name = p->input_fi;
+  meta_file=p->meta_file;
+  text_start=p->text_start;
   setcheck(p->check_before_init);
   setswitchcpu(p->fi_switch);
   fi_enable = 0;

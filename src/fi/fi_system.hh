@@ -62,14 +62,23 @@ class Fi_System : public MemObject
 	private :
 		std::ifstream input;
 		std::string in_name;
+		std::string meta_file;
+		unsigned int text_start;	
+		Addr StartingPCAddr;
+		ifstream meta_input;
 
 
-		class Fi_SystemEvent : public Event
+	class Fi_SystemEvent : public Event
 	{
 		private:
 			ThreadContext *tc;
 			uint64_t ticks;
 		public:
+			unsigned char getSignificance(Addr PCAddr){
+				unsigned long = PCAddr - StartingPCAddr;
+
+			}
+
 			void setticks(uint64_t tick){ticks=tick;}
 			Fi_SystemEvent(ThreadContext *tc){
 				DPRINTF(FaultInjection,"scheduling switchcpu\n");
@@ -109,7 +118,7 @@ class Fi_System : public MemObject
 		std::map<Addr, ThreadEnabledFault*> fi_activation; //A hash table key : PCB address --- vector position
 		std::map<Addr, ThreadEnabledFault*>::iterator fi_activation_iter;
 
-		
+
 		ThreadEnabledFault *allthreads;
 
 
@@ -139,7 +148,7 @@ class Fi_System : public MemObject
 
 		void setcheck(bool v){check_before_init=v;};
 		void setswitchcpu(bool v) {switchcpu = v;}
-		
+
 
 		void delete_faults();
 
@@ -239,14 +248,14 @@ class Fi_System : public MemObject
 				if( thread->getMode() == START && FullSystem && (TheISA::inUserMode(tc))   ){
 					Addr pcaddr = ptr->instAddr();
 					std::string _name = tc->getCpuPtr()->name();
-//					thread->write_instr_and_name(pcaddr,ptr->getcurInstr()->getName());
+					//					thread->write_instr_and_name(pcaddr,ptr->getcurInstr()->getName());
 
 					while ((iewFault = reinterpret_cast<IEWStageInjectedFault *>(iewStageInjectedFaultQueue.scan(_name, *thread, pcaddr))) != NULL){
 						*value = iewFault->process(*value);
 						DPRINTF(FaultInjection,"PCAddr:%llx Fault Inserted in instruction %s\n",pcaddr,ptr->getcurInstr()->getName());
 						scheduleswitch(tc);
 					}
-//					DPRINTF(FaultInjection,"PCAddr:%llx Fault Inserted in instruction %s\n",pcaddr,ptr->getcurInstr()->getName());
+					//					DPRINTF(FaultInjection,"PCAddr:%llx Fault Inserted in instruction %s\n",pcaddr,ptr->getcurInstr()->getName());
 
 					thread->increaseExecutedInstr(_name);
 					allthreads->increaseExecutedInstr(_name);
@@ -275,16 +284,16 @@ class Fi_System : public MemObject
 
 			GeneralFetchInjectedFault *fetchfault = NULL;
 			std::string _name = tc->getCpuPtr()->name();
-			
-			if(thread->getMode() != START)
-			  return cur_instr;
 
-		 	if(FullSystem && TheISA::inUserMode(tc)){	
+			if(thread->getMode() != START)
+				return cur_instr;
+
+			if(FullSystem && TheISA::inUserMode(tc)){	
 				thread->increaseFetchedInstr(_name);
 				thread->write_PC_address(pcaddr);
 			}
 			else
-		 		return cur_instr;	
+				return cur_instr;	
 
 			allthreads->increaseFetchedInstr(_name);
 			while ((fetchfault = reinterpret_cast<GeneralFetchInjectedFault *>(fetchStageInjectedFaultQueue.scan(_name, *thread, pcaddr))) != NULL){
@@ -302,8 +311,8 @@ class Fi_System : public MemObject
 			RegisterDecodingInjectedFault *decodefault = NULL;
 
 			if(thread->getMode() != START)
-			  return cur_instr;
-			
+				return cur_instr;
+
 			while ((decodefault = reinterpret_cast<RegisterDecodingInjectedFault *>(decodeStageInjectedFaultQueue.scan(_name, *thread, pcaddr))) != NULL){
 				cur_instr = decodefault->process(cur_instr);
 				DPRINTF(FaultInjection,"PCAddr:%llx Fault Inserted %s \n",pcaddr,cur_instr->getName());
@@ -312,6 +321,21 @@ class Fi_System : public MemObject
 
 
 			return cur_instr;
+		}
+
+
+		void setStartingPCAddr(Addr vAddr){StartingPCAddr = vAddr;}
+		Addr getStartingPCAddr(){return StartingPCAddr}
+		void open_meta_file(){
+			meta_input.open(meta_file.c_str(),ifstream::binary);
+			if (!meta_input.is_open() ){
+				DPRINTF(FaultInjection,"Cannot Open meta data file\n");
+				assert(NULL);
+			}
+		}
+
+		bool getSignificance(Addr PC_addr){
+			return true;
 		}
 
 
