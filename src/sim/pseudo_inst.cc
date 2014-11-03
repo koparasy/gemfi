@@ -754,11 +754,13 @@ DPRINTF(FaultInjection,"FaultInjection Request: %u from %llx\n",req,TheISA::getF
 void init_fi_system(ThreadContext *tc,uint64_t start, uint64_t stop)
 {
   
-  DPRINTF(FaultInjection,"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~REAdy For checkpoint\n"); 
   Addr pStart = vtophys(tc,start);
   Addr pStop = vtophys(tc,stop);
 
   DPRINTF(FaultInjection,"Cur PC address %llx (%llx,%llx) to physical (%llx, %llx)\n",tc->pcState().instAddr(),start,stop, pStart, pStop);
+  fi_system->setStartingPCAddr(start);
+
+
   if(!FullSystem)
     panicFsOnlyPseudoInst("init_fi_system");
   if(fi_system->getMainCheckpoint() == true)

@@ -174,7 +174,10 @@ class BaseDynInst : public RefCounted
 
     /** InstRecord that tracks this instructions. */
     Trace::InstRecord *traceData;
-
+    //ALTERCODE
+    int instSize;
+    Addr instPCAddr;
+    //~ALTERCODE
   protected:
     /** The result of the instruction; assumes an instruction can have many
      *  destination registers.
@@ -877,6 +880,14 @@ class BaseDynInst : public RefCounted
     /** Sets the number of consecutive store conditional failures. */
     void setStCondFailures(unsigned sc_failures)
     { thread->storeCondFailures = sc_failures; }
+    
+    //ALTERCODE
+    int getInstSize() { return instSize; }
+    void setInstSize(int val){ instSize = val;}
+
+    Addr getInstPCAddr(){ return instPCAddr; }
+    void setInstPCAddr(Addr val){ instPCAddr = val;}
+    //~ALTERCODE
 };
 
 template<class Impl>

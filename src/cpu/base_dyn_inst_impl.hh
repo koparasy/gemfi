@@ -131,6 +131,8 @@ BaseDynInst<Impl>::initVars()
 #endif
 
     reqToVerify = NULL;
+    instPCAddr = 0;
+    instSize=-1; 
 }
 
 template <class Impl>
