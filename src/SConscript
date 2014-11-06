@@ -151,7 +151,7 @@ class SourceFile(object):
 
 class Source(SourceFile):
     '''Add a c/c++ source file to the build'''
-    def __init__(self, source, Werror=True, swig=False, **guards):
+    def __init__(self, source, Werror=False, swig=False, **guards):
         '''specify the source file, and any guards'''
         super(Source, self).__init__(source, **guards)
 

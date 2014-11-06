@@ -221,11 +221,15 @@ class Fi_System : public MemObject
 
                 if(!( tc->getEnabledFI()))
                     return value;
-
                 ThreadEnabledFault *thread = tc->getEnabledFIThread();
                 LoadStoreInjectedFault *loadStoreFault = NULL;
                 if( thread->getMode() == START && FullSystem  && (TheISA::inUserMode(tc))  ){
                     Addr pcAddr = ptr->instAddr(); //PC address for this instruction
+                    bool sigInstr = getSignificance(pcAddr);
+                     if (sigInstr)
+                        return value;
+
+                //DPRINTF(FaultInjection,"Load store faults I am In here\n"); 
                     std::string _name = tc->getCpuPtr()->name();
                     thread->write_instr_and_name(pcAddr,ptr->getcurInstr()->getName());
                     while ((loadStoreFault  = reinterpret_cast<LoadStoreInjectedFault *>(LoadStoreInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
@@ -251,7 +255,7 @@ class Fi_System : public MemObject
 
                     bool sigInstr = getSignificance(pcAddr);
 
-                    if (!sigInstr)
+                    if (sigInstr)
                         return;
 
 
@@ -263,11 +267,12 @@ class Fi_System : public MemObject
                         DPRINTF(FaultInjection,"PCAddr:%llx Fault Inserted in instruction %s\n",pcAddr,ptr->getcurInstr()->getName());
                         scheduleswitch(tc);
                     }
-                    //					DPRINTF(FaultInjection,"PCAddr:%llx Fault Inserted in instruction %s\n",pcaddr,ptr->getcurInstr()->getName());
+                   //DPRINTF(FaultInjection,"PCAddr:%llx Fault Inserted in instruction %s\n",pcaddr,ptr->getcurInstr()->getName());
 
                     thread->increaseExecutedInstr(_name);
                     allthreads->increaseExecutedInstr(_name);
                 }
+
                 return;
             }
 
@@ -296,6 +301,13 @@ class Fi_System : public MemObject
             if(thread->getMode() != START)
                 return cur_instr;
 
+
+            bool sigInstr = getSignificance(pcAddr);
+
+            if (sigInstr)
+                return cur_instr;
+
+
             if(FullSystem && TheISA::inUserMode(tc)){	
                 thread->increaseFetchedInstr(_name);
                 thread->write_PC_address(pcAddr);
@@ -304,10 +316,6 @@ class Fi_System : public MemObject
                 return cur_instr;	
 
 
-            bool sigInstr = getSignificance(pcAddr);
-
-            if (!sigInstr)
-                return cur_instr;
 
             allthreads->increaseFetchedInstr(_name);
             while ((fetchfault = reinterpret_cast<GeneralFetchInjectedFault *>(fetchStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){

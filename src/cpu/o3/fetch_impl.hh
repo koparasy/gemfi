@@ -1309,7 +1309,7 @@ DefaultFetch<Impl>::fetch(bool &status_change)
             MachInst inst = TheISA::gtoh(cacheInsts[blkOffset]);
             //ALTERCODE
             //inject faults on fetch stage (opcode--whole instruction)
-            if(enabled_fi && fi_system->fi_fetch)
+            if(enabled_fi )
                 fi_system -> fetch_fault(curr_tc,curr_thread,inst,thisPC.instAddr());
             //~ALTERCODE
             decoder[tid]->moreBytes(thisPC, fetchAddr, inst);
@@ -1324,17 +1324,10 @@ DefaultFetch<Impl>::fetch(bool &status_change)
         // Extract as many instructions and/or microops as we can from
         // the memory we've processed so far.
         do {
-                int instSize = -1;
-                Addr instPCAddr = 0;
             if (!(curMacroop || inRom)) {
                if (decoder[tid]->instReady()) {
                    staticInst = decoder[tid]->decode(thisPC);
-                    //ALTERCODE
-                    instSize=decoder[tid]->getInstSize();  
-                    instPCAddr = decoder[tid]->getInstAddr();
-                    //ALTERCODE
-       
-                    // Increment stat of fetched instructions.
+                               // Increment stat of fetched instructions.
                     ++fetchedInsts;
 
                     if (staticInst->isMacroop()) {
@@ -1372,8 +1365,6 @@ DefaultFetch<Impl>::fetch(bool &status_change)
             DynInstPtr instruction =
                 buildInst(tid, staticInst, curMacroop,
                         thisPC, nextPC, true);
-            instruction->setInstSize(instSize);
-            instruction->setInstPCAddr(instPCAddr);
             ppFetch->notify(instruction);
             numInst++;
 

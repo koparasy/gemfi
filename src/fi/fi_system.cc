@@ -599,6 +599,7 @@ void Fi_System::start_fi(ThreadContext *tc,  uint64_t threadid){
 
 void Fi_System::pause_fi(ThreadContext *tc,uint64_t threadid)
 {
+  static int number_of_pauses=0;
   Addr _tmpAddr  = TheISA::getFiThread(tc);
   fi_activation_iter = fi_activation.find(_tmpAddr);
   if (fi_activation_iter == fi_activation.end()) {
@@ -610,6 +611,10 @@ void Fi_System::pause_fi(ThreadContext *tc,uint64_t threadid)
     fi_enable--;
     tc->setEnabledFIThread(NULL);
   }
+    if( (number_of_pauses++)%100 == 99){
+        DPRINTF(FaultInjection,"Paused one more time\n");
+    }
+    
 }
 
 void Fi_System:: stop_fi(ThreadContext *tc, uint64_t req){
@@ -640,6 +645,7 @@ void Fi_System:: stop_fi(ThreadContext *tc, uint64_t req){
 
 
 void Fi_System::dump_fi(ThreadContext *tc){
+    DPRINTF(FaultInjection, "Dumping number of instructions\n");
 	for( fi_activation_iter = fi_activation.begin(); fi_activation_iter!=fi_activation.end() ; ++fi_activation_iter){
 		DPRINTF(FaultInjection, " Thread ID : %llx\n",fi_activation_iter->first);
 		fi_activation_iter->second->print_time();

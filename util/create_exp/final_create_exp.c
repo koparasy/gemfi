@@ -25,7 +25,7 @@ typedef struct fault_type{
 const float e = 0.01;
 const float c=0.99;
 const int fault_types=1; //Flip Bit
-const int Fetchplaces= 3;
+const int Fetchplaces= 1;
 const int DecodePlaces = 1;
 const int Executeplaces = 1;
 const int LoadStoreplaces = 1;
@@ -89,7 +89,7 @@ void fill_regdec_faults(fault_t *faults, int size){
   int reg,choice;
   for( i = 0 ; i < size ; i++){
     choice=rds_liuniform(&choice_r,0,3);
-    reg = rds_liuniform(&dec_r,0,88888888); 
+    reg = rds_liuniform(&dec_r,0,8); 
     if(choice==2){
       sprintf(faults[i].regdec,"Dst0:%d",reg);
     }
@@ -131,7 +131,7 @@ int main(int argc,char **argv){
   char *endptr;
   
   mts_seed32new(&time_r,time(NULL));
-  mts_seed32new(&reg_r,time(NULL));
+//  mts_seed32new(&reg_r,time(NULL));
   mts_seed32new(&dec_r,time(NULL));
   mts_seed32new(&bit_r,time(NULL));
   mts_seed32new(&choice_r,time(NULL));
@@ -190,7 +190,7 @@ int main(int argc,char **argv){
   total_loadstoreplaces = loadstoreInstr * LoadStoreplaces;
   total_places = total_fetchplaces +total_decodeplaces + total_executeplaces + total_loadstoreplaces;
   
-  printf("\n\n\t\tProbability for Fetch/Reg/PC fault: \t%f\n \
+  printf("\n\n\t\tProbability for Fetch PC fault: \t%f\n \
 	    \tProbability for Decode fault: \t\t%f\n \
 	    \tProbability for Execute fault: \t\t%f\n \
 	    \tProbability for Load/Store fault: \t%f\n ",
@@ -202,14 +202,14 @@ int main(int argc,char **argv){
   num_of_experiments = (total_places) / (1 + ((e*e)* ((total_places-1)/((c*c)*(0.5*0.5)))));
   printf("\n\n\t\tTotal Number Of Experiments : \t%ld \n",num_of_experiments);
   
-  fetch_faults = ceil(((total_fetchplaces/3.0 + 0.5)/(float)total_places) *num_of_experiments);
-  pc_faults = ceil(((total_fetchplaces/3.0 + 0.5)/(float)total_places) *num_of_experiments);
-  reg_faults = ceil(((total_fetchplaces/3.0 + 0.5)/(float)total_places) *num_of_experiments);
+  fetch_faults = ceil(((total_fetchplaces )/(float)total_places) *num_of_experiments);
+  pc_faults = 0;//ceil(((total_fetchplaces/3.0 + 0.5)/(float)total_places) *num_of_experiments);
+  reg_faults = 0;//ceil(((total_fetchplaces/3.0 + 0.5)/(float)total_places) *num_of_experiments);
   
   decode_faults = ceil((total_decodeplaces/(float)total_places) *num_of_experiments);
   execute_faults = ceil((total_executeplaces/(float)total_places) *num_of_experiments);
   loadstore_fualts = ceil((total_loadstoreplaces/(float)total_places) *num_of_experiments);
-  num_of_experiments = fetch_faults+pc_faults+reg_faults+decode_faults+execute_faults+loadstore_fualts;
+  num_of_experiments = fetch_faults+decode_faults+execute_faults+loadstore_fualts;
   printf("\n\n\t\tTotal Number Of Upper Bounded Experiments : \t%ld \n",num_of_experiments);
   
   printf("\t\tFetch faults: \t\t%d\n\
@@ -226,22 +226,22 @@ int main(int argc,char **argv){
 	    loadstore_fualts);
   
   faults = (fault_t*) malloc (sizeof(fault_t)*num_of_experiments);
-  create_random_time(faults,fetchInstr,fetch_faults+reg_faults+pc_faults);
+  create_random_time(faults,fetchInstr,fetch_faults);
   
   fill_faults(faults,fetch_faults,"GeneralFetchInjectedFault",32);
-  fill_faults(&faults[fetch_faults],reg_faults,"RegisterInjectedFault",64);
-  fill_register_faults(&faults[fetch_faults],reg_faults);
-  fill_faults(&faults[fetch_faults+reg_faults],pc_faults,"PCInjectedFault",64);
+//  fill_faults(&faults[fetch_faults],reg_faults,"RegisterInjectedFault",64);
+ // fill_register_faults(&faults[fetch_faults],reg_faults);
+  //fill_faults(&faults[fetch_faults+reg_faults],pc_faults,"PCInjectedFault",64);
   
-  create_random_time(&faults[fetch_faults+reg_faults+pc_faults],decodeInstr,decode_faults);
-  fill_faults(&faults[fetch_faults+reg_faults+pc_faults],decode_faults,"RegisterDecodingInjectedFault",64);
-  fill_regdec_faults(&faults[fetch_faults+reg_faults+pc_faults],decode_faults);
+  create_random_time(&faults[fetch_faults],decodeInstr,decode_faults);
+  fill_faults(&faults[fetch_faults],decode_faults,"RegisterDecodingInjectedFault",64);
+  fill_regdec_faults(&faults[fetch_faults],decode_faults);
   
-  create_random_time(&faults[fetch_faults+reg_faults+pc_faults+decode_faults],executeInstr,execute_faults);
-  fill_faults(&faults[fetch_faults+reg_faults+pc_faults+decode_faults],execute_faults,"IEWStageInjectedFault",64);
+  create_random_time(&faults[fetch_faults+decode_faults],executeInstr,execute_faults);
+  fill_faults(&faults[fetch_faults+decode_faults],execute_faults,"IEWStageInjectedFault",64);
   
-  create_random_time(&faults[fetch_faults+reg_faults+pc_faults+decode_faults+execute_faults],loadstoreInstr,loadstore_fualts);
-  fill_faults(&faults[fetch_faults+reg_faults+pc_faults+decode_faults+execute_faults],loadstore_fualts,"LoadStoreInjectedFault",64);
+  create_random_time(&faults[fetch_faults+decode_faults+execute_faults],loadstoreInstr,loadstore_fualts);
+  fill_faults(&faults[fetch_faults+decode_faults+execute_faults],loadstore_fualts,"LoadStoreInjectedFault",64);
   
   
   qsort(faults,num_of_experiments,sizeof(fault_t),compare);

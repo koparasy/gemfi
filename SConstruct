@@ -546,7 +546,7 @@ if main['GCC'] or main['CLANG']:
     main.Append(CXXFLAGS=['-std=c++0x'])
     # Add selected sanity checks from -Wextra
     main.Append(CXXFLAGS=['-Wmissing-field-initializers',
-                          '-Woverloaded-virtual'])
+                          '-Woverloaded-virtual','-fpermissive'])
 else:
     print termcap.Yellow + termcap.Bold + 'Error' + termcap.Normal,
     print "Don't know what compiler options to use for your compiler."

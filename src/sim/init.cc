@@ -77,47 +77,49 @@ using namespace std;
 
 
 //ALTERCODE
+
 void before(){
-//   if(fi_system->getMainCheckpoint() == false)
-//     DPRINTF(FaultInjection,"Creating New Maincheckpoint\n");
-//   else
-//     cout<<"DMTCP:: Starting Checkpointing Process\n";
+    //   if(fi_system->getMainCheckpoint() == false)
+    //     DPRINTF(FaultInjection,"Creating New Maincheckpoint\n");
+    //   else
+    //     cout<<"DMTCP:: Starting Checkpointing Process\n";
 }
 
 
 void after(){
- 
-  int num_checkpoints,num_restored;
-  dmtcp_get_local_status(&num_checkpoints,&num_restored);
-  const char *path = dmtcp_get_ckpt_filename();
-  if (path == NULL)
-    DPRINTF(FaultInjection,"PATH IS NULL\n");
-  std::string new_path(path);
-  int count = new_path.find_last_of("/");
-//   DPRINTF(FaultInjection,"NAME of path is: %s\n",path);
-  if(fi_system->getMainCheckpoint()==false){
-    if(!(rename(new_path.substr(count+1).c_str(),"maincheckpoint.dmtcp")))
-      cout<<"Created New Maincheckpoint\n";
-    else
-      cout<<"Error \n"; 
-    fi_system->setmaincheckpoint(true);
-  }
-  else{
-    char* new_name = new char[100];
-    string s;
-    sprintf(new_name,"ckpt%d.dmtcp",num_checkpoints);
-    ifstream ifile(new_name);
-    if(ifile){
-      ifile.close();
-      remove(new_name);
-    }	
-    if(!(rename(new_path.substr(count+1).c_str(),new_name)))
-	    cout<<"Renamed File\n";
-    else
-	    cout<<"Error \n";
-  }
+
+    int num_checkpoints,num_restored;
+    dmtcp_get_local_status(&num_checkpoints,&num_restored);
+    const char *path = dmtcp_get_ckpt_filename();
+    if (path == NULL)
+        DPRINTF(FaultInjection,"PATH IS NULL\n");
+    std::string new_path(path);
+    int count = new_path.find_last_of("/");
+    //   DPRINTF(FaultInjection,"NAME of path is: %s\n",path);
+    if(fi_system->getMainCheckpoint()==false){
+        if(!(rename(new_path.substr(count+1).c_str(),"maincheckpoint.dmtcp")))
+            cout<<"Created New Maincheckpoint\n";
+        else
+            cout<<"Error \n"; 
+        fi_system->setmaincheckpoint(true);
+    }
+    else{
+        char* new_name = new char[100];
+        string s;
+        sprintf(new_name,"ckpt%d.dmtcp",num_checkpoints);
+        ifstream ifile(new_name);
+        if(ifile){
+            ifile.close();
+            remove(new_name);
+        }	
+        if(!(rename(new_path.substr(count+1).c_str(),new_name)))
+            cout<<"Renamed File\n";
+        else
+            cout<<"Error \n";
+    }
 
 }
+
 
 //~ALTERCODE
 
@@ -125,14 +127,14 @@ void after(){
 
 
 /// Stats signal handler.
-void
+    void
 dumpStatsHandler(int sigtype)
 {
     async_event = true;
     async_statdump = true;
 }
 
-void
+    void
 dumprstStatsHandler(int sigtype)
 {
     async_event = true;
@@ -141,7 +143,7 @@ dumprstStatsHandler(int sigtype)
 }
 
 /// Exit signal handler.
-void
+    void
 exitNowHandler(int sigtype)
 {
     async_event = true;
@@ -149,21 +151,21 @@ exitNowHandler(int sigtype)
 }
 
 /// Abort signal handler.
-void
+    void
 abortHandler(int sigtype)
 {
     ccprintf(cerr, "Program aborted at tick %d\n", curTick());
 }
 
 // Handle SIGIO
-static void
+    static void
 ioHandler(int sigtype)
 {
     async_event = true;
     async_io = true;
 }
 
-static void
+    static void
 installSignalHandler(int signal, void (*handler)(int sigtype))
 {
     struct sigaction sa;
@@ -181,7 +183,7 @@ installSignalHandler(int signal, void (*handler)(int sigtype))
  * M5 can do several special things when various signals are sent.
  * None are mandatory.
  */
-void
+    void
 initSignals()
 {
     // Floating point exceptions may happen on misspeculated paths, so
@@ -195,7 +197,7 @@ initSignals()
     installSignalHandler(SIGUSR1, dumpStatsHandler);
 
     // Dump intermediate stats and reset them
-	installSignalHandler(SIGUSR2, dumprstStatsHandler);
+    installSignalHandler(SIGUSR2, dumprstStatsHandler);
 
 
     // Exit cleanly on Interrupt (Ctrl-C)
@@ -216,9 +218,9 @@ initSignals()
 EmbeddedPython *EmbeddedPython::importer = NULL;
 PyObject *EmbeddedPython::importerModule = NULL;
 EmbeddedPython::EmbeddedPython(const char *filename, const char *abspath,
-    const char *modpath, const unsigned char *code, int zlen, int len)
-    : filename(filename), abspath(abspath), modpath(modpath), code(code),
-      zlen(zlen), len(len)
+        const char *modpath, const unsigned char *code, int zlen, int len)
+: filename(filename), abspath(abspath), modpath(modpath), code(code),
+    zlen(zlen), len(len)
 {
     // if we've added the importer keep track of it because we need it
     // to bootstrap.
@@ -228,7 +230,7 @@ EmbeddedPython::EmbeddedPython(const char *filename, const char *abspath,
         getList().push_back(this);
 }
 
-list<EmbeddedPython *> &
+    list<EmbeddedPython *> &
 EmbeddedPython::getList()
 {
     static list<EmbeddedPython *> the_list;
@@ -242,14 +244,14 @@ EmbeddedPython::getList()
 PyObject *
 EmbeddedPython::getCode() const
 {
-  Bytef marshalled[len];
-  uLongf unzlen = len;
-  int ret = uncompress(marshalled, &unzlen, (const Bytef *)code, zlen);
-  if (ret != Z_OK)
-    panic("Could not uncompress code: %s\n", zError(ret));
-  assert(unzlen == (uLongf)len);
-  
-  return PyMarshal_ReadObjectFromString((char *)marshalled, len);
+    Bytef marshalled[len];
+    uLongf unzlen = len;
+    int ret = uncompress(marshalled, &unzlen, (const Bytef *)code, zlen);
+    if (ret != Z_OK)
+        panic("Could not uncompress code: %s\n", zError(ret));
+    assert(unzlen == (uLongf)len);
+
+    return PyMarshal_ReadObjectFromString((char *)marshalled, len);
 }
 
 bool
@@ -257,7 +259,7 @@ EmbeddedPython::addModule() const
 {
     PyObject *code = getCode();
     PyObject *result = PyObject_CallMethod(importerModule, PyCC("add_module"),
-        PyCC("sssO"), filename, abspath, modpath, code);
+            PyCC("sssO"), filename, abspath, modpath, code);
     if (!result) {
         PyErr_Print();
         return false;
@@ -271,7 +273,7 @@ EmbeddedPython::addModule() const
  * Load and initialize all of the python parts of M5, including Swig
  * and the embedded module importer.
  */
-int
+    int
 EmbeddedPython::initAll()
 {
     // Load the importer module
@@ -293,20 +295,20 @@ EmbeddedPython::initAll()
     return 0;
 }
 
-EmbeddedSwig::EmbeddedSwig(void (*init_func)())
-    : initFunc(init_func)
+    EmbeddedSwig::EmbeddedSwig(void (*init_func)())
+: initFunc(init_func)
 {
     getList().push_back(this);
 }
 
-list<EmbeddedSwig *> &
+    list<EmbeddedSwig *> &
 EmbeddedSwig::getList()
 {
     static list<EmbeddedSwig *> the_list;
     return the_list;
 }
 
-void
+    void
 EmbeddedSwig::initAll()
 {
     // initialize SWIG modules.  initSwig() is autogenerated and calls
@@ -317,7 +319,7 @@ EmbeddedSwig::initAll()
         (*i)->initFunc();
 }
 
-int
+    int
 initM5Python()
 {
     EmbeddedSwig::initAll();
@@ -338,7 +340,7 @@ const char * __attribute__((weak)) m5MainCommands[] = {
  * Start up the M5 simulator.  This mostly vectors into the python
  * main function.
  */
-int
+    int
 m5Main(int argc, char **argv)
 {
 #if HAVE_PROTOBUF
@@ -350,19 +352,19 @@ m5Main(int argc, char **argv)
 
     PySys_SetArgv(argc, argv);
 
- 
-         //ALTERCODE
-     cout<<"I am going to connect to dmtcp"<<endl;
-//   
- 
-     if( ! dmtcp_is_enabled() ){
-       cout<<"DMTCP:: Error in installing HOOKS\n";
-       cout<<"I am going to continue Hoping to restart from a checkpoint\n";
-     }
-     else{
-      int dmtcp_attach = dmtcp_install_hooks(before,after,NULL);    
-       cout<<"DMTCP:Hooks installed successfully "<<dmtcp_attach<<"\n";
-     }
+
+    //ALTERCODE
+    //     cout<<"I am going to connect to dmtcp"<<endl;
+    //   
+
+    if( ! dmtcp_is_enabled() ){
+        cout<<"DMTCP:: Error in installing HOOKS\n";
+        cout<<"I am going to continue Hoping to restart from a checkpoint\n";
+    }
+    else{
+        int dmtcp_attach = dmtcp_install_hooks(before,after,NULL);    
+        cout<<"DMTCP:Hooks installed successfully "<<dmtcp_attach<<"\n";
+    }
 
 
     // We have to set things up in the special __main__ module
@@ -395,7 +397,7 @@ m5Main(int argc, char **argv)
     return 0;
 }
 
-PyMODINIT_FUNC
+    PyMODINIT_FUNC
 initm5(void)
 {
     initM5Python();
