@@ -198,6 +198,7 @@ def addCommonOptions(parser):
         help="switch from timing to Detailed CPU after warmup period of <N>")
     parser.add_option("-p", "--prog-interval", type="str",
         help="CPU Progress Interval")
+ 
 
     # Fastforwarding and simpoint related materials
     parser.add_option("-W", "--warmup-insts", action="store", type="int",
