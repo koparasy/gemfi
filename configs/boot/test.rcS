@@ -1,3 +1,3 @@
-./dct 64 64 0 2 
+./dct_dual 64 64 0 2 
 echo "finished execution"
 m5 exit
