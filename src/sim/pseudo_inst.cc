@@ -764,6 +764,7 @@ namespace PseudoInst {
             DPRINTF(FaultInjection,"Val Of checkpoint %d\n",succeed);
             if(succeed == 1){
                 std::cout<<"!!!FI_SYSTEM!!! Internal checkpoint successfully created terminating...\n";
+                fi_system->rename_ckpt("maincheckpoint.dmtcp");
                 exit(1);
             }
             else if(succeed == 2){

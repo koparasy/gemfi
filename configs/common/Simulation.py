@@ -82,6 +82,9 @@ def setCPUClass(options):
         CPUClass = TmpClass
         TmpClass = AtomicSimpleCPU
         test_mem_mode = 'atomic'
+    elif options.switch_on_fault:
+        CPUClass = AtomicSimpleCPU
+        test_mem_mode='timing'
 
     return (TmpClass, test_mem_mode, CPUClass)
 
@@ -454,6 +457,10 @@ def run(options, root, testsys, cpu_class):
                     str(testsys.cpu[0].max_insts_any_thread)
             exit_event = m5.simulate()
         elif cpu_class and options.fast_forward:
+            print "Switch at instruction count:%s" % \
+                    str(testsys.cpu[0].max_insts_any_thread)
+            exit_event = m5.simulate()
+        elif options.switch_on_fault:
             print "Switch at instruction count:%s" % \
                     str(testsys.cpu[0].max_insts_any_thread)
             exit_event = m5.simulate()

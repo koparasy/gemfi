@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <map>
-
+#include <dmtcp.h>
 #include "cpu/o3/cpu.hh"
 #include "cpu/base.hh"
 
@@ -43,7 +43,7 @@ using namespace std;
 
 Fi_System *fi_system;
 
-    Fi_System::Fi_System(Params *p)
+Fi_System::Fi_System(Params *p)
 :MemObject(p)
 {
 
@@ -87,12 +87,13 @@ Fi_System *fi_system;
 
 
 
+
 }
 Fi_System::~Fi_System(){
 
 }
 
-    void
+void
 Fi_System::init()
 {
 
@@ -148,12 +149,9 @@ Fi_System:: dump(){
         }
         std::cout <<"~===Fi_System::dump()===\n"; 
     }
-
-
 }
 
-
-    void
+void
 Fi_System::startup()
 {
     if (DTRACE(FaultInjection)) {
@@ -162,8 +160,7 @@ Fi_System::startup()
     dump();
 }
 
-
-    Fi_System *
+Fi_System *
 Fi_SystemParams::create()
 {
     if (DTRACE(FaultInjection)) {
@@ -172,7 +169,16 @@ Fi_SystemParams::create()
     return new Fi_System(this);
 }
 
-    Port *
+Fi_System *
+Fi_SystemParams::create()
+{
+  if (DTRACE(FaultInjection)) {
+    std::cout << "Fi_System:create()\n";
+  }
+  return new Fi_System(this);
+}
+
+Port *
 Fi_System::getPort(const string &if_name, int idx)
 {
     std::cout << "Fi_System:getPort() " << "if_name: " << if_name << " idx: " << idx <<  "\n";
@@ -238,8 +244,8 @@ Fi_System:: getFromFile(std::ifstream &os){
 void 
 Fi_System::delete_faults(){
 
-    //   while(!mainInjectedFaultQueue.empty())
-    mainInjectedFaultQueue.remove(mainInjectedFaultQueue.head);
+    while(!mainInjectedFaultQueue.empty())
+       mainInjectedFaultQueue.remove(mainInjectedFaultQueue.head);
 
     while(!fetchStageInjectedFaultQueue.empty())
         fetchStageInjectedFaultQueue.remove(fetchStageInjectedFaultQueue.head);
@@ -270,22 +276,16 @@ Fi_System::delete_faults(){
     LoadStoreInjectedFaultQueue.setName("LoadStoreFaultQueue");
     LoadStoreInjectedFaultQueue.setHead(NULL);
     LoadStoreInjectedFaultQueue.setTail(NULL);
-
 }
 
 
-    void
+void
 Fi_System:: reset()
 {
 
     std:: stringstream s1;
 
-    //remove faults from Queue
     delete_faults();
-
-
-
-    allthreads = NULL;
 
     if(in_name.size() > 1){
         if (DTRACE(FaultInjection)) {
@@ -298,10 +298,8 @@ Fi_System:: reset()
         if (DTRACE(FaultInjection)) {
             std::cout << "~Fi_System::Reading New Faults \n";
         }
-    }
-
     dump();
-
+    }
 }
 
 
@@ -490,10 +488,17 @@ Fi_System::increaseTicks(std :: string curCpu , ThreadEnabledFault *curThread , 
    std::map<int,bool>::iterator inserted;
    inserted = miscregs.find(reg);
 if(inserted==miscregs.end())
+<<<<<<< HEAD
     return false;
     else
     return true;
     }
+=======
+  return false;
+  else
+  return true;
+  }
+>>>>>>> 6ca24fbfd6469ce3abd65a589ad3781ef198d034
 
 void
 Fi_System::monitor_propagation(const int type, ThreadContext *tc, StaticInst *si, int idx,const Addr addr){
@@ -523,7 +528,27 @@ Fi_System::monitor_propagation(const int type, ThreadContext *tc, StaticInst *si
             scheduleswitch(tc);
         }
     }
+<<<<<<< HEAD
     return;
+=======
+    else if(type == RegisterMisc)
+      fault = altered_misc_reg(reg);
+
+    if(fault){
+      //       printStack();
+      DPRINTF(FaultInjection,"Register Fault Propagated to instruction : %s PCAddr:%llx PHYSICAL %llx \n",si->getName(),addr,vtophys(tc,addr));
+      if(type == RegisterInt )
+        intregs.erase(reg);
+      else if(type == RegisterFloat)
+        floatregs.erase(reg-FP_Base_DepTag);
+      else if(type == RegisterMisc)
+        miscregs.erase(reg);
+
+      scheduleswitch(tc);
+    }
+  }
+  return;
+>>>>>>> 6ca24fbfd6469ce3abd65a589ad3781ef198d034
 }
 
 void
@@ -545,10 +570,17 @@ Fi_System::stop_monitoring_propagation(const int type, ThreadContext *tc,StaticI
             scheduleswitch(tc);
         }
     }
+<<<<<<< HEAD
 
     return;
+=======
+  }
+
+  return;
+>>>>>>> 6ca24fbfd6469ce3abd65a589ad3781ef198d034
 }
 */
+
 void
 Fi_System::scheduleswitch(ThreadContext *tc){
     if(getswitchcpu()){
@@ -615,7 +647,6 @@ void Fi_System::pause_fi(ThreadContext *tc,uint64_t threadid)
     if( (number_of_pauses++)%100 == 99){
         DPRINTF(FaultInjection,"Paused one more time %d\n",number_of_pauses);
     }
-
 }
 
 void Fi_System:: stop_fi(ThreadContext *tc, uint64_t req){
@@ -636,7 +667,6 @@ void Fi_System:: stop_fi(ThreadContext *tc, uint64_t req){
         DPRINTF(FaultInjection,"~===Fault Injection Deactivation Instruction===\n");
         fi_enable--;
     }
-
 }
 
 
@@ -653,5 +683,20 @@ void Fi_System::dump_fi(ThreadContext *tc){
     
     if(getswitchcpu())
        scheduleswitch(tc);
+}
 
+
+void Fi_System::rename_ckpt(const char* new_name){
+  int num_checkpoints,num_restored;
+  dmtcp_get_local_status(&num_checkpoints,&num_restored);
+  const char *path = dmtcp_get_ckpt_filename();
+  if (path == NULL)
+    DPRINTF(FaultInjection,"PATH IS NULL\n");
+  std::string new_path(path);
+  int count = new_path.find_last_of("/");
+
+  if(!(rename(new_path.substr(count+1).c_str(),new_name)))
+     DPRINTF(FaultInjection," Checkpoint created (%s)\n",new_name);
+  else
+    cout<<"Error \n"; 
 }

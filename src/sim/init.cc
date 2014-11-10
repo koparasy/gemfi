@@ -77,7 +77,7 @@ using namespace std;
 
 
 //ALTERCODE
-
+/*
 void before(){
     //   if(fi_system->getMainCheckpoint() == false)
     //     DPRINTF(FaultInjection,"Creating New Maincheckpoint\n");
@@ -120,7 +120,7 @@ void after(){
 
 }
 
-
+*/
 //~ALTERCODE
 
 
@@ -353,17 +353,12 @@ m5Main(int argc, char **argv)
     PySys_SetArgv(argc, argv);
 
 
-    //ALTERCODE
-    //     cout<<"I am going to connect to dmtcp"<<endl;
-    //   
-
-    if( ! dmtcp_is_enabled() ){
+   if( ! dmtcp_is_enabled() ){
         cout<<"DMTCP:: Error in installing HOOKS\n";
         cout<<"I am going to continue Hoping to restart from a checkpoint\n";
     }
     else{
-        int dmtcp_attach = dmtcp_install_hooks(before,after,NULL);    
-        cout<<"DMTCP:Hooks installed successfully "<<dmtcp_attach<<"\n";
+        cout<<"DMTCP is enabled \n";
     }
 
 
