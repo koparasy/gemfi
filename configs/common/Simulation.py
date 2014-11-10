@@ -245,10 +245,10 @@ def benchCheckpoints(options, maxtick, cptdir):
 def repeatSwitch(testsys, repeat_switch_cpu_list, maxtick, switch_freq):
     print "starting switch loop"
     while True:
-        exit_event = m5.simulate(switch_freq)
+        exit_event = m5.simulate()
         exit_cause = exit_event.getCause()
 
-        if exit_cause != "simulate() limit reached":
+        if exit_cause != "switchcpu":
             return exit_event
 
         m5.switchCpus(testsys, repeat_switch_cpu_list)
@@ -257,10 +257,6 @@ def repeatSwitch(testsys, repeat_switch_cpu_list, maxtick, switch_freq):
         for old_cpu, new_cpu in repeat_switch_cpu_list:
             tmp_cpu_list.append((new_cpu, old_cpu))
         repeat_switch_cpu_list = tmp_cpu_list
-
-        if (maxtick - m5.curTick()) <= switch_freq:
-            exit_event = m5.simulate(maxtick - m5.curTick())
-            return exit_event
 
 def run(options, root, testsys, cpu_class):
     if options.checkpoint_dir:
@@ -314,7 +310,10 @@ def run(options, root, testsys, cpu_class):
         switch_cpu_list = [(testsys.cpu[i], switch_cpus[i]) for i in xrange(np)]
 
     if options.repeat_switch:
-        switch_class = getCPUClass(options.cpu_type)[0]
+        switch_class = getCPUClass("detailed")[0]
+
+        print "Going to simulate with %s" % str(switch_class)
+
         if switch_class.require_caches() and \
                 not options.caches:
             print "%s: Must be used with caches" % str(switch_class)
@@ -367,27 +366,6 @@ def run(options, root, testsys, cpu_class):
             elif options.fast_forward:
                 testsys.cpu[i].max_insts_any_thread = int(options.fast_forward)
             # Fast forward to a simpoint (warning: time consuming)
-            elif options.simpoint:
-                if testsys.cpu[i].workload[0].simpoint == 0:
-                    fatal('simpoint not found')
-                testsys.cpu[i].max_insts_any_thread = \
-                    testsys.cpu[i].workload[0].simpoint
-            # No distance specified, just switch
-            else:
-                testsys.cpu[i].max_insts_any_thread = 1
-
-            # warmup period
-            if options.warmup_insts:
-                switch_cpus[i].max_insts_any_thread =  options.warmup_insts
-
-            # simulation period
-            if options.maxinsts:
-                switch_cpus_1[i].max_insts_any_thread = options.maxinsts
-
-            # attach the checker cpu if selected
-            if options.checker:
-                switch_cpus[i].addCheckerCpu()
-                switch_cpus_1[i].addCheckerCpu()
 
         testsys.switch_cpus = switch_cpus
         testsys.switch_cpus_1 = switch_cpus_1
@@ -455,6 +433,25 @@ def run(options, root, testsys, cpu_class):
               "Checkpoint starts starts from tick: %d", maxtick, cpt_starttick)
 
     if options.standard_switch or cpu_class:
+        exit_event = m5.simulate(100)
+        exit_cause=exit_event.getCause()
+        counter = 0
+        while True:
+            print "Switching One more time"
+            counter = counter + 1
+            if (counter % 2) == 0:
+                m5.switchCpus(testsys,switch_cpu_list1)
+            else: 
+                m5.switchCpus(testsys,switch_cpu_list)
+            exit_event = m5.simulate();
+            exit_cause = exit_event.getCause()
+            print 'Exiting @ tick %i because %s' % (m5.curTick(), exit_event.getCause())
+            if exit_cause != "switchcpu":
+                break
+        
+        print 'Exiting @ tick %i because %s' % (m5.curTick(), exit_event.getCause())
+        sys.exit(exit_event.getCode())
+
         if options.standard_switch:
             print "Switch at instruction count:%s" % \
                     str(testsys.cpu[0].max_insts_any_thread)
@@ -490,7 +487,7 @@ def run(options, root, testsys, cpu_class):
             if options.warmup_insts:
                 exit_event = m5.simulate()
             else:
-                exit_event = m5.simulate(options.standard_switch)
+                exit_event = m5.simulate()
             print "Switching CPUS @ tick %s" % (m5.curTick())
             print "Simulation ends instruction count:%d" % \
                     (testsys.switch_cpus_1[0].max_insts_any_thread)

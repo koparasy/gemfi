@@ -65,44 +65,43 @@ extern Fi_System *fi_system;
 
 class Fi_System : public MemObject
 {
-  private :
-    std::ifstream input;
-    std::string in_name;
-    std::string meta_file;
-    int text_start;	
-    Addr StartingPCAddr;
-    ifstream meta_input;
+    private :
+        std::ifstream input;
+        std::string in_name;
+        std::string meta_file;
+        int text_start;	
+        Addr StartingPCAddr;
+        ifstream meta_input;
 
 
-    class Fi_SystemEvent : public Event
-  {
-    private:
-      ThreadContext *tc;
-      uint64_t ticks;
-    public:
-      void setticks(uint64_t tick){ticks=tick;}
-      Fi_SystemEvent(ThreadContext *tc){
-        DPRINTF(FaultInjection,"scheduling switchcpu\n");
-        tc = tc;
-      };
-      void process(){
-        DPRINTF(FaultInjection,"Switching CPU cause error was injected THEN %lld NOW %lld\n",ticks,curTick());
-        PseudoInst::switchcpu(tc);
+     class Fi_SystemEvent : public Event
+    {
+        private:
+            ThreadContext *tc;
+            uint64_t ticks;
+        public:
+            void setticks(uint64_t tick){ticks=tick;}
+            Fi_SystemEvent(ThreadContext *tc){
+                DPRINTF(FaultInjection,"scheduling switchcpu\n");
+                tc = tc;
+            };
+            void process(){
+                DPRINTF(FaultInjection,"Switching CPU cause error was injected THEN %lld NOW %lld\n",ticks,curTick());
+                PseudoInst::switchcpu(tc);
 
-      };
-  };
+            };
+    };
 
 
-  public :
+    public :
 
-    // Path to the file which includes all the the injection faults
+        // Path to the file which includes all the the injection faults
 
-    InjectedFaultQueue mainInjectedFaultQueue;		//("Main Fault Queue");
-    InjectedFaultQueue fetchStageInjectedFaultQueue;	//("Fetch Stage Fault Queue");
-    InjectedFaultQueue decodeStageInjectedFaultQueue;	//("Decode Stage Fault Queue");	
-    InjectedFaultQueue iewStageInjectedFaultQueue;	//("IEW Stage Fault Queue");
-    InjectedFaultQueue LoadStoreInjectedFaultQueue;	//("LoadStore Fault Queue")
-
+        InjectedFaultQueue mainInjectedFaultQueue;		//("Main Fault Queue");
+        InjectedFaultQueue fetchStageInjectedFaultQueue;	//("Fetch Stage Fault Queue");
+        InjectedFaultQueue decodeStageInjectedFaultQueue;	//("Decode Stage Fault Queue");	
+        InjectedFaultQueue iewStageInjectedFaultQueue;	//("IEW Stage Fault Queue");
+        InjectedFaultQueue LoadStoreInjectedFaultQueue;	//("LoadStore Fault Queue")
     /*
      * The map correlate a thread/application with the pcb address
      * the colleration is done by keeping a hash table of

@@ -56,6 +56,8 @@
 #include "sim/sim_exit.hh"
 #include "sim/system.hh"
 
+#include "debug/FaultInjection.hh"
+
 using namespace std;
 
 // constructor
@@ -107,6 +109,7 @@ SimpleThread::~SimpleThread()
 void
 SimpleThread::takeOverFrom(ThreadContext *oldContext)
 {
+    DPRINTF(FaultInjection,"Taking over THREADS\n");
     ::takeOverFrom(*tc, *oldContext);
     decoder.takeOverFrom(oldContext->getDecoderPtr());
 

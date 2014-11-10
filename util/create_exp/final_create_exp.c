@@ -43,9 +43,9 @@ void create_random_time(fault_t *faults,long int range, int num_of_faults){
 }
 
 
-void print_faults(fault_t *faults, int size){
+void print_faults(fault_t *faults, int size, char *name){
   int i;
-  FILE *f = fopen("experiments.txt","w");
+  FILE *f = fopen(name,"w");
   for(i = 0 ; i<size; i++){
     fprintf(f,"%s %s%ld %s%d %s %s %d %d",faults[i].faulttype,faults[i].when,faults[i].time,
 	   faults[i].what,faults[i].bit+1,faults[i].cpu,faults[i].thread,
@@ -103,7 +103,7 @@ int compare(const void *a ,const void *b){
   fault_t *aa = (fault_t*) a;
   fault_t *bb = (fault_t*) b;
   
-  return  aa->time - bb->time;
+  return   bb->time - aa->time;
 }
 
 
@@ -125,7 +125,7 @@ int main(int argc,char **argv){
   int fetch_faults;
   int decode_faults;
   int execute_faults;
-  int loadstore_fualts;
+  int loadstore_faults;
   long int num_of_experiments;
   char *cvalue = NULL;
   char *endptr;
@@ -208,8 +208,8 @@ int main(int argc,char **argv){
   
   decode_faults = ceil((total_decodeplaces/(float)total_places) *num_of_experiments);
   execute_faults = ceil((total_executeplaces/(float)total_places) *num_of_experiments);
-  loadstore_fualts = ceil((total_loadstoreplaces/(float)total_places) *num_of_experiments);
-  num_of_experiments = fetch_faults+decode_faults+execute_faults+loadstore_fualts;
+  loadstore_faults = ceil((total_loadstoreplaces/(float)total_places) *num_of_experiments);
+  num_of_experiments = fetch_faults+decode_faults+execute_faults+loadstore_faults;
   printf("\n\n\t\tTotal Number Of Upper Bounded Experiments : \t%ld \n",num_of_experiments);
   
   printf("\t\tFetch faults: \t\t%d\n\
@@ -223,7 +223,7 @@ int main(int argc,char **argv){
 	    pc_faults,
 	    decode_faults,
 	    execute_faults,
-	    loadstore_fualts);
+	    loadstore_faults);
   
   faults = (fault_t*) malloc (sizeof(fault_t)*num_of_experiments);
   create_random_time(faults,fetchInstr,fetch_faults);
@@ -240,12 +240,27 @@ int main(int argc,char **argv){
   create_random_time(&faults[fetch_faults+decode_faults],executeInstr,execute_faults);
   fill_faults(&faults[fetch_faults+decode_faults],execute_faults,"IEWStageInjectedFault",64);
   
-  create_random_time(&faults[fetch_faults+decode_faults+execute_faults],loadstoreInstr,loadstore_fualts);
-  fill_faults(&faults[fetch_faults+decode_faults+execute_faults],loadstore_fualts,"LoadStoreInjectedFault",64);
+  create_random_time(&faults[fetch_faults+decode_faults+execute_faults],loadstoreInstr,loadstore_faults);
+  fill_faults(&faults[fetch_faults+decode_faults+execute_faults],loadstore_faults,"LoadStoreInjectedFault",64);
   
   
-  qsort(faults,num_of_experiments,sizeof(fault_t),compare);
-  
-  print_faults(faults,num_of_experiments);
+  qsort(&faults[0], fetch_faults ,sizeof(fault_t),compare);
+  print_faults(&faults[0],fetch_faults,"Fetch.txt");
+
+ 
+  qsort(&faults[fetch_faults], decode_faults ,sizeof(fault_t),compare);
+  print_faults(&faults[fetch_faults],decode_faults,"Decode.txt");
+
+ 
+  qsort(&faults[decode_faults+fetch_faults], execute_faults ,sizeof(fault_t),compare);
+  print_faults(&faults[decode_faults+fetch_faults],execute_faults,"IEW.txt");
+
+ 
+  qsort(&faults[decode_faults+fetch_faults + execute_faults], loadstore_faults ,sizeof(fault_t),compare);
+  print_faults(&faults[decode_faults+fetch_faults + execute_faults],loadstore_faults,"LDS.txt");
+
+
+
+
   return 0;
 }
