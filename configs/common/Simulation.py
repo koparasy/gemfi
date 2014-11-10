@@ -472,7 +472,15 @@ def run(options, root, testsys, cpu_class):
             exit_event = m5.simulate(10000)
         print "Switched CPUS @ tick %s" % (m5.curTick())
 
-        m5.switchCpus(testsys, switch_cpu_list)
+        exit_event = m5.simulate()
+        exit_cause = exit_event.getCause()
+        if exit_cause == "switchcpu":
+            print "GEMFI:switched cpu"
+            m5.switchCpus(testsys, switch_cpu_list)
+        else:
+            print "exiting cause of %s"%exit_event.getCause()
+
+
 
         if options.standard_switch:
             print "Switch at instruction count:%d" % \

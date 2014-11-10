@@ -9,10 +9,11 @@ terminate(){
 #global variabled to handle storage units
 export M5_PATH=/home/dinos/x86
 checkpoint_dir="my_ckpts"
-all_exp="/srv/homes/koparasy/Developing/github/gemfi/execution/experiments"
-mutex="/srv/homes/koparasy/Developing/github/gemfi/execution/script.lock"
+results="/srv/homes/koparasy/gem5campaings/results"
+all_exp="/srv/homes/koparasy/gem5campaings/experiments"
+mutex="/srv/homes/koparasy/gem5campaings/script.lock"
 experiments=(Fetch.txt Decode.txt IEW.txt LDS.txt)
-ckpts=(fetch_ckpt.dmtcp, decode_ckpt.dmtcp,iew_ckpt.dmtcp, lds_ckpt.dmtcp)
+ckpts=(fetch_ckpt.dmtcp decode_ckpt.dmtcp iew_ckpt.dmtcp lds_ckpt.dmtcp)
 ckpt_dirs=(fetch decode iew lds)
 # I need to assign differnt ports to each core therefore i use the coreid as a hash
 x=$1
@@ -58,8 +59,8 @@ fi
 
 if [ ! -f "$checkpoint_dir/maincheckpoint/maincheckpoint.dmtcp" ]; then
   echo "$checkpoint_dir/maincheckpoint/maincheckpoint.dmtcp checkpoint does not exist creating"
-#dmtcp_checkpoint ./../../build/X86/gem5.opt --debug-flags=FaultInjection --remote-gdb-port=-1 -r -d start/ ../../configs/example/fs.py --cpu-type=detailed --caches --fi-in input -b test -M 1 --switch-on-fault=1
-  dmtcp_checkpoint ./../../build/X86/gem5.opt --debug-flags=FaultInjection --remote-gdb-port=-1 -r -d start/ ../../configs/example/fs.py --fi-in input -b test -M 1 --switch-on-fault 0 
+dmtcp_checkpoint ./../../build/X86/gem5.opt --debug-flags=FaultInjection --remote-gdb-port=-1 -r -d start/ ../../configs/example/fs.py --cpu-type=detailed --caches --fi-in input -b test -M 1 --switch-on-fault=1
+#  dmtcp_checkpoint ./../../build/X86/gem5.opt --debug-flags=FaultInjection --remote-gdb-port=-1 -r -d start/ ../../configs/example/fs.py --fi-in input -b test -M 1 --switch-on-fault 0 
   result=$?
   if [ "$result" -eq "1" ]; then
     echo "Checkpoint created">>"$my_core"
@@ -79,43 +80,44 @@ if [ ! -f "$checkpoint_dir/maincheckpoint/maincheckpoint.dmtcp" ]; then
   fi
 fi
 
-
 for (( i = 0 ; i < ${#experiments[@]} ; i++))
 do
   cur_exp="$all_exp/${experiments[$i]}"
   echo "$cur_exp"
   while [ -s "$cur_exp" ]
   do
-    lockfile $mutex #take lock
     
+    echo "Lock taken"
+#lockfile $mutex #take lock
+    echo "Lock taken"
     exp=$(tail -n 1 $cur_exp)
     head -n -1 $cur_exp > temp.txt 
     mv temp.txt $cur_exp
     
-    rm -f $mutex #free lock
+#   rm -f $mutex #free lock
+    echo "lock released"
     echo -n "$exp">input
 
 # Check if there is a checkpoint for this kind of faults
 # if there is use it otherwise use the maincheckpoint
 
-#    if [ -f "$checkpoint_dir/${ckpt_dirs[$i]}/${ckpts[$i]}" ]; then
-#      echo "Restoring from $ckpts[i]"
-#      cp "$checkpoint_dir/${ckpt_dirs[$i]}/${ckpts[$i]}" . 
-#      cp "$checkpoint_dir/${ckpt_dirs[$i]}/ckpt_gem5.opt_*" .
-#      dmtcp_restart "${ckpts[$i]}" &
-#      pid=$!
-#      ./../time.sh $pids
-#    else
-#      echo "restoring from maincheckpoint"
-#      cp "$checkpoint_dir/maincheckpoint/maincheckpoint.dmtcp" .
-#      cp -r "$checkpoint_dir/maincheckpoint/ckpt_gem5.opt_*" .
-#      dmtcp_restart maincheckpoint.dmtcp &
-#      pid=$!
-#      ./../time.sh pids
-#    fi
-#
-    pids=$!
-#    ./../time.sh $pids
+    if [ -f "$checkpoint_dir/${ckpt_dirs[$i]}/${ckpts[$i]}" ]; then
+      echo "Restoring from $ckpts[i]"
+      cp $checkpoint_dir/${ckpt_dirs[$i]}/${ckpts[$i]} . 
+      cp -r $checkpoint_dir/${ckpt_dirs[$i]}/ckpt_gem5.opt_* .
+      dmtcp_restart ${ckpts[$i]} &
+      pids=$!
+      echo "Passing child id $i"
+      ./../time.sh $pids
+    else
+      echo "restoring from maincheckpoint"
+      cp $checkpoint_dir/maincheckpoint/maincheckpoint.dmtcp .
+      cp -r $checkpoint_dir/maincheckpoint/ckpt_gem5.opt_* .
+      dmtcp_restart maincheckpoint.dmtcp &
+      pids=$!
+      echo "Passing child id $i"
+      ./../time.sh $pids
+    fi
     _name=$(echo -n  "$(/sbin/ifconfig | grep 'em1' | tr -s ' '  | cut -d ' ' -f5| sed 's/://g')$(date | sed 's/ //g')$my_core")
     echo  "$my_core storing $_name ..... " >>"$my_core"
     echo "$_name"
@@ -123,8 +125,10 @@ do
     mv input "$_name"
     cp start/* "$_name"
     
-    mv "$_name" ../results
+    mv "$_name" $results 
     echo "$ my_core .....results stored">>"$my_core"
+
+    exit
 
     if [ -f "${ckpts[$i]}" ]; then
      mv ${ckpts[$i]}  "$checkpoint_dir/${ckpt_dirs[$i]}/"
@@ -132,15 +136,10 @@ do
     else
       echo "This should never happen"
     fi
-
-    if [ -f "dmtcp_restart*.sh" ]; then
-      rm dmtcp_restart*.sh
-    fi
   done
 done
 #trap "terminate $pids" SIGINT SIGTERM
 echo "my experiments have finished"
-touch "../$my_core.txt"
 exit
 
 

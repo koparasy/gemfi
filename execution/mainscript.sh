@@ -9,7 +9,7 @@ terminate(){
 start_new=$1
 num_cores=$2
 
-work_station="/srv/homes/koparasy/Developing/github/gemfi/execution"
+work_station="/srv/homes/koparasy/gem5campaings"
 my_pid="$work_station/mypid.txt"
 my_childs=""
 echo $$>"$my_pid"
@@ -20,15 +20,13 @@ fi
 
 if [ $start_new -eq "1" ] ; then
   echo "Starting new"
-  rm -r $work_station/core*
+  rm -r core*
   for (( i = 0 ; i < $num_cores; i++))
   do
-    mkdir $work_station/core$i
+    mkdir core$i
   done
 fi
 
-my_childs=""
-cd $work_station
 my_childs=""
 for (( i = 0 ; i < $num_cores ; i++)) 
 do

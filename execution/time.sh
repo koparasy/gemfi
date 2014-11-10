@@ -1,6 +1,6 @@
 #!/bin/bash
 my_child=$1
-
+echo "$my_child"
 while  kill -0 $my_child ;
 do
   IFS=' '
