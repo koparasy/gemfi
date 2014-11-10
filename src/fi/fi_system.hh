@@ -74,7 +74,7 @@ class Fi_System : public MemObject
         ifstream meta_input;
 
 
-        class Fi_SystemEvent : public Event
+     class Fi_SystemEvent : public Event
     {
         private:
             ThreadContext *tc;

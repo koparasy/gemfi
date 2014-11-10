@@ -52,6 +52,8 @@
 #include "cpu/quiesce_event.hh"
 #include "debug/O3CPU.hh"
 
+#include "debug/FaultInjection.hh"
+
 template <class Impl>
 FSTranslatingPortProxy&
 O3ThreadContext<Impl>::getVirtProxy()
@@ -70,6 +72,8 @@ template <class Impl>
 void
 O3ThreadContext<Impl>::takeOverFrom(ThreadContext *old_context)
 {
+    
+    DPRINTF(FaultInjection,"Taking over THREADS\n");
     ::takeOverFrom(*this, *old_context);
     TheISA::Decoder *newDecoder = getDecoderPtr();
     TheISA::Decoder *oldDecoder = old_context->getDecoderPtr();
