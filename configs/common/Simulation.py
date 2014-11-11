@@ -82,9 +82,7 @@ def setCPUClass(options):
         CPUClass = TmpClass
         TmpClass = AtomicSimpleCPU
         test_mem_mode = 'atomic'
-    elif options.switch_on_fault:
-        CPUClass = AtomicSimpleCPU
-        test_mem_mode='timing'
+   
 
     return (TmpClass, test_mem_mode, CPUClass)
 

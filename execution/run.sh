@@ -11,7 +11,7 @@ export M5_PATH=/home/dinos/x86
 checkpoint_dir="my_ckpts"
 results="/srv/homes/koparasy/gem5campaings/results"
 all_exp="/srv/homes/koparasy/gem5campaings/experiments"
-mutex="/srv/homes/koparasy/gem5campaings/script.lock"
+mutex="/home/dinos/gemfi/execution/script.lock"
 experiments=(Fetch.txt Decode.txt IEW.txt LDS.txt)
 ckpts=(fetch_ckpt.dmtcp decode_ckpt.dmtcp iew_ckpt.dmtcp lds_ckpt.dmtcp)
 ckpt_dirs=(fetch decode iew lds)
@@ -59,8 +59,7 @@ fi
 
 if [ ! -f "$checkpoint_dir/maincheckpoint/maincheckpoint.dmtcp" ]; then
   echo "$checkpoint_dir/maincheckpoint/maincheckpoint.dmtcp checkpoint does not exist creating"
-dmtcp_checkpoint ./../../build/X86/gem5.opt --debug-flags=FaultInjection --remote-gdb-port=-1 -r -d start/ ../../configs/example/fs.py --cpu-type=detailed --caches --fi-in input -b test -M 1 --switch-on-fault=1
-#  dmtcp_checkpoint ./../../build/X86/gem5.opt --debug-flags=FaultInjection --remote-gdb-port=-1 -r -d start/ ../../configs/example/fs.py --fi-in input -b test -M 1 --switch-on-fault 0 
+dmtcp_checkpoint ./../../build/X86/gem5.opt --debug-flags=FaultInjection --remote-gdb-port=-1 -r -d start/ ../../configs/example/fs.py --caches --fi-in input -b test -M 1 --switch-on-fault=1 --repeat-switch=1
   result=$?
   if [ "$result" -eq "1" ]; then
     echo "Checkpoint created">>"$my_core"
@@ -68,7 +67,7 @@ dmtcp_checkpoint ./../../build/X86/gem5.opt --debug-flags=FaultInjection --remot
     cp -r ckpt_gem5.opt_* "$checkpoint_dir/maincheckpoint/"
     rm dmtcp_restart*
     rm maincheckpoint.dmtcp
-    rm ckpt_gem5.opt_*
+    rm -r ckpt_gem5.opt_*
   else
     if [ -f dmtcp_restart*.sh ]; then
       rm dmtcp_restart*.sh
@@ -88,13 +87,13 @@ do
   do
     
     echo "Lock taken"
-#lockfile $mutex #take lock
+    lockfile $mutex #take lock
     echo "Lock taken"
     exp=$(tail -n 1 $cur_exp)
     head -n -1 $cur_exp > temp.txt 
     mv temp.txt $cur_exp
     
-#   rm -f $mutex #free lock
+    rm -f $mutex #free lock
     echo "lock released"
     echo -n "$exp">input
 
@@ -124,11 +123,10 @@ do
     mkdir "$_name"
     mv input "$_name"
     cp start/* "$_name"
-    
+    rm start/ApplicationOutput 
     mv "$_name" $results 
     echo "$ my_core .....results stored">>"$my_core"
-
-    exit
+  
 
     if [ -f "${ckpts[$i]}" ]; then
      mv ${ckpts[$i]}  "$checkpoint_dir/${ckpt_dirs[$i]}/"

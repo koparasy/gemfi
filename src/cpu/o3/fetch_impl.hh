@@ -1309,8 +1309,8 @@ DefaultFetch<Impl>::fetch(bool &status_change)
             MachInst inst = TheISA::gtoh(cacheInsts[blkOffset]);
             //ALTERCODE
             //inject faults on fetch stage (opcode--whole instruction)
-            if(enabled_fi )
-                fi_system -> fetch_fault(curr_tc,curr_thread,inst,thisPC.instAddr());
+            if(enabled_fi)
+                inst= fi_system -> fetch_fault(curr_tc,curr_thread,inst,thisPC.instAddr());
             //~ALTERCODE
             decoder[tid]->moreBytes(thisPC, fetchAddr, inst);
 

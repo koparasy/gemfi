@@ -169,15 +169,6 @@ Fi_SystemParams::create()
     return new Fi_System(this);
 }
 
-Fi_System *
-Fi_SystemParams::create()
-{
-  if (DTRACE(FaultInjection)) {
-    std::cout << "Fi_System:create()\n";
-  }
-  return new Fi_System(this);
-}
-
 Port *
 Fi_System::getPort(const string &if_name, int idx)
 {
