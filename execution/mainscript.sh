@@ -9,17 +9,18 @@ terminate(){
 start_new=$1
 num_cores=$2
 
-work_station="/srv/homes/koparasy/gem5campaings"
-my_pid="$work_station/mypid.txt"
+workstation="/scratch"
+my_pid="$workstation/mypid.txt"
 my_childs=""
 echo $$>"$my_pid"
 
-if [ ! -d "$work_station/results" ] ; then
-  mkdir -p $work_station/results
+if [ ! -d "$workstation/results" ] ; then
+  mkdir -p $workstation/results
 fi
 
 if [ $start_new -eq "1" ] ; then
   echo "Starting new"
+  cp -r "$workstation/build/x86" "$workstation"
   rm -r core*
   for (( i = 0 ; i < $num_cores; i++))
   do

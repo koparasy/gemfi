@@ -7,11 +7,11 @@ terminate(){
 }
 
 #global variabled to handle storage units
-export M5_PATH=/home/dinos/x86
+export M5_PATH=/scratch/x86
 checkpoint_dir="my_ckpts"
-results="/srv/homes/koparasy/gem5campaings/results"
-all_exp="/srv/homes/koparasy/gem5campaings/experiments"
-mutex="/home/dinos/gemfi/execution/script.lock"
+results="/scratch/results"
+all_exp="/scratch/experiments"
+mutex="/scratch/script.lock"
 experiments=(Fetch.txt Decode.txt IEW.txt LDS.txt)
 ckpts=(fetch_ckpt.dmtcp decode_ckpt.dmtcp iew_ckpt.dmtcp lds_ckpt.dmtcp)
 ckpt_dirs=(fetch decode iew lds)
@@ -117,7 +117,7 @@ do
       echo "Passing child id $i"
       ./../time.sh $pids
     fi
-    _name=$(echo -n  "$(/sbin/ifconfig | grep 'em1' | tr -s ' '  | cut -d ' ' -f5| sed 's/://g')$(date | sed 's/ //g')$my_core")
+    _name=$(echo -n  "$(/sbin/ifconfig | grep 'eth1\|eth0\|eth2\|eth3' | tr -s ' '  | cut -d ' ' -f5| sed 's/://g')$(date | sed 's/ //g')$my_core")
     echo  "$my_core storing $_name ..... " >>"$my_core"
     echo "$_name"
     mkdir "$_name"
@@ -126,7 +126,7 @@ do
     rm start/ApplicationOutput 
     mv "$_name" $results 
     echo "$ my_core .....results stored">>"$my_core"
-  
+     
 
     if [ -f "${ckpts[$i]}" ]; then
      mv ${ckpts[$i]}  "$checkpoint_dir/${ckpt_dirs[$i]}/"
