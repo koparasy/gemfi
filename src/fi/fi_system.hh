@@ -267,7 +267,6 @@ class Fi_System : public MemObject
 
 
           std::string _name = tc->getCpuPtr()->name();
-          //					thread->write_instr_and_name(pcaddr,ptr->getcurInstr()->getName());
 
           while ((iewFault = reinterpret_cast<IEWStageInjectedFault *>(iewStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
             int succeed = dmtcp_checkpoint();
@@ -324,7 +323,6 @@ class Fi_System : public MemObject
 
       if(FullSystem && TheISA::inUserMode(tc)){	
         thread->increaseFetchedInstr(_name);
-        thread->write_PC_address(pcAddr);
       }
       else
         return cur_instr;	

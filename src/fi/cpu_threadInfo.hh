@@ -83,7 +83,6 @@ class cpuExecutedTicks {
 class ThreadEnabledFault {
 	friend class InjectedFault;
 	private :
-	ofstream myfile;
 	uint64_t mode; 
 	Addr MagicInstVirtualAddr;  // Store the value of the Pc address when the framework is activated
 	int threadId; // Given when fi_activate_inst is executed 
@@ -129,18 +128,6 @@ class ThreadEnabledFault {
 	void CalculateLoadStoreTime(std:: string curCpu , uint64_t *exec_instr ,uint64_t *exec_time);
 
 	void print_time();
-	void write_PC_address(Addr pcaddr){
-	  myfile<<pcaddr;
-	  myfile<<std::endl;
-	}
-	
-	void write_instr_and_name(Addr pcaddr,std::string inst){
-	 myfile<<pcaddr;
-	 myfile<<"\t";
-	 myfile<<inst;
-	 myfile<<std::endl;
-	}
-	
 	
 	uint64_t getMode() {return mode;}
 	void setMode(uint64_t mod) {mode = mod;}

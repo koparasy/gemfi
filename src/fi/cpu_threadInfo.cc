@@ -47,10 +47,7 @@ ThreadEnabledFault::ThreadEnabledFault(int threadId, std::string name)
   setThreadId(threadId);
   setMyid();
   setMagicInstVirtualAddr(-1);
-  std::ostringstream sstream;
-  sstream << "Thread" << threadId;
-  myfile.open(sstream.str().c_str());
-}
+  }
 
 ThreadEnabledFault::~ThreadEnabledFault()
 {

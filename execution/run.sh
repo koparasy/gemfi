@@ -101,7 +101,7 @@ do
 # if there is use it otherwise use the maincheckpoint
 
     if [ -f "$checkpoint_dir/${ckpt_dirs[$i]}/${ckpts[$i]}" ]; then
-      echo "Restoring from $ckpts[i]"
+      echo "Restoring from $ckpts[$i]"
       cp $checkpoint_dir/${ckpt_dirs[$i]}/${ckpts[$i]} . 
       cp -r $checkpoint_dir/${ckpt_dirs[$i]}/ckpt_gem5.opt_* .
       dmtcp_restart ${ckpts[$i]} &
