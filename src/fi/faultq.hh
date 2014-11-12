@@ -48,6 +48,7 @@ class InjectedFault
 {
   friend class InjectedFaultQueue;
   friend class ThreadEnabledFault;
+  friend class Fi_System;
 //  friend class Fi_System;
 
 public:
@@ -63,7 +64,6 @@ public:
   static const InjectedFaultType LoadStoreInjectedFault	= 8;
   InjectedFault *nxt;
   InjectedFault *prv;
-protected:
   //Fault Timing Types (WHEN) -- Timing of the injection
   typedef uint16_t InjectedFaultTimingType;
   static const InjectedFaultTimingType TickTiming = 1;

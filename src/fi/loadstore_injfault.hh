@@ -23,12 +23,12 @@ public:
   void dump() const;
   
   template <class T> 
-  T process(T v){
+  T process(T v, unsigned dataSize){
     DPRINTF(FaultInjection,"===LoadStoreFault::Process(T)==\n");
     
     T retval = v;
-    if(getValueType() == InjectedFault::FlipBit && getValue() > sizeof(T)*8){ //Make sure that the flipped bit is inside the affected structure!
-      setValue(getValue()%(sizeof(T)*8) +1);
+    if(getValueType() == InjectedFault::FlipBit && getValue() > dataSize*8){ //Make sure that the flipped bit is inside the affected structure!
+      setValue(getValue()%(dataSize*8) +1);
       DPRINTF(FaultInjection,"Altered Flip bit location\n");
       dump();
     }

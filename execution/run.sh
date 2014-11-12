@@ -35,7 +35,6 @@ fi
 
 cd $my_core
 
-
 if [ ! -d "$checkpoint_dir" ]; then 
   mkdir "$checkpoint_dir"
 fi
