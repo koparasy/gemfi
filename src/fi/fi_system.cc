@@ -577,8 +577,9 @@ Fi_System::scheduleswitch(ThreadContext *tc){
     if(getswitchcpu()){
         Fi_SystemEvent *switching = new Fi_SystemEvent(tc);
         switching->setticks(curTick());
-        mainEventQueue[0]->schedule(switching,curTick()+10000,true);
-        DPRINTF(FaultInjection,"EVENT IS scheduled for %i\n",curTick()+10000);
+	Tick when = curTick() + 1000 * SimClock::Int::ns;
+        mainEventQueue[0]->schedule(switching,when,true);
+        DPRINTF(FaultInjection,"EVENT IS scheduled for %i\n",when);
         setswitchcpu(false);
     }
 }
