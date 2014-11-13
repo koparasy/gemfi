@@ -34,6 +34,7 @@
 #include "base/trace.hh"
 #include "base/types.hh"
 #include "debug/Decoder.hh"
+#include "fi/fi_system.hh"
 
 namespace X86ISA
 {
@@ -67,6 +68,58 @@ Decoder::doResetState()
         return PrefixState;
     }
 }
+
+
+void
+Decoder::process( ThreadContext * tc, ThreadEnabledFault *thread)
+{
+    //This function drives the decoder state machine.
+
+    //Some sanity checks. You shouldn't try to process more bytes if
+    //there aren't any, and you shouldn't overwrite an already
+    //decoder ExtMachInst.
+    assert(!outOfBytes);
+    assert(!instDone);
+
+    if (state == ResetState)
+        state = doResetState();
+    if (state == FromCacheState) {
+        state = doFromCacheState();
+    } else {
+	fetchChunk = fi_system->fetch_fault(tc,thread, fetchChunk, basePC);
+        instBytes->chunks.push_back(fetchChunk);
+    }
+
+    //While there's still something to do...
+    while (!instDone && !outOfBytes) {
+        uint8_t nextByte = getNextByte();
+        switch (state) {
+          case PrefixState:
+            state = doPrefixState(nextByte);
+            break;
+          case OpcodeState:
+            state = doOpcodeState(nextByte);
+            break;
+          case ModRMState:
+            state = doModRMState(nextByte);
+            break;
+          case SIBState:
+            state = doSIBState(nextByte);
+            break;
+          case DisplacementState:
+            state = doDisplacementState();
+            break;
+          case ImmediateState:
+            state = doImmediateState();
+            break;
+          case ErrorState:
+            panic("Went to the error state in the decoder.\n");
+          default:
+            panic("Unrecognized state! %d\n", state);
+        }
+    }
+}
+
 
 void
 Decoder::process()

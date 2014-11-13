@@ -44,6 +44,10 @@
 #include "cpu/static_inst.hh"
 #include "debug/Decoder.hh"
 
+class ThreadContext;
+class ThreadEnabledFault;
+
+
 namespace X86ISA
 {
 
@@ -269,7 +273,9 @@ namespace X86ISA
             }
 
             void process();
-
+//ALTERCODE
+	    void process(ThreadContext *tc, ThreadEnabledFault *thread);
+//ALTERCODE
             //Use this to give data to the decoder. This should be used
             //when there is control flow.
             void moreBytes(const PCState &pc, Addr fetchPC, MachInst data)
@@ -281,6 +287,18 @@ namespace X86ISA
                 outOfBytes = false;
                 process();
             }
+
+//ALTERCODE
+	void moreBytes(const PCState &pc, Addr fetchPC, MachInst data, ThreadContext *tc, ThreadEnabledFault *thread)
+        {
+                DPRINTF(Decoder, "Getting more bytes.\n");
+                basePC = fetchPC;
+                offset = (fetchPC >= pc.instAddr()) ? 0 : pc.instAddr() - fetchPC;
+                fetchChunk = data;
+                outOfBytes = false;
+                process(tc,thread);
+        }
+//ALTERCODE
 
             bool needMoreBytes()
             {
