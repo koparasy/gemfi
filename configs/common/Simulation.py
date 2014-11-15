@@ -521,6 +521,7 @@ def run(options, root, testsys, cpu_class):
             exit_event = benchCheckpoints(options, maxtick, cptdir)
 
     print 'Exiting @ tick %i because %s' % (m5.curTick(), exit_event.getCause())
+    sys.exit(exit_event.getCause())
     if options.checkpoint_at_end:
         m5.checkpoint(joinpath(cptdir, "cpt.%d"))
 
