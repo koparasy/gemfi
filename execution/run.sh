@@ -7,11 +7,11 @@ terminate(){
 }
 
 #global variabled to handle storage units
-export M5_PATH=/scratch/x86
+export M5_PATH=/home/dinos/x86
 checkpoint_dir="my_ckpts"
-results="/scratch/results"
-all_exp="/scratch/experiments"
-mutex="/scratch/script.lock"
+results="/home/dinos/results"
+all_exp="/home/dinos/experiments"
+mutex="/home/dinos/script.lock"
 experiments=(Fetch.txt Decode.txt IEW.txt LDS.txt)
 ckpts=(fetch_ckpt.dmtcp decode_ckpt.dmtcp iew_ckpt.dmtcp lds_ckpt.dmtcp)
 ckpt_dirs=(fetch decode iew lds)
@@ -78,25 +78,6 @@ dmtcp_checkpoint ./../../build/X86/gem5.opt --debug-flags=FaultInjection --remot
   fi
 fi
 
-if [ -f "input" ]; then
-      cp $checkpoint_dir/maincheckpoint/maincheckpoint.dmtcp .
-      cp -r $checkpoint_dir/maincheckpoint/ckpt_gem5.opt_* .
-      dmtcp_restart maincheckpoint.dmtcp &
-      pids=$!
-      echo "Passing child id $i"
-      ./../time.sh $pids
-      _name=$(echo -n  "$(/sbin/ifconfig | grep 'eth1\|eth0\|eth2\|eth3' | tr -s ' '  | cut -d ' ' -f5| sed 's/://g')$(date | sed 's/ //g')$my_core")
-      echo  "$my_core storing $_name ..... " >>"$my_core"
-      echo "$_name"
-      mkdir "$_name"
-      mv input "$_name"
-      cp start/* "$_name"
-      rm start/ApplicationOutput 
-      rm *.dmtcp
-      rm -r ckpt_gem5.opt*
-fi
-
-
 for (( i = 0 ; i < ${#experiments[@]} ; i++))
 do
   cur_exp="$all_exp/${experiments[$i]}"
@@ -135,7 +116,7 @@ do
       echo "Passing child id $i"
       ./../time.sh $pids
     fi
-    _name=$(echo -n  "$(/sbin/ifconfig | grep 'eth1\|eth0\|eth2\|eth3' | tr -s ' '  | cut -d ' ' -f5| sed 's/://g')$(date | sed 's/ //g')$my_core")
+    _name=$(echo -n  "$(/sbin/ifconfig | grep 'em0\|em1\|eth1\|eth0\|eth2\|eth3' | tr -s ' '  | cut -d ' ' -f5| sed 's/://g')$(date | sed 's/ //g')$my_core")
     echo  "$my_core storing $_name ..... " >>"$my_core"
     echo "$_name"
     mkdir "$_name"

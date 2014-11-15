@@ -9,7 +9,7 @@ terminate(){
 start_new=$1
 num_cores=$2
 
-workstation="/scratch"
+workstation="/home/dinos"
 my_pid="$workstation/mypid.txt"
 my_childs=""
 echo $$>"$my_pid"
@@ -19,13 +19,13 @@ if [ ! -d "$workstation/results" ] ; then
 fi
 
 if [ $start_new -eq "1" ] ; then
-  cp -r $workstation/build/test.rcS ../configs/boot/test.rcS
+  cp -r /srv/homes/koparasy/test.rcS ../configs/boot/test.rcS
   echo "Starting new"
-  cp -r "$workstation/build/x86" "$workstation"
+  cp -r "/srv/homes/koparasy/x86" "$workstation"
   rm -r core*
   for (( i = 0 ; i < $num_cores; i++))
   do
-    mkdir core$i
+    mkdir cor/e$i
   done
 fi
 
