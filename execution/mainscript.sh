@@ -19,7 +19,7 @@ if [ ! -d "$workstation/results" ] ; then
 fi
 
 if [ $start_new -eq "1" ] ; then
-  cp -r $workstation/build/test.rcS ../configs/boot/test.rcS
+#  cp -r $workstation/build/test.rcS ../configs/boot/test.rcS
   echo "Starting new"
   cp -r "$workstation/build/x86" "$workstation"
   rm -r core*

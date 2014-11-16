@@ -128,8 +128,10 @@ do
      
 
     if [ -f "${ckpts[$i]}" ]; then
-     mv ${ckpts[$i]}  "$checkpoint_dir/${ckpt_dirs[$i]}/"
-     mv ckpt_gem5.opt_*  "$checkpoint_dir/${ckpt_dirs[$i]}/"
+     cp -ri ${ckpts[$i]}  "$checkpoint_dir/${ckpt_dirs[$i]}/"
+     rm	 ${ckpts[$i]}
+     cp -r ckpt_gem5.opt_*  "$checkpoint_dir/${ckpt_dirs[$i]}/"
+	rm -r  ckpt_gem5.opt_* 
     else
       echo "This should never happen"
     fi
