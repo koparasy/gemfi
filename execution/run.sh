@@ -78,6 +78,25 @@ dmtcp_checkpoint ./../../build/X86/gem5.opt --debug-flags=FaultInjection --remot
   fi
 fi
 
+if [ -f "input" ]; then
+      cp $checkpoint_dir/maincheckpoint/maincheckpoint.dmtcp .
+      cp -r $checkpoint_dir/maincheckpoint/ckpt_gem5.opt_* .
+      dmtcp_restart maincheckpoint.dmtcp &
+      pids=$!
+      echo "Passing child id $i"
+      ./../time.sh $pids
+      _name=$(echo -n  "$(/sbin/ifconfig | grep 'eth1\|eth0\|eth2\|eth3' | tr -s ' '  | cut -d ' ' -f5| sed 's/://g')$(date | sed 's/ //g')$my_core")
+      echo  "$my_core storing $_name ..... " >>"$my_core"
+      echo "$_name"
+      mkdir "$_name"
+      mv input "$_name"
+      cp start/* "$_name"
+      rm start/ApplicationOutput 
+      rm *.dmtcp
+      rm -r ckpt_gem5.opt*
+fi
+
+
 for (( i = 0 ; i < ${#experiments[@]} ; i++))
 do
   cur_exp="$all_exp/${experiments[$i]}"
