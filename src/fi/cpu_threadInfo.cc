@@ -15,6 +15,7 @@ cpuExecutedTicks:: cpuExecutedTicks(std:: string name)
 {
   setName(name);
   setInstrFetched(0);
+  setInstrDecoded(0);
   setInstrExecuted(0);
   setInstrLoadStore(0);
   setTicks(0);
@@ -22,13 +23,14 @@ cpuExecutedTicks:: cpuExecutedTicks(std:: string name)
 
 cpuExecutedTicks::~cpuExecutedTicks()
 {
-  
+
 }
 
 void cpuExecutedTicks:: dump(){
-    if (DTRACE(FaultInjection)) {
+  if (DTRACE(FaultInjection)) {
     std::cout<<"================\t"<<"CpuExecutedTicks :"<<getName()<<" \t==========================\n"; 
     std::cout << "CpuFetchedInstr: " <<getInstrFetched() <<"\n";
+    std::cout << "CpuDecodeInstr: "<<getInstrDecoded()<<"\n";
     std::cout << "CpuExecutedInstr: "<<getInstrExecuted() <<  "\n";
     std::cout << "CpuLoadStoreInstr "<<getInstrLoadStore()<<"\n";
     std::cout << "Ticks: "<<getTicks() << "\n";
@@ -43,18 +45,18 @@ ThreadEnabledFault::ThreadEnabledFault(int threadId, std::string name)
   cores.insert(pair<string,cpuExecutedTicks*> (allcores,all));
 
   cores.insert(pair<string,cpuExecutedTicks*>(name, new cpuExecutedTicks(name)));
-  
+
   setThreadId(threadId);
   setMyid();
   setMagicInstVirtualAddr(-1);
-  }
+}
 
 ThreadEnabledFault::~ThreadEnabledFault()
 {
   delete all;
   for(itcores = cores.begin(); itcores!=cores.end() ; ++itcores)
-      delete itcores->second;
-  
+    delete itcores->second;
+
 }
 
 
@@ -72,17 +74,17 @@ void ThreadEnabledFault::dump(){
 
 int ThreadEnabledFault:: increaseTicks(std:: string curCpu, uint64_t ticks)
 {
- 
+
   assert(all != NULL);
   all->increaseTicks(ticks);
   itcores = cores.find(curCpu);
   if ( itcores == cores.end())
-	cores[curCpu] = new cpuExecutedTicks(curCpu);
+    cores[curCpu] = new cpuExecutedTicks(curCpu);
   else
-	cores[curCpu]->increaseTicks(ticks);
+    cores[curCpu]->increaseTicks(ticks);
 
   return 1;
-  
+
 }
 
 
@@ -95,14 +97,25 @@ int ThreadEnabledFault:: increaseFetchedInstr(std:: string curCpu)
   all->increaseFetchInstr();
   itcores = cores.find(curCpu);
   if ( itcores == cores.end())
-	cores[curCpu] = new cpuExecutedTicks(curCpu);
+    cores[curCpu] = new cpuExecutedTicks(curCpu);
   else
-	cores[curCpu]->increaseFetchInstr();
+    cores[curCpu]->increaseFetchInstr();
   return 1;
- 
+
 }
 
+int ThreadEnabledFault:: increaseDecodedInstr(std:: string curCpu)
+{
+  assert( all != NULL);
+  all->increaseDecodeInstr();
+  itcores = cores.find(curCpu);
+  if ( itcores == cores.end())
+    cores[curCpu] = new cpuExecutedTicks(curCpu);
+  else
+    cores[curCpu]->increaseDecodeInstr();
+  return 1;
 
+}
 
 //This thread has executed one more instruction.
 
@@ -112,9 +125,9 @@ int ThreadEnabledFault:: increaseExecutedInstr(std:: string curCpu)
   all->increaseExecInstr();
   itcores = cores.find(curCpu);
   if ( itcores == cores.end())
-	cores[curCpu] = new cpuExecutedTicks(curCpu);
+    cores[curCpu] = new cpuExecutedTicks(curCpu);
   else
-	cores[curCpu]->increaseExecInstr();
+    cores[curCpu]->increaseExecInstr();
   return 1;
 }
 
@@ -125,9 +138,9 @@ int ThreadEnabledFault:: increaseLoadStoreInstr(std:: string curCpu)
   all->increaseLoadStoreInstr();
   itcores = cores.find(curCpu);
   if ( itcores == cores.end())
-	cores[curCpu] = new cpuExecutedTicks(curCpu);
+    cores[curCpu] = new cpuExecutedTicks(curCpu);
   else
-	cores[curCpu]->increaseLoadStoreInstr();
+    cores[curCpu]->increaseLoadStoreInstr();
   return 1;
 }
 
@@ -138,8 +151,8 @@ void ThreadEnabledFault:: CalculateFetchedTime(std::string curCpu , uint64_t *fe
 {
   assert( all != NULL);
   if(curCpu.compare("all")==0){
-      *fetched_time  =  all->getTicks();
-      *fetched_instr =  all->getInstrFetched();
+    *fetched_time  =  all->getTicks();
+    *fetched_instr =  all->getInstrFetched();
   }
   else{
     itcores = cores.find(curCpu);
@@ -147,16 +160,34 @@ void ThreadEnabledFault:: CalculateFetchedTime(std::string curCpu , uint64_t *fe
       *fetched_time = itcores->second->getTicks();
       *fetched_instr = itcores->second->getInstrFetched();
     }
-      return;
+    return;
   }
 }
+
+void ThreadEnabledFault:: CalculateDecodedTime(std::string curCpu , uint64_t *fetched_instr , uint64_t *fetched_time )
+{
+  assert( all != NULL);
+  if(curCpu.compare("all")==0){
+    *fetched_time  =  all->getTicks();
+    *fetched_instr =  all->getInstrDecoded();
+  }
+  else{
+    itcores = cores.find(curCpu);
+    if(itcores != cores.end()){
+      *fetched_time = itcores->second->getTicks();
+      *fetched_instr = itcores->second->getInstrDecoded();
+    }
+    return;
+  }
+}
+
 
 void ThreadEnabledFault:: CalculateExecutedTime(std::string curCpu  , uint64_t *exec_instr , uint64_t *exec_time)
 {
   assert( all != NULL);
   if(curCpu.compare("all")==0){
-      *exec_time  =  all->getTicks();
-      *exec_instr =  all->getInstrExecuted();
+    *exec_time  =  all->getTicks();
+    *exec_instr =  all->getInstrExecuted();
   }
   else{
     itcores = cores.find(curCpu);
@@ -196,11 +227,12 @@ void ThreadEnabledFault:: print_time(){
     for(itcores = cores.begin(); itcores!=cores.end() ; ++itcores){
       std::cout<<"CORE:"<<itcores->second->getName()<<"\n";
       std::cout<<"Fetched Instr: "<< itcores->second->getInstrFetched() <<"\n";
+      std::cout<<"Decoded Instr: "<< itcores->second->getInstrDecoded() <<"\n";
       std::cout<<"Executed Instr: "<< itcores->second->getInstrExecuted() <<"\n";
       std::cout<<"LoadStore Instr: "<< itcores->second->getInstrLoadStore() <<"\n";
       std::cout<<"Ticks : "<< itcores->second->getTicks() <<"\n";
     }
-    
+
   }
 }
 

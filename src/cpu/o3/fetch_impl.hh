@@ -1356,7 +1356,7 @@ DefaultFetch<Impl>::fetch(bool &status_change)
 
 			//ALTERCODE
 			//inject fault on decoded instruction
-			if(enabled_fi && fi_system->fi_decode)
+			if(enabled_fi)
 				staticInst = fi_system -> decode_fault(curr_tc,curr_thread,staticInst,thisPC.instAddr());
 			//~ALTERCODE
 

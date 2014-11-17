@@ -34,6 +34,7 @@ extern std::string allcores;
 class cpuExecutedTicks {
 	private:
 		uint64_t instrFetched; //how many instructions has this core fetched for a specific thread
+    uint64_t instrDecoded;
 		uint64_t instrExexuted; // how many instructions has this core executed for a specific thread
 		uint64_t instrLoadStore;
 		/* 
@@ -51,12 +52,14 @@ class cpuExecutedTicks {
 		void setName(std:: string v){_name = v;} 
 
 		void setInstrFetched(uint64_t v){instrFetched = v;  }
+    void setInstrDecoded(uint64_t v){instrDecoded = v; }
 		void setInstrExecuted(uint64_t v){instrExexuted = v; }
 		void setInstrLoadStore(uint64_t v){instrLoadStore = v;}
 
 		void setTicks(uint64_t v){_ticks=v;}
 
 		uint64_t getInstrFetched(){return instrFetched;}
+    uint64_t getInstrDecoded(){return instrDecoded;}
 		uint64_t getInstrExecuted(){return instrExexuted;}
 		uint64_t getInstrLoadStore(){return instrLoadStore;}   
 
@@ -65,6 +68,7 @@ class cpuExecutedTicks {
 		std::string getName() {return _name;}
 
 		void increaseFetchInstr() { instrFetched++;}
+    void increaseDecodeInstr(){ instrDecoded++;}
 		void increaseExecInstr() {instrExexuted++;}
 		void increaseLoadStoreInstr(){instrLoadStore++;}
 
@@ -115,7 +119,7 @@ class ThreadEnabledFault {
 
 
 	int increaseFetchedInstr(std:: string curCpu);
-	int increaseDecodedInstr(std:: string curCpu);
+  int increaseDecodedInstr(std:: string curCpu);
 	int increaseExecutedInstr(std:: string curCpu);
 	int increaseLoadStoreInstr(std:: string curCpu);
 
