@@ -336,30 +336,35 @@ Fi_System:: get_fi_decode_counters( InjectedFault *p , ThreadEnabledFault &threa
 
     *fetch_time=0;
     *fetch_instr=0;
+    int val;
     // Case :: specific cpu ---- specific thread
     if((p->getWhere().compare(curCpu))==0 && (p->getThread()).compare("all") != 0 && thread.getThreadId() == atoi( (p->getThread()).c_str() ) ){ // case thread_id - cpu_id
         thread.CalculateDecodedTime(curCpu,fetch_instr,fetch_time);
+        val=1;
     }//Case :: ALL cores --- specific Thread
     else if((p->getWhere().compare("all") == 0) && (p->getThread()).compare("all") != 0 && thread.getThreadId() == atoi( (p->getThread()).c_str() )){// case thread_id - all
         thread.CalculateDecodedTime("all",fetch_instr,fetch_time);
+        val =2;
     }//Case :: Specific Cpu --- All threads
     else if( ( (p->getWhere().compare(curCpu)) == 0  ) && (((p->getThread()).compare("all")) == 0)  ){ //case cpu_id - all
         allthreads->CalculateDecodedTime(curCpu,fetch_instr,fetch_time);
+        val=3;
     }//Case:: All cores --- All threads
     else if( ((p->getThread()).compare("all") == 0) && ((p->getWhere().compare("all")) == 0) ){ //case all - all
         allthreads->CalculateDecodedTime("all",fetch_instr,fetch_time);
+        val = 4;
     }
  if(*fetch_time | *fetch_instr){
         if(p->getFaultType() == p->RegisterInjectedFault || p->getFaultType() == p->PCInjectedFault || p->getFaultType() == p->MemoryInjectedFault){
             p->setCPU(reinterpret_cast<BaseCPU *>(find(curCpu.c_str()))); // I may manifest during this cycle so se the core.
-            return 1;
+            return val;
         }
         else if(p->getFaultType() == p->GeneralFetchInjectedFault || p->getFaultType() == p->OpCodeInjectedFault ||
                 p->getFaultType() == p->RegisterDecodingInjectedFault || p->getFaultType() == p->ExecutionInjectedFault){
             O3CPUInjectedFault *k = reinterpret_cast<O3CPUInjectedFault*> (p);
             BaseO3CPU *v = reinterpret_cast<BaseO3CPU *>(find(curCpu.c_str())); // I may manifest during this cycle so se the core.
             k->setCPU(v);
-            return 2;
+            return val;
         }
     }
     return 0;

@@ -278,6 +278,7 @@ InjectedFaultQueue::remove(InjectedFault *f)
 
 InjectedFault *InjectedFaultQueue::scan(std::string s , ThreadEnabledFault &thisThread , Addr vaddr){
 
+  static uint64_t called=0;
   InjectedFault *p;
   int i;
   uint64_t exec_time = 0;
@@ -285,6 +286,7 @@ InjectedFault *InjectedFaultQueue::scan(std::string s , ThreadEnabledFault &this
   unsigned char flag = 1;
   p = head;
   //pass the list and check if a fault meets the conditions
+
   while(p && flag){
     if(!p->isManifested()){
       exec_time = 0;
@@ -292,6 +294,7 @@ InjectedFault *InjectedFaultQueue::scan(std::string s , ThreadEnabledFault &this
       //find how much time do I run.
       if(name().compare("DecodeStageFaultQueue") == 0 ){
         i = fi_system->get_fi_decode_counters( p , thisThread, s , &exec_instr , &exec_time );
+        called++;
       }
       else if(name().compare("IEWStageFaultQueue") == 0 ){
         i = fi_system->get_fi_exec_counters( p , thisThread, s , &exec_instr , &exec_time );
@@ -302,7 +305,6 @@ InjectedFault *InjectedFaultQueue::scan(std::string s , ThreadEnabledFault &this
       else{
         i = fi_system->get_fi_fetch_counters( p , thisThread, s , &exec_instr , &exec_time );
       }
-
       if(i){
         switch( p->getTimingType() ){
           case (InjectedFault ::TickTiming):

@@ -368,6 +368,8 @@ int get_fi_decode_counters( InjectedFault *p , ThreadEnabledFault &thread,std::s
 			else
 				return cur_instr;
 
+
+			allthreads->increaseDecodedInstr(_name);
 			while ((decodefault = reinterpret_cast<RegisterDecodingInjectedFault *>(decodeStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
 				int succeed = dmtcp_checkpoint();
 				if ( succeed == 1){
