@@ -13,32 +13,32 @@ using namespace std;
 // Insert faults
 InjectedFault::InjectedFault(ifstream &os)
 {
-	std:: string _when, _what, _thread, _where ;
-	int _occ;
-	os>>_when;
-	os>>_what;
-	os>>_thread;
-	os>>_where;
-	os>>_occ;	
-	if(DTRACE(FaultInjection)){
-	   std::cout << "InjectedFault :: when :" << _when << "\n";
-	   std::cout << "InjectedFault :: where :" << _where << "\n";
-	   std::cout << "InjectedFault :: what :" << _what  << "\n";
-	   std::cout << "InjectedFault :: thread :" << _thread << "\n";
-	   std::cout << "InjectedFault :: occ :" << _occ << "\n";
-	}
-	
-	
-	setThread(_thread);
-	setWhen(_when);
-	setWhere(_where);
-	setWhat(_what);
-	parseWhat(_what);
-	parseWhen(_when);
-	setFaultID();
-	setOccurrence(_occ);
-	setManifested(false);
-	
+  std:: string _when, _what, _thread, _where ;
+  int _occ;
+  os>>_when;
+  os>>_what;
+  os>>_thread;
+  os>>_where;
+  os>>_occ;	
+  if(DTRACE(FaultInjection)){
+    std::cout << "InjectedFault :: when :" << _when << "\n";
+    std::cout << "InjectedFault :: where :" << _where << "\n";
+    std::cout << "InjectedFault :: what :" << _what  << "\n";
+    std::cout << "InjectedFault :: thread :" << _thread << "\n";
+    std::cout << "InjectedFault :: occ :" << _occ << "\n";
+  }
+
+
+  setThread(_thread);
+  setWhen(_when);
+  setWhere(_where);
+  setWhat(_what);
+  parseWhat(_what);
+  parseWhen(_when);
+  setFaultID();
+  setOccurrence(_occ);
+  setManifested(false);
+
 }
 
 
@@ -52,11 +52,11 @@ InjectedFault::~InjectedFault()
 const char *
 InjectedFault::description() const
 {
-    return "InjectedFault";
+  return "InjectedFault";
 }
 
 
-int
+  int
 InjectedFault::parseWhen(std::string s)
 {
   if (s.compare(0,4,"Inst",0,4) == 0) {
@@ -76,11 +76,11 @@ InjectedFault::parseWhen(std::string s)
     assert(0);
     return 1;
   }
-  
+
   return 0;
 }
 
-int
+  int
 InjectedFault::parseWhat(std::string s)
 {
   if (s.compare(0,4,"Immd",0,4) == 0) {
@@ -108,50 +108,50 @@ InjectedFault::parseWhat(std::string s)
     assert(0);
     return 1;
   }
-  
+
   return 0;
 }
 
-void 
+  void 
 InjectedFault::increaseTiming(uint64_t cycles, uint64_t insts, uint64_t addr)
 {
   switch (getTimingType())
-    {
+  {
     case (InjectedFault::TickTiming):
       {
-	setTiming(cycles);
-	break;
+        setTiming(cycles);
+        break;
       }
     case (InjectedFault::InstructionTiming):
       {
-	  setTiming(insts);
-	  break;
+        setTiming(insts);
+        break;
       }
     case (InjectedFault::VirtualAddrTiming):
       {
-	/*Originally this changed to a different timing type, however, we will keep it at the same type to enable the precise injection of permanent faults (e.g. first value of a macroblock)
-	 */
+        /*Originally this changed to a different timing type, however, we will keep it at the same type to enable the precise injection of permanent faults (e.g. first value of a macroblock)
+        */
 
 
-	/* Virtual addresses can not be used for non transient faults, that is because in the presence of branches we can not predefine an address for the next fault to occure (will the branch succeed or not).
-	   For that reason we change the Timing Type either the Tick or Instruction can be used, one can add an option but currently instructions are choosen no thought was put onto that choice.
-	 */
-	//setTimingType(InjectedFault::InstructionTiming);
-	//setTiming(insts);
-	
-	/*we also remove the fault from the fault queue as it was done for the other types too
-	 */
-	//getQueue()->remove(this);
-	
-	break;
+        /* Virtual addresses can not be used for non transient faults, that is because in the presence of branches we can not predefine an address for the next fault to occure (will the branch succeed or not).
+           For that reason we change the Timing Type either the Tick or Instruction can be used, one can add an option but currently instructions are choosen no thought was put onto that choice.
+           */
+        //setTimingType(InjectedFault::InstructionTiming);
+        //setTiming(insts);
+
+        /*we also remove the fault from the fault queue as it was done for the other types too
+        */
+        //getQueue()->remove(this);
+
+        break;
       }
     default:
       {
-	std::cout << "InjectedFault::increaseTiming() - getTimingType default type error\n";
-	assert(0);
-	break;
+        std::cout << "InjectedFault::increaseTiming() - getTimingType default type error\n";
+        assert(0);
+        break;
       }
-    }
+  }
 }
 
 
@@ -177,19 +177,19 @@ InjectedFault::dump() const
 }
 
 InjectedFaultQueue::InjectedFaultQueue()
-:objName(""), head(NULL),tail(NULL)
+  :objName(""), head(NULL),tail(NULL)
 {
   //
 }
 
-InjectedFaultQueue::InjectedFaultQueue(const string &n)
-  : objName(n), head(NULL), tail(NULL)
+  InjectedFaultQueue::InjectedFaultQueue(const string &n)
+: objName(n), head(NULL), tail(NULL)
 {
-  
+
 }
 
 
-void
+  void
 InjectedFaultQueue::insert(InjectedFault *f)
 {
   f->setQueue(this); // when inserting a fault to a queue place a reference from it to the queue
@@ -197,13 +197,13 @@ InjectedFaultQueue::insert(InjectedFault *f)
   InjectedFault *p;
 
   p = head;
-  
+
   if (empty()) {//queue is empty
     head = f;
     tail = f;
     head->nxt=NULL;
     tail->nxt=NULL;
-    
+
     head->prv=NULL;
     tail->prv=NULL;
     return;
@@ -212,7 +212,7 @@ InjectedFaultQueue::insert(InjectedFault *f)
     while ((p!=NULL) && (p->getTiming() < f->getTiming())) {//travel queue elements to find the one before which our element will be inserted
       p = p->nxt;
     }
-    
+
     if (p==NULL) {//element inserted at the end
       tail->nxt = f;
       f->prv = tail;
@@ -236,7 +236,7 @@ InjectedFaultQueue::insert(InjectedFault *f)
 
 }
 
-void
+  void
 InjectedFaultQueue::remove(InjectedFault *f)
 {
   InjectedFault *p;
@@ -278,6 +278,7 @@ InjectedFaultQueue::remove(InjectedFault *f)
 
 InjectedFault *InjectedFaultQueue::scan(std::string s , ThreadEnabledFault &thisThread , Addr vaddr){
 
+  static uint64_t called=0;
   InjectedFault *p;
   int i;
   uint64_t exec_time = 0;
@@ -285,68 +286,72 @@ InjectedFault *InjectedFaultQueue::scan(std::string s , ThreadEnabledFault &this
   unsigned char flag = 1;
   p = head;
   //pass the list and check if a fault meets the conditions
+
   while(p && flag){
     if(!p->isManifested()){
       exec_time = 0;
       exec_instr = 0;
       //find how much time do I run.
-      if(name().compare("IEWStageFaultQueue") == 0 ){
-	i = fi_system->get_fi_exec_counters( p , thisThread, s , &exec_instr , &exec_time );
+      if(name().compare("DecodeStageFaultQueue") == 0 ){
+        i = fi_system->get_fi_decode_counters( p , thisThread, s , &exec_instr , &exec_time );
+        called++;
+      }
+      else if(name().compare("IEWStageFaultQueue") == 0 ){
+        i = fi_system->get_fi_exec_counters( p , thisThread, s , &exec_instr , &exec_time );
       }
       else if (name().compare("LoadStoreFaultQueue") == 0 ){
-	i = fi_system->get_fi_loadstore_counters( p , thisThread, s , &exec_instr , &exec_time );
+        i = fi_system->get_fi_loadstore_counters( p , thisThread, s , &exec_instr , &exec_time );
       }
       else{
-	i = fi_system->get_fi_fetch_counters( p , thisThread, s , &exec_instr , &exec_time );
+        i = fi_system->get_fi_fetch_counters( p , thisThread, s , &exec_instr , &exec_time );
       }
-
       if(i){
-	  switch( p->getTimingType() ){
-	    case (InjectedFault ::TickTiming):
-	    {   
-	      if(exec_time == p->getTiming()){ //correct time so intend to manifest
-		p->setServicedAt(exec_time);
-		return(p);
-	      }
-	      else if(exec_time > p->getTiming())
-		flag = 0;
-	    }
-	    break;
-	    case (InjectedFault ::InstructionTiming):
-	    {
-	      if(exec_instr == p->getTiming() ){
-		p->setServicedAt(exec_instr);
-		return(p);
-	      }
-	      else if(exec_instr > p->getTiming())
-		flag = 0;
-	    }
-	    break;
-	    case (InjectedFault ::VirtualAddrTiming):
-	    {
-	      if(vaddr == p->getTiming() + thisThread.getMagicInstVirtualAddr() ){
-		  p->setServicedAt(vaddr);
-		  p->dump();
-		  return(p);
-	      }
-	      
-	    }
-	    break;
-	    default:
-	      {
-		std::cout << "InjectedFaultQueue::scan() - getTimingType default type error\n";
-		assert(0);
-		break;
-	      }
-	  
-	  
-	  }
-	}
+        switch( p->getTimingType() ){
+          case (InjectedFault ::TickTiming):
+            {   
+              if(exec_time == p->getTiming()){ //correct time so intend to manifest
+                p->setServicedAt(exec_time);
+                return(p);
+              }
+              else if(exec_time > p->getTiming())
+                flag = 0;
+            }
+            break;
+          case (InjectedFault ::InstructionTiming):
+            {
+              if(exec_instr == p->getTiming() ){
+                p->setServicedAt(exec_instr);
+                return(p);
+              }
+              else if(exec_instr > p->getTiming())
+                flag = 0;
+            }
+            break;
+          case (InjectedFault ::VirtualAddrTiming):
+            {
+              if(vaddr == p->getTiming() + thisThread.getMagicInstVirtualAddr() ){
+                p->setServicedAt(vaddr);
+                p->dump();
+                return(p);
+              }
+
+            }
+            break;
+          default:
+            {
+              std::cout << "InjectedFaultQueue::scan() - getTimingType default type error\n";
+              assert(0);
+              break;
+            }
+
+
+        }
+      }
     }
     p = p->nxt;
   }
   return(NULL);
-  
+
 }
 
 

@@ -177,6 +177,7 @@ class Fi_System : public MemObject
 		int increaseTicks(std :: string curCpu , ThreadEnabledFault *curThread , uint64_t ticks);
 
 		int get_fi_fetch_counters(InjectedFault *p , ThreadEnabledFault &thread,std::string curCpu , uint64_t *exec_time , uint64_t *exec_instr );
+int get_fi_decode_counters( InjectedFault *p , ThreadEnabledFault &thread,std::string curCpu , uint64_t *fetch_instr , uint64_t *fetch_time );
 		int get_fi_exec_counters(InjectedFault *p , ThreadEnabledFault &thread,std::string curCpu , uint64_t *exec_time , uint64_t *exec_instr );
 		int get_fi_loadstore_counters(InjectedFault *p , ThreadEnabledFault &thread,std::string curCpu , uint64_t *exec_time , uint64_t *exec_instr );
 
@@ -361,6 +362,14 @@ class Fi_System : public MemObject
 			if (sigInstr)
 				return cur_instr;
 
+      if(FullSystem && TheISA::inUserMode(tc)){	
+				thread->increaseDecodedInstr(_name);
+			}
+			else
+				return cur_instr;
+
+
+			allthreads->increaseDecodedInstr(_name);
 			while ((decodefault = reinterpret_cast<RegisterDecodingInjectedFault *>(decodeStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
 				int succeed = dmtcp_checkpoint();
 				if ( succeed == 1){
