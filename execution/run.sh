@@ -84,18 +84,18 @@ do
   echo "$cur_exp"
   while [ -s "$cur_exp" ]
   do
-    
-    echo "Lock taken"
-    lockfile $mutex #take lock
-    echo "Lock taken"
-    exp=$(tail -n 1 $cur_exp)
-    head -n -1 $cur_exp > temp.txt 
-    mv temp.txt $cur_exp
-    
-    rm -f $mutex #free lock
-    echo "lock released"
-    echo -n "$exp">input
-
+    if [ ! -f input ]; then  
+      echo "Lock taken"
+      lockfile $mutex #take lock
+      echo "Lock taken"
+      exp=$(tail -n 1 $cur_exp)
+      head -n -1 $cur_exp > temp.txt 
+      mv temp.txt $cur_exp
+      
+      rm -f $mutex #free lock
+      echo "lock released"
+      echo -n "$exp">input
+    fi
 # Check if there is a checkpoint for this kind of faults
 # if there is use it otherwise use the maincheckpoint
 
