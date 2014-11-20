@@ -62,18 +62,18 @@ dmtcp_checkpoint ./../../build/X86/gem5.opt --debug-flags=FaultInjection --remot
   result=$?
   if [ "$result" -eq "1" ]; then
     echo "Checkpoint created">>"$my_core"
-    cp maincheckpoint.dmtcp "$checkpoint_dir/maincheckpoint/"
-    cp -r ckpt_gem5.opt_* "$checkpoint_dir/maincheckpoint/"
-    rm dmtcp_restart*
-    rm maincheckpoint.dmtcp
-    rm -r ckpt_gem5.opt_*
+    #cp maincheckpoint.dmtcp "$checkpoint_dir/maincheckpoint/"
+     #   cp -r ckpt_gem5.opt_* "$checkpoint_dir/maincheckpoint/"
+     #   rm dmtcp_restart*
+     #   rm maincheckpoint.dmtcp
+     # rm -r ckpt_gem5.opt_*
   else
     if [ -f dmtcp_restart*.sh ]; then
       rm dmtcp_restart*.sh
     fi
-    if [ -f ckpt_gem5.opt* ]; then
-      rm ckpt_gem5.opt*
-    fi
+#    if [ -f ckpt_gem5.opt* ]; then
+# rm ckpt_gem5.opt*
+#    fi
     echo "ERROR IN CREATING THE CHECKPOINT $my_core"
   fi
 fi
