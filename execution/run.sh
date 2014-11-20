@@ -84,7 +84,11 @@ do
   echo "$cur_exp"
   while [ -s "$cur_exp" ]
   do
+<<<<<<< HEAD
     if [ ! -f input ];  then
+=======
+    if [ ! -f input ]; then  
+>>>>>>> ceeb2e6d065afd5d0a1a07434528a9d76d8a342c
       echo "Lock taken"
       lockfile $mutex #take lock
       echo "Lock taken"
