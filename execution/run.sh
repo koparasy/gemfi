@@ -84,33 +84,33 @@ do
   echo "$cur_exp"
   while [ -s "$cur_exp" ]
   do
-    
-    echo "Lock taken"
-    lockfile $mutex #take lock
-    echo "Lock taken"
-    exp=$(tail -n 1 $cur_exp)
-    head -n -1 $cur_exp > temp.txt 
-    mv temp.txt $cur_exp
-    
-    rm -f $mutex #free lock
-    echo "lock released"
-    echo -n "$exp">input
-
+    if [ ! -f input ];  then
+      echo "Lock taken"
+      lockfile $mutex #take lock
+      echo "Lock taken"
+      exp=$(tail -n 1 $cur_exp)
+      head -n -1 $cur_exp > temp.txt 
+      mv temp.txt $cur_exp
+      
+      rm -f $mutex #free lock
+      echo "lock released"
+      echo -n "$exp">input
+    fi
 # Check if there is a checkpoint for this kind of faults
 # if there is use it otherwise use the maincheckpoint
 
-    if [ -f "$checkpoint_dir/${ckpt_dirs[$i]}/${ckpts[$i]}" ]; then
+    if [ -f "${ckpts[$i]}" ]; then
       echo "Restoring from $ckpts[$i]"
-      cp $checkpoint_dir/${ckpt_dirs[$i]}/${ckpts[$i]} . 
-      cp -r $checkpoint_dir/${ckpt_dirs[$i]}/ckpt_gem5.opt_* .
+#cp $checkpoint_dir/${ckpt_dirs[$i]}/${ckpts[$i]} . 
+#     cp -r $checkpoint_dir/${ckpt_dirs[$i]}/ckpt_gem5.opt_* .
       dmtcp_restart ${ckpts[$i]} &
       pids=$!
       echo "Passing child id $i"
       ./../time.sh $pids
     else
       echo "restoring from maincheckpoint"
-      cp $checkpoint_dir/maincheckpoint/maincheckpoint.dmtcp .
-      cp -r $checkpoint_dir/maincheckpoint/ckpt_gem5.opt_* .
+#      cp $checkpoint_dir/maincheckpoint/maincheckpoint.dmtcp .
+#      cp -r $checkpoint_dir/maincheckpoint/ckpt_gem5.opt_* .
       dmtcp_restart maincheckpoint.dmtcp &
       pids=$!
       echo "Passing child id $i"
@@ -127,12 +127,12 @@ do
     echo "$ my_core .....results stored">>"$my_core"
      
 
-    if [ -f "${ckpts[$i]}" ]; then
-     mv ${ckpts[$i]}  "$checkpoint_dir/${ckpt_dirs[$i]}/"
-     mv ckpt_gem5.opt_*  "$checkpoint_dir/${ckpt_dirs[$i]}/"
-    else
-      echo "This should never happen"
-    fi
+#    if [ -f "${ckpts[$i]}" ]; then
+#     mv ${ckpts[$i]}  "$checkpoint_dir/${ckpt_dirs[$i]}/"
+#     mv ckpt_gem5.opt_*  "$checkpoint_dir/${ckpt_dirs[$i]}/"
+#    else
+#      echo "This should never happen"
+#    fi
   done
 done
 #trap "terminate $pids" SIGINT SIGTERM
