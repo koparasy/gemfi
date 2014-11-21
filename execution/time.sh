@@ -49,6 +49,6 @@ do
   else
     echo "Only me on the computer"
   fi
-  sleep 200
+  sleep 60
 done
 

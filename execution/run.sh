@@ -7,11 +7,11 @@ terminate(){
 }
 
 #global variabled to handle storage units
-export M5_PATH=/home/dinos/x86
+export M5_PATH=/scratch/x86
 checkpoint_dir="my_ckpts"
-results="/home/dinos/results"
-all_exp="/home/dinos/experiments"
-mutex="/home/dinos/script.lock"
+results="/scratch/results"
+all_exp="/scratch/experiments"
+mutex="/scratch/script.lock"
 experiments=(Fetch.txt Decode.txt IEW.txt LDS.txt)
 ckpts=(fetch_ckpt.dmtcp decode_ckpt.dmtcp iew_ckpt.dmtcp lds_ckpt.dmtcp)
 ckpt_dirs=(fetch decode iew lds)
@@ -125,14 +125,6 @@ do
     rm start/ApplicationOutput 
     mv "$_name" $results 
     echo "$ my_core .....results stored">>"$my_core"
-     
-
-#    if [ -f "${ckpts[$i]}" ]; then
-#     mv ${ckpts[$i]}  "$checkpoint_dir/${ckpt_dirs[$i]}/"
-#     mv ckpt_gem5.opt_*  "$checkpoint_dir/${ckpt_dirs[$i]}/"
-#    else
-#      echo "This should never happen"
-#    fi
   done
 done
 #trap "terminate $pids" SIGINT SIGTERM
