@@ -20,6 +20,7 @@ if [ ! -d "$workstation/results" ] ; then
   mkdir -p $workstation/results
 fi
 
+
 if [ $start_new -eq "1" ] ; then
   cp -r $workstation/build/$script ../configs/boot/test.rcS
   echo "Starting new"
