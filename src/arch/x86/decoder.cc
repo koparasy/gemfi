@@ -518,7 +518,7 @@ StaticInstPtr
 Decoder::decode(ExtMachInst mach_inst, Addr addr)
 {
     DecodeCache::InstMap::iterator iter = instMap->find(mach_inst);
-    if (iter != instMap->end())
+    if (iter != instMap->end() && ! iter->second->getFaultInjected() )
         return iter->second;
 
     StaticInstPtr si = decodeInst(mach_inst);

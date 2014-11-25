@@ -242,7 +242,7 @@ int get_fi_decode_counters( InjectedFault *p , ThreadEnabledFault &thread,std::s
 						if ( succeed == 1){
 							rename_ckpt("lds_ckpt.dmtcp");
 							value = loadStoreFault->process(value);
-							DPRINTF(FaultInjection,"LDS: PCAddr:%llx Fault Inserted in instruction %s\n",pcAddr,ptr->getcurInstr()->getName());
+							DPRINTF(FaultInjection,"LDS: PCAddr:%llx Fault Inserted in thread %d at instruction %s\n",pcAddr,thread->getThreadId(),ptr->getcurInstr()->getName());
 							scheduleswitch(tc);
 						}
 						else{
@@ -279,7 +279,7 @@ int get_fi_decode_counters( InjectedFault *p , ThreadEnabledFault &thread,std::s
 						if ( succeed == 1){
 							rename_ckpt("iew_ckpt.dmtcp");
 							*value = iewFault->process(*value);
-							DPRINTF(FaultInjection,"IEW: PCAddr:%llx Fault Inserted in instruction %s\n",pcAddr,ptr->getcurInstr()->getName());
+							DPRINTF(FaultInjection,"IEW: PCAddr:%llx Fault Inserted in thread %d at instruction %s\n",pcAddr,thread->getThreadId(),ptr->getcurInstr()->getName());
 							scheduleswitch(tc);
 						}
 						else
@@ -303,7 +303,7 @@ int get_fi_decode_counters( InjectedFault *p , ThreadEnabledFault &thread,std::s
 				if ( succeed == 1){
 					rename_ckpt("fetch_ckpt.dmtcp");
 					mainfault->process();
-					DPRINTF(FaultInjection,"MAIN: PCAddr:%llx Fault Inserted in instruction \n",pcAddr);
+					DPRINTF(FaultInjection,"MAIN: PCAddr:%llx Fault Inserted in thread %d at instruction \n",thread->getThreadId(),pcAddr);
 					if(string(mainfault->description()).compare("RegisterInjectedFault") != 0)
 						scheduleswitch(tc);
 				}
@@ -339,7 +339,7 @@ int get_fi_decode_counters( InjectedFault *p , ThreadEnabledFault &thread,std::s
 				if ( succeed == 1){
 					rename_ckpt("fetch_ckpt.dmtcp");
 					cur_instr = fetchfault->process(cur_instr);
-					DPRINTF(FaultInjection,"Fetch: PCAddr:%llx Fault Inserted \n",pcAddr);
+					DPRINTF(FaultInjection,"Fetch: PCAddr:%llx In thread %d Fault Inserted \n",thread->getThreadId(),pcAddr);
 					scheduleswitch(tc);
 				}
 				else
@@ -375,7 +375,8 @@ int get_fi_decode_counters( InjectedFault *p , ThreadEnabledFault &thread,std::s
 				if ( succeed == 1){
 					rename_ckpt("decode_ckpt.dmtcp");
 					cur_instr = decodefault->process(cur_instr);
-					DPRINTF(FaultInjection,"Decode:PCAddr:%llx Fault Inserted %s \n",pcAddr,cur_instr->getName());
+          cur_instr->setFaultInjected(true);
+					DPRINTF(FaultInjection,"Decode:PCAddr:%llx Fault Inserted in thread %d at instruction %s \n",pcAddr,thread->getThreadId(),cur_instr->getName());
 					scheduleswitch(tc);
 				}
 				else
