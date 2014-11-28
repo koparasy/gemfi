@@ -774,34 +774,15 @@ namespace PseudoInst {
 
 
     }
-    void get_Pc_address(ThreadContext *tc)
+    uint64_t gemfi_faulty(ThreadContext *tc)
     {
-
-        if(DTRACE(FaultInjection))
-        {
-            std::cout<<"=== Getting Virtaul PC address ===\n";
-        }
-
-        Addr _tmpAddr  = TheISA::getFiThread(tc);
-        //   Addr _tmpAddr = _metemp.treadAddr; /*tc->readMiscReg(AlphaISA::IPR_PALtemp23);*/
-        fi_system->fi_activation_iter = fi_system->fi_activation.find(_tmpAddr);
-        if (fi_system->fi_activation_iter != fi_system->fi_activation.end()) {
-            fi_system->fi_activation[_tmpAddr]->setMagicInstVirtualAddr(  tc->pcState().instAddr());
-            DPRINTF(FaultInjection,"Relative point : %llx \n",tc->pcState().instAddr());
-        }
-        else{
-
-            if(DTRACE(FaultInjection))
-            {
-                std::cout<<"===This Thread Has not Activated the Fault Injection System===\n";
-                std::cout<<"~===\t ignoring instruction\t===\n";
-            }
-        }
-
-        if(DTRACE(FaultInjection))
-        {
-            std::cout<<"~=== Getting Virtaul PC address ===\n";
-        }
+	Addr _tmpAddr = TheISA::getFiThread(tc);
+    	fi_system->fi_activation_iter = fi_system->fi_activation.find(_tmpAddr);
+        uint64_t val=0;
+    	if (fi_system->fi_activation_iter != fi_system->fi_activation.end()  ) {
+		val = fi_system->fi_activation[_tmpAddr]->getfaulty();
+	}
+	return val;
 
     }
 

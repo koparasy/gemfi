@@ -43,7 +43,7 @@ ThreadEnabledFault::ThreadEnabledFault(int threadId, std::string name)
 {
   all = new cpuExecutedTicks(allcores);
   cores.insert(pair<string,cpuExecutedTicks*> (allcores,all));
-
+  isfaulty=0;
   cores.insert(pair<string,cpuExecutedTicks*>(name, new cpuExecutedTicks(name)));
 
   setThreadId(threadId);

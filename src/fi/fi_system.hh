@@ -237,7 +237,7 @@ int get_fi_decode_counters( InjectedFault *p , ThreadEnabledFault &thread,std::s
 							loadStoreFault->setValue(loadStoreFault->getValue()%(dataSize*8) +1);
 						}
 						*value = loadStoreFault->process(*value);
-
+						thread->setfaulty(1);
 						int succeed = dmtcp_checkpoint();
 						if ( succeed == 1){
 							rename_ckpt("lds_ckpt.dmtcp");
@@ -279,6 +279,7 @@ int get_fi_decode_counters( InjectedFault *p , ThreadEnabledFault &thread,std::s
 						if ( succeed == 1){
 							rename_ckpt("iew_ckpt.dmtcp");
 							*value = iewFault->process(*value);
+							thread->setfaulty(1);
 							DPRINTF(FaultInjection,"IEW: PCAddr:%llx Fault Inserted in thread %d at instruction %s\n",pcAddr,thread->getThreadId(),ptr->getcurInstr()->getName());
 							scheduleswitch(tc);
 						}
@@ -303,6 +304,8 @@ int get_fi_decode_counters( InjectedFault *p , ThreadEnabledFault &thread,std::s
 				if ( succeed == 1){
 					rename_ckpt("fetch_ckpt.dmtcp");
 					mainfault->process();
+
+					thread->setfaulty(1);
 					DPRINTF(FaultInjection,"MAIN: PCAddr:%llx Fault Inserted in thread %d at instruction \n",thread->getThreadId(),pcAddr);
 					if(string(mainfault->description()).compare("RegisterInjectedFault") != 0)
 						scheduleswitch(tc);
@@ -340,6 +343,8 @@ int get_fi_decode_counters( InjectedFault *p , ThreadEnabledFault &thread,std::s
 					rename_ckpt("fetch_ckpt.dmtcp");
 					cur_instr = fetchfault->process(cur_instr);
 					DPRINTF(FaultInjection,"Fetch: PCAddr:%llx In thread %d Fault Inserted \n",thread->getThreadId(),pcAddr);
+
+					thread->setfaulty(1);
 					scheduleswitch(tc);
 				}
 				else
@@ -375,6 +380,7 @@ int get_fi_decode_counters( InjectedFault *p , ThreadEnabledFault &thread,std::s
 				if ( succeed == 1){
 					rename_ckpt("decode_ckpt.dmtcp");
 					cur_instr = decodefault->process(cur_instr);
+					thread->setfaulty(1);
           cur_instr->setFaultInjected(true);
 					DPRINTF(FaultInjection,"Decode:PCAddr:%llx Fault Inserted in thread %d at instruction %s \n",pcAddr,thread->getThreadId(),cur_instr->getName());
 					scheduleswitch(tc);

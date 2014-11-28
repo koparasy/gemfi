@@ -91,6 +91,7 @@ class ThreadEnabledFault {
 	Addr MagicInstVirtualAddr;  // Store the value of the Pc address when the framework is activated
 	int threadId; // Given when fi_activate_inst is executed 
 	int myId; // different for all threads something like hash id used only for debugging purposes.
+	uint64_t isfaulty;
 	protected :
 	std::map<string,cpuExecutedTicks*> cores; // Store all cores which this thread as ever execute an instruction
 	std::map<string,cpuExecutedTicks*>::iterator itcores;
@@ -101,6 +102,8 @@ class ThreadEnabledFault {
 
 
 	void setMagicInstVirtualAddr(Addr v){ MagicInstVirtualAddr  = v; }
+	void setfaulty(uint64_t val){ isfaulty=val;}
+	uint64_t getfaulty(){ return isfaulty;}
 	void setThreadId(int v){ threadId  = v; }
 	void setMyid(){
 		static int my_id_counter = 0;

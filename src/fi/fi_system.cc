@@ -651,6 +651,7 @@ void Fi_System::start_fi(ThreadContext *tc,  uint64_t threadid){
         if	(fi_activation_iter->second->getMode() == PAUSE ){
             fi_enable++;
             fi_activation_iter->second->setMode(START);
+	    fi_activation_iter->second->setfaulty(0);
             tc->setEnabledFIThread(fi_activation_iter->second);
             tc->setEnabledFI(true);
             fi_activation_iter->second->setThreadId(threadid);
