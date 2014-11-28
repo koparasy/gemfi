@@ -1,3 +1,4 @@
+echo "###### Starting Taylor ######"
 ./WithRedo 20 0.5 
-echo "finished execution" 20 0.5
+echo "###### Finished Taylor ######"
 m5 exit
