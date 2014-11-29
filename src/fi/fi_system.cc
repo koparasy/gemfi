@@ -336,7 +336,7 @@ Fi_System:: get_fi_decode_counters( InjectedFault *p , ThreadEnabledFault &threa
 
     *fetch_time=0;
     *fetch_instr=0;
-    int val;
+    int val = 0;
     // Case :: specific cpu ---- specific thread
     if((p->getWhere().compare(curCpu))==0 && (p->getThread()).compare("all") != 0 && thread.getThreadId() == atoi( (p->getThread()).c_str() ) ){ // case thread_id - cpu_id
         thread.CalculateDecodedTime(curCpu,fetch_instr,fetch_time);
@@ -367,7 +367,7 @@ Fi_System:: get_fi_decode_counters( InjectedFault *p , ThreadEnabledFault &threa
             return val;
         }
     }
-    return 0;
+    return val;
   }
 
 
@@ -651,8 +651,10 @@ void Fi_System::start_fi(ThreadContext *tc,  uint64_t threadid){
         if	(fi_activation_iter->second->getMode() == PAUSE ){
             fi_enable++;
             fi_activation_iter->second->setMode(START);
+	    fi_activation_iter->second->setfaulty(0);
             tc->setEnabledFIThread(fi_activation_iter->second);
             tc->setEnabledFI(true);
+            fi_activation_iter->second->setThreadId(threadid);
         }
         else{
             DPRINTF(FaultInjection,"I have already enabled fault injection I am going to ignore this request\n");

@@ -199,6 +199,9 @@
                             panic("M5 panic instruction called at pc = %#x.\n",
                                   RIP);
                         }}, IsNonSpeculative);
+			0x56: gemfi_faulty({{
+			  Rax=PseudoInst::gemfi_faulty(xc->tcBase());
+                        }}, IsNonSpeculative);
                         0x57: fi_activate_inst({{
 			  PseudoInst::fi_activate_inst(xc->tcBase(), Rdi, Rsi);
                         }}, IsNonSpeculative);
