@@ -39,14 +39,6 @@ do
       cd ..
     fi
   fi
-  _users=$(users|wc -l)
-  if [ "$_users" -gt "1" ]; then
-    echo "someone else is using the computer"
-    kill -15 $my_child
-    exit
-  else
-    echo "Only me on the computer"
-  fi
-  sleep 30
+ sleep 30
 done
 

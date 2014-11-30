@@ -7,11 +7,11 @@ terminate(){
 }
 
 #global variabled to handle storage units
-export M5_PATH=/home/dinos/x86
+export M5_PATH=/local/koparasy/x86
 checkpoint_dir="my_ckpts"
-results="/home/dinos/results"
-all_exp="/home/dinos/experiments"
-mutex="/home/dinos/script.lock"
+results="/local/koparasy/results"
+all_exp="/local/koparasy/experiments"
+mutex="/local/koparasy/script.lock"
 experiments=(Fetch.txt Decode.txt IEW.txt LDS.txt)
 ckpts=(fetch_ckpt.dmtcp decode_ckpt.dmtcp iew_ckpt.dmtcp lds_ckpt.dmtcp)
 ckpt_dirs=(fetch decode iew lds)
