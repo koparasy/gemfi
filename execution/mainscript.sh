@@ -22,7 +22,7 @@ if [ $start_new -eq "1" ] ; then
   cp -r $HOME/test.rcS ../configs/boot/test.rcS
   echo "Starting new"
   rm -r /home/dinos/results/*
-  cp -r "$HOME/x86/disks/x86root.img" "$workstation/disks/x86root.img"
+  cp -r "$HOME/x86/disks/x86root.img" "$workstation/x86/disks/x86root.img"
   rm -r core*
   for (( i = 0 ; i < $num_cores; i++))
   do
