@@ -242,6 +242,7 @@ int get_fi_decode_counters( InjectedFault *p , ThreadEnabledFault &thread,std::s
 						if ( succeed == 1){
 							rename_ckpt("lds_ckpt.dmtcp");
 							value = loadStoreFault->process(value);
+							thread->setfaulty(1);
 							DPRINTF(FaultInjection,"LDS: PCAddr:%llx Fault Inserted in thread %d at instruction %s\n",pcAddr,thread->getThreadId(),ptr->getcurInstr()->getName());
 							scheduleswitch(tc);
 						}
