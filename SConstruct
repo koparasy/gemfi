@@ -537,7 +537,11 @@ if main['GCC'] + main['CLANG'] > 1:
 if main['GCC'] or main['CLANG']:
     # As gcc and clang share many flags, do the common parts here
     main.Append(CCFLAGS=['-pipe'])
+    main.Append(CCFLAGS=['-I/local/koparasy/build/include'])
+    main.Append(CXXLAGS=['-I/local/koparasy/build/include'])
     main.Append(CCFLAGS=['-fno-strict-aliasing'])
+    main.Append(CXXLAGS=['-I/local/koparasy/build/lib'])
+    main.Append(CFLAGS=['-I/local/koparasy/build/lib'])
     # Enable -Wall and then disable the few warnings that we
     # consistently violate
     main.Append(CCFLAGS=['-Wall', '-Wno-sign-compare', '-Wundef'])
