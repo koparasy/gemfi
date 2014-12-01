@@ -1096,6 +1096,9 @@ DefaultFetch<Impl>::buildInst(ThreadID tid, StaticInstPtr staticInst,
 		StaticInstPtr curMacroop, TheISA::PCState thisPC,
 		TheISA::PCState nextPC, bool trace)
 {
+  if (staticInst->getFaultInjected())
+    DPRINTF(FaultInjection,"Creating Faulty Instruction One more time\n");
+
 	// Get a sequence number.
 	InstSeqNum seq = cpu->getAndIncrementInstSeq();
 
@@ -1103,6 +1106,13 @@ DefaultFetch<Impl>::buildInst(ThreadID tid, StaticInstPtr staticInst,
 	DynInstPtr instruction =
 		new DynInst(staticInst, curMacroop, thisPC, nextPC, seq, cpu);
 	instruction->setTid(tid);
+
+
+  if (staticInst->getFaultInjected()){
+   staticInst->correctInst();
+   staticInst->setFaultInjected(false);
+   DPRINTF(FaultInjection,"Removing Instruction One more time\n");
+  }
 
 	instruction->setASID(tid);
 

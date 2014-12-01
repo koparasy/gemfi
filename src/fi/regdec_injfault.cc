@@ -53,14 +53,30 @@ RegisterDecodingInjectedFault::process(StaticInstPtr staticInst)
   if (getSrcOrDst() == RegisterDecodingInjectedFault::SrcRegisterInjectedFault) {
     int rTc = getRegToChange() % staticInst->numSrcRegs(); //Make sure the rTC field of the instruction exists
     if(staticInst->_srcRegIdx[rTc] >= TheISA::FP_Reg_Base)
-	setChangeToReg(getChangeToReg()+TheISA::FP_Reg_Base);
+	  setChangeToReg(getChangeToReg()+TheISA::FP_Reg_Base);
+
+    DPRINTF(FaultInjection,"Src Register is: %d\n",staticInst->_srcRegIdx[rTc]);
+    DPRINTF(FaultInjection, " Index %d\n",rTc);
+    staticInst->_correct_reg=staticInst->_srcRegIdx[rTc];
     staticInst->_srcRegIdx[rTc] = getChangeToReg();
+    staticInst->_index = rTc;
+    staticInst->_srcOrDest = 0;
+
   }
   else {
     int rTc = getRegToChange() % staticInst->numDestRegs();
       if(staticInst->_destRegIdx[rTc] >= TheISA::FP_Reg_Base)
-	setChangeToReg(getChangeToReg()+TheISA::FP_Reg_Base);
+        	setChangeToReg(getChangeToReg()+TheISA::FP_Reg_Base);
+
+
+    staticInst->_correct_reg=staticInst->_destRegIdx[rTc];
+    DPRINTF(FaultInjection,"Dest Register is: %d\n",staticInst->_destRegIdx[rTc]);
+    DPRINTF(FaultInjection, " Index %d\n",rTc);
     staticInst->_destRegIdx[rTc] = getChangeToReg();
+    staticInst->_index = rTc;
+    staticInst->_srcOrDest = 1;
+
+
   }  
   
   if (DTRACE(FaultInjection)) {

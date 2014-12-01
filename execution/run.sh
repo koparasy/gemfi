@@ -96,21 +96,15 @@ do
       echo "lock released"
       echo -n "$exp">input
     fi
-# Check if there is a checkpoint for this kind of faults
-# if there is use it otherwise use the maincheckpoint
 
     if [ -f "${ckpts[$i]}" ]; then
       echo "Restoring from $ckpts[$i]"
-#cp $checkpoint_dir/${ckpt_dirs[$i]}/${ckpts[$i]} . 
-#     cp -r $checkpoint_dir/${ckpt_dirs[$i]}/ckpt_gem5.opt_* .
       dmtcp_restart ${ckpts[$i]} &
       pids=$!
       echo "Passing child id $i"
       ./../time.sh $pids
     else
       echo "restoring from maincheckpoint"
-#      cp $checkpoint_dir/maincheckpoint/maincheckpoint.dmtcp .
-#      cp -r $checkpoint_dir/maincheckpoint/ckpt_gem5.opt_* .
       dmtcp_restart maincheckpoint.dmtcp &
       pids=$!
       echo "Passing child id $i"

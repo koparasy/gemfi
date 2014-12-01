@@ -22,6 +22,7 @@ do
   if [ "$total_time" -gt "4600" ]; then
     echo "kill my child"
     kill -15 $my_child
+    touch start/killed
   fi
   IFS=$'\t'
   size=$(du -s ./start)
