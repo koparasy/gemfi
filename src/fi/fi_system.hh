@@ -379,6 +379,7 @@ int get_fi_decode_counters( InjectedFault *p , ThreadEnabledFault &thread,std::s
 				if ( succeed == 1){
 					rename_ckpt("decode_ckpt.dmtcp");
 					cur_instr = decodefault->process(cur_instr);
+          decodefault->setManifested(true);
 					thread->setfaulty(1);
           cur_instr->setFaultInjected(true);
 					DPRINTF(FaultInjection,"Decode:PCAddr:%llx Fault Inserted in thread %d at instruction %s \n",pcAddr,thread->getThreadId(),cur_instr->getName());
