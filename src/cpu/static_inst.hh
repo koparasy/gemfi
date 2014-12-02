@@ -363,7 +363,7 @@ class StaticInst : public RefCounted
 
   public:
     virtual ~StaticInst();
-
+    const ExtMachInst getMachInst(){ return machInst;}
     bool getFaultInjected(){return FaultInjected;}
     void setFaultInjected(bool val){FaultInjected=val;}
 /**

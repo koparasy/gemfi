@@ -1369,7 +1369,8 @@ DefaultFetch<Impl>::fetch(bool &status_change)
 			if(enabled_fi)
 				staticInst = fi_system -> decode_fault(curr_tc,curr_thread,staticInst,thisPC.instAddr());
 			//~ALTERCODE
-
+      if ( staticInst->getFaultInjected())
+          decoder[tid]->erase(staticInst);
 			DynInstPtr instruction =
 				buildInst(tid, staticInst, curMacroop,
 						thisPC, nextPC, true);

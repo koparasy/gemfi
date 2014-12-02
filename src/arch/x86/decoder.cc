@@ -35,7 +35,7 @@
 #include "base/types.hh"
 #include "debug/Decoder.hh"
 #include "fi/fi_system.hh"
-
+#include "debug/FaultInjection.hh"
 namespace X86ISA
 {
 
@@ -518,9 +518,11 @@ StaticInstPtr
 Decoder::decode(ExtMachInst mach_inst, Addr addr)
 {
     DecodeCache::InstMap::iterator iter = instMap->find(mach_inst);
-    if (iter != instMap->end() )
-        return iter->second;
-
+    if (iter != instMap->end() ){
+      if( iter->second->getFaultInjected() ) 
+        DPRINTF(FaultInjection,"Returning Faulty Instruction SHOULD NOT HAPPEN\n");
+      return iter->second;
+    }
     StaticInstPtr si = decodeInst(mach_inst);
     (*instMap)[mach_inst] = si;
     return si;
