@@ -200,6 +200,7 @@ class StaticInst : public RefCounted
   public:
   
     void correctInst(){
+      /*
       if ( _srcOrDest ){
         DPRINTF(FaultInjection,"Dest Register is: %d\n",_correct_reg);
         _destRegIdx[_index]=_correct_reg;
@@ -209,7 +210,7 @@ class StaticInst : public RefCounted
         _srcRegIdx[_index]= _correct_reg;
       }
     DPRINTF(FaultInjection, " Index %d\n",_index);
-    
+    */
     }
     /// @name Register information.
     /// The sum of numFPDestRegs() and numIntDestRegs() equals

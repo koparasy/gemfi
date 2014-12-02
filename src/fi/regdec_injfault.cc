@@ -52,18 +52,18 @@ RegisterDecodingInjectedFault::process(StaticInstPtr staticInst)
   int i;
   for( i = 0; i < staticInst->numSrcRegs() ; i++){
     DPRINTF(FaultInjection, "Src Operand %d, is %d \n",i,(int) staticInst->_srcRegIdx[i]);
-    if (staticInst->_srcRegIdx[i] < TheISA::FP_Reg_Base )
+    if (staticInst->_srcRegIdx[i] < TheISA::NumIntRegs )
       DPRINTF(FaultInjection , " Is Integer\n");
-    else if (staticInst->_srcRegIdx[i] < TheISA::CC_Reg_Base)
+    else if (staticInst->_srcRegIdx[i] < TheISA::NumIntRegs+TheISA::NumFloatRegs)
       DPRINTF(FaultInjection," Is FLoating Point\n" );
     else 
       DPRINTF(FaultInjection, "Is MiscReg \n");
   }
   for( i = 0; i < staticInst->numDestRegs() ; i++){
     DPRINTF(FaultInjection, "Dest Operand %d, is %d\n",i,(int) staticInst->_destRegIdx[i]);
-    if (staticInst->_destRegIdx[i] < TheISA::FP_Reg_Base )
+    if (staticInst->_destRegIdx[i] < TheISA::NumIntRegs )
       DPRINTF(FaultInjection , " Is Integer\n");
-    else if (staticInst->_destRegIdx[i] < TheISA::CC_Reg_Base)
+    else if (staticInst->_destRegIdx[i] < TheISA::NumIntRegs+TheISA::NumFloatRegs)
       DPRINTF(FaultInjection," Is FLoating Point\n" );
     else 
       DPRINTF(FaultInjection, "Is MiscReg \n");
