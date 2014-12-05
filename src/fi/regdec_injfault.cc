@@ -29,6 +29,37 @@ RegisterDecodingInjectedFault::description() const
     return "RegisterDecodingInjectedFault";
 }
 
+int
+RegisterDecodingInjectedFault::inject(RegType type, int op, ThreadContext *tc){
+  int baseFloatIndex = fi_IntRegs;
+  int baseCCIndex = fi_IntRegs + fi_FloatRegs;
+  int totalRegs = fi_IntRegs + fi_FloatRegs + fi_CCRegs;
+  int checkpoint = dmtcp_checkpoint(); 
+  if ( checkpoint == 1){
+    fi_system->rename_ckpt("decode_ckpt.dmtcp");
+    switch (type){
+      case INT:
+        return (rand() % (baseFloatIndex) );
+        break;
+      case FLOAT:
+        return ( rand() % ( baseCCIndex - baseFloatIndex ) + baseFloatIndex);
+        break;
+      case MISC:
+        return ( rand () % (totalRegs - baseCCIndex) +baseCCIndex);
+        break;
+      case CC:
+        return ( rand () % (totalRegs - baseCCIndex) +baseCCIndex);
+        break;
+    }
+    fi_system->scheduleswitch(tc);
+  }
+  else{
+    fi_system->reset();
+    return op;
+  }
+  return op;
+}
+
 void 
 RegisterDecodingInjectedFault::dump() const
 {
@@ -57,7 +88,7 @@ bool RegisterDecodingInjectedFault::process(StaticInstPtr staticInst)
 {
     int tried=0;
     bool faultInjected=false;
-    srand(time(NULL));
+    srand(22);
     DPRINTF(FaultInjection, "Setting Faulty Values to Instruction\n");
     int places = staticInst->numSrcRegs() + staticInst->numDestRegs();
     if ( places != 0 ){
@@ -84,69 +115,6 @@ bool RegisterDecodingInjectedFault::process(StaticInstPtr staticInst)
     return false;
 }
 
-/*
-   StaticInstPtr
-   RegisterDecodingInjectedFault::process(StaticInstPtr staticInst)
-   {
-   int tried=0;
-   bool faultInjected=false;
-   srand(time(NULL));
-   while(tried < 2 && ! faultInjected){
-   if (getSrcOrDst() == RegisterDecodingInjectedFault::SrcRegisterInjectedFault&&tried < 2){
-   if ( staticInst->numSrcRegs() == 0){
-   tried++;
-   setSrcOrDst(2);
-   }
-   while ( !faultInjected ){
-   int regToChange=rand()%staticInst->numSrcRegs();
-   if (staticInst->_srcRegIdx[regToChange] < TheISA::FP_Reg_Base ){
-   int NewReg  = rand()%(TheISA::FP_Reg_Base);
-   faultInjected=injectInputFault(NewReg,regToChange,staticInst);
-   DPRINTF(FaultInjection , "Inject Fault To : #Src: Is Integer\n");
-   }
-   else if ( staticInst->_srcRegIdx[regToChange] < TheISA::CC_Reg_Base ){
-   int NewReg  = rand()%(TheISA::CC_Reg_Base - TheISA::FP_Reg_Base) + FP_Reg_Base;
-   faultInjected=injectInputFault(NewReg,regToChange,staticInst);
-   DPRINTF(FaultInjection,"Inject Fault To : #Src: Is FLoating Point\n");
-   }
-   else if (  staticInst->_srcRegIdx[regToChange] > TheISA:: Segment_base_reg &&  staticInst->_srcRegIdx[regToChange] < TheISA::Segment_end_reg  ){
-   int NewReg  = rand()%(TheISA::Segment_end_reg - TheISA::Segment_base_reg) + TheISA::Segment_base_reg;
-   faultInjected=injectInputFault(NewReg,regToChange,staticInst);
-   DPRINTF(FaultInjection, "Inject Fault To : #Src: Is MiscReg \n");
-   }
-   }
-   }
-   if (getSrcOrDst() == RegisterDecodingInjectedFault::DstRegisterInjectedFault ){
-   if ( staticInst->numSrcRegs() == 0){
-   tried++;
-   setSrcOrDst(1);
-   }
-
-   while ( !faultInjected ){
-   int regToChange=rand()%staticInst->numDestRegs();
-   if (staticInst->_destRegIdx[regToChange] < TheISA::FP_Reg_Base ){
-   int NewReg  = rand()%(TheISA::FP_Reg_Base);
-   faultInjected=injectInputFault(NewReg,regToChange,staticInst);
-   DPRINTF(FaultInjection , "Inject Fault To : #DestDest : Is Integer\n");
-   }
-   else if ( staticInst->_destRegIdx[regToChange] < TheISA::CC_Reg_Base ){
-   int NewReg  = rand()%(TheISA::CC_Reg_Base - TheISA::FP_Reg_Base) + FP_Reg_Base;
-   faultInjected=injectInputFault(NewReg,regToChange,staticInst);
-   DPRINTF(FaultInjection,"Inject Fault To : #Dest:  Is FLoating Point\n" );
-   }
-   else if (  staticInst->_destRegIdx[regToChange] > TheISA:: Segment_base_reg &&  staticInst->_srcRegIdx[regToChange] < TheISA::Segment_end_reg  ){
-   int NewReg  = rand()%(TheISA::Segment_end_reg - TheISA::Segment_base_reg) + TheISA::Segment_base_reg;
-   faultInjected=injectOutputFault(NewReg,regToChange,staticInst);
-   DPRINTF(FaultInjection, "Inject Fault To : #Dest Is MiscReg \n");
-   }
-   }
-   }
-   }
-   if ( tried == 2)
-   DPRINTF(FaultInjection,"No Operands to be injected\n");
-   return staticInst;
-   }
- */
 
 
     int

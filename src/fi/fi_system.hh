@@ -57,6 +57,10 @@ class InjectedFaultQueue;
 
 extern Fi_System *fi_system;
 
+
+extern unsigned fi_IntRegs;
+extern unsigned fi_FloatRegs;
+extern unsigned fi_CCRegs;
 /*
  * This file encapsulates all the functionality of our framework
  * 
@@ -64,316 +68,360 @@ extern Fi_System *fi_system;
 
 class Fi_System : public MemObject
 {
-    private :
-        std::ifstream input;
-        std::string in_name;
-        std::string meta_file;
-        int text_start;	
-        Addr StartingPCAddr;
-        ifstream meta_input;
+  private :
+    std::ifstream input;
+    std::string in_name;
+    std::string meta_file;
+    int text_start;	
+    Addr StartingPCAddr;
+    ifstream meta_input;
 
 
-        class Fi_SystemEvent : public Event
-    {
-        private:
-            ThreadContext *tc;
-            uint64_t ticks;
-        public:
-            void setticks(uint64_t tick){ticks=tick;}
-            Fi_SystemEvent(ThreadContext *tc){
-                DPRINTF(FaultInjection,"scheduling switchcpu\n");
-                tc = tc;
-            };
-            void process(){
-                DPRINTF(FaultInjection,"Switching CPU cause error was injected THEN %lld NOW %lld\n",ticks,curTick());
-                PseudoInst::switchcpu(tc);
-
-            };
-    };
-
-
-    public :
-
-        // Path to the file which includes all the the injection faults
-
-        InjectedFaultQueue mainInjectedFaultQueue;		//("Main Fault Queue");
-        InjectedFaultQueue fetchStageInjectedFaultQueue;	//("Fetch Stage Fault Queue");
-        InjectedFaultQueue decodeStageInjectedFaultQueue;	//("Decode Stage Fault Queue");	
-        InjectedFaultQueue iewStageInjectedFaultQueue;	//("IEW Stage Fault Queue");
-        InjectedFaultQueue LoadStoreInjectedFaultQueue;	//("LoadStore Fault Queue")
-        /*
-         * The map correlate a thread/application with the pcb address
-         * the colleration is done by keeping a hash table of
-         * the pcb address collerated with the index of the vector
-         * where the information is going to be stored
-         * 
-         */
-
-        static const int RegisterInt	= 1;
-        static const int RegisterFloat 	= 2;
-        static const int RegisterMisc  	= 3;
-
-
-        std::map<Addr, ThreadEnabledFault*> fi_activation; //A hash table key : PCB address --- vector position
-        std::map<Addr, ThreadEnabledFault*>::iterator fi_activation_iter;
-
-
-        ThreadEnabledFault *allthreads;
-
-
-        std::map <int,bool> intregs;
-        std::map <int,bool> floatregs;
-        std::map <int,bool> miscregs;
-        float starttime, endtime;
-        unsigned int fi_enable;
-        bool fi_execute;
-        bool fi_decode;
-        bool fi_fetch;
-        bool fi_loadstore;
-        bool fi_main;
-
+    class Fi_SystemEvent : public Event
+  {
     private:
+      ThreadContext *tc;
+      uint64_t ticks;
+    public:
+      void setticks(uint64_t tick){ticks=tick;}
+      Fi_SystemEvent(ThreadContext *tc){
+        DPRINTF(FaultInjection,"scheduling switchcpu\n");
+        tc = tc;
+      };
+      void process(){
+        DPRINTF(FaultInjection,"Switching CPU cause error was injected THEN %lld NOW %lld\n",ticks,curTick());
+        PseudoInst::switchcpu(tc);
 
-        vector<uint64_t> stackTrack;
-
-        bool check_before_init;
-        bool switchcpu;
-        bool maincheckpoint;
-
-        int get_core_fetched_time(std::string Cpu,uint64_t* time,uint64_t *instr);
-        int get_core_decoded_time(std::string Cpu,uint64_t* time,uint64_t *instr);
-        int get_core_executed_time(std::string Cpu,uint64_t* time,uint64_t *instr);
-        int get_core_loadstore_time(std::string Cpu,uint64_t* time,uint64_t *instr);
-
-        void setcheck(bool v){check_before_init=v;};
-        void setswitchcpu(bool v) {switchcpu = v;}
+      };
+  };
 
 
-        void delete_faults();
+  public :
 
-    public: 
-        typedef Fi_SystemParams Params;
+    // Path to the file which includes all the the injection faults
 
-        const Params *params() const
-        {
-            return reinterpret_cast<const Params *>(_params); 
+    InjectedFaultQueue mainInjectedFaultQueue;		//("Main Fault Queue");
+    InjectedFaultQueue fetchStageInjectedFaultQueue;	//("Fetch Stage Fault Queue");
+    InjectedFaultQueue decodeStageInjectedFaultQueue;	//("Decode Stage Fault Queue");	
+    InjectedFaultQueue iewStageInjectedFaultQueue;	//("IEW Stage Fault Queue");
+    InjectedFaultQueue LoadStoreInjectedFaultQueue;	//("LoadStore Fault Queue")
+    /*
+     * The map correlate a thread/application with the pcb address
+     * the colleration is done by keeping a hash table of
+     * the pcb address collerated with the index of the vector
+     * where the information is going to be stored
+     * 
+     */
+
+    static const int RegisterInt	= 1;
+    static const int RegisterFloat 	= 2;
+    static const int RegisterMisc  	= 3;
+
+
+    std::map<Addr, ThreadEnabledFault*> fi_activation; //A hash table key : PCB address --- vector position
+    std::map<Addr, ThreadEnabledFault*>::iterator fi_activation_iter;
+
+
+    ThreadEnabledFault *allthreads;
+
+
+    std::map <int,bool> intregs;
+    std::map <int,bool> floatregs;
+    std::map <int,bool> miscregs;
+    float starttime, endtime;
+    unsigned int fi_enable;
+    bool fi_execute;
+    bool fi_decode;
+    bool fi_fetch;
+    bool fi_loadstore;
+    bool fi_main;
+
+  private:
+
+    vector<uint64_t> stackTrack;
+
+    bool check_before_init;
+    bool switchcpu;
+    bool maincheckpoint;
+
+    int get_core_fetched_time(std::string Cpu,uint64_t* time,uint64_t *instr);
+    int get_core_decoded_time(std::string Cpu,uint64_t* time,uint64_t *instr);
+    int get_core_executed_time(std::string Cpu,uint64_t* time,uint64_t *instr);
+    int get_core_loadstore_time(std::string Cpu,uint64_t* time,uint64_t *instr);
+
+    void setcheck(bool v){check_before_init=v;};
+    void setswitchcpu(bool v) {switchcpu = v;}
+
+
+    void delete_faults();
+
+  public: 
+    typedef Fi_SystemParams Params;
+
+    const Params *params() const
+    {
+      return reinterpret_cast<const Params *>(_params); 
+    }
+
+
+    Fi_System(Params *p);
+    ~Fi_System();
+
+    /*  
+        void add_altered_int_reg(int reg);
+        void add_altered_float_reg(int reg);
+        void add_altered_misc_reg(int reg);
+
+        bool altered_int_reg(int reg);
+        bool altered_float_reg(int reg);
+        bool altered_misc_reg(int reg);
+        */
+
+    int increaseTicks(std :: string curCpu , ThreadEnabledFault *curThread , uint64_t ticks);
+
+    int get_fi_fetch_counters(InjectedFault *p , ThreadEnabledFault &thread,std::string curCpu , uint64_t *exec_time , uint64_t *exec_instr );
+    int get_fi_decode_counters( InjectedFault *p , ThreadEnabledFault &thread,std::string curCpu , uint64_t *fetch_instr , uint64_t *fetch_time );
+    int get_fi_exec_counters(InjectedFault *p , ThreadEnabledFault &thread,std::string curCpu , uint64_t *exec_time , uint64_t *exec_instr );
+    int get_fi_loadstore_counters(InjectedFault *p , ThreadEnabledFault &thread,std::string curCpu , uint64_t *exec_time , uint64_t *exec_instr );
+
+    void getFromFile(std::ifstream &os);
+    bool getCheck(){return check_before_init;}
+    bool getswitchcpu(){return switchcpu;}
+    bool getMainCheckpoint(){return maincheckpoint;}
+    void setmaincheckpoint(bool v){maincheckpoint = v;}
+    void reset();
+    virtual Port* getPort(const std::string &if_name, int idx = 0);
+    virtual void init();
+    virtual void startup();
+
+
+    void stop_fi(ThreadContext *tc, uint64_t id);
+    void start_fi(ThreadContext *tc, uint64_t id);
+    void pause_fi(ThreadContext *tc, uint64_t id);
+    void dump_fi(ThreadContext *tc);
+
+    void rename_ckpt(const char* new_name);
+
+    /* 
+       void monitor_propagation(const int type, ThreadContext *tc,StaticInst *si, int idx,const Addr addr);
+       void stop_monitoring_propagation(const int type, ThreadContext *tc,StaticInst *si, int idx);
+       void stackHandler(ThreadContext *tc,uint64_t NPC);
+       void printStack();
+       */
+
+    void scheduleswitch(ThreadContext *tc);
+    void dump();
+
+    /*
+     *  All the following function get the hardware running thread
+     * and check if a fault is going to be injected during this cycle/instruction
+     * Different function are created depending on the pipeline
+     * stage that the fault is going to manifest.
+     * Furthermore all the executed instructions are increased from this functions
+     */
+
+
+    template <class MYVAL, class U>
+      inline MYVAL lds_fault(U ptr,ThreadContext *tc,MYVAL value,unsigned dataSize){
+
+        if(!( tc->getEnabledFI()))
+          return value;
+        ThreadEnabledFault *thread = tc->getEnabledFIThread();
+        LoadStoreInjectedFault *loadStoreFault = NULL;
+        if( thread->getMode() == START && FullSystem  && (TheISA::inUserMode(tc))  ){
+          Addr pcAddr = ptr->instAddr(); //PC address for this instruction
+          bool sigInstr = getSignificance(pcAddr);
+          if (sigInstr)
+            return value;
+
+          std::string _name = tc->getCpuPtr()->name();
+          while ((loadStoreFault  = reinterpret_cast<LoadStoreInjectedFault *>(LoadStoreInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
+            if(loadStoreFault->getValueType() == InjectedFault::FlipBit && loadStoreFault->getValue() > dataSize*8){ 
+              loadStoreFault->setValue(loadStoreFault->getValue()%(dataSize*8) +1);
+            }
+            int succeed = dmtcp_checkpoint();
+            if ( succeed == 1){
+              rename_ckpt("lds_ckpt.dmtcp");
+              value = loadStoreFault->process(value);
+              thread->setfaulty(1);
+              DPRINTF(FaultInjection,"LDS: PCAddr:%llx Fault Inserted in thread %d at instruction %s\n",pcAddr,thread->getThreadId(),ptr->getcurInstr()->getName());
+              scheduleswitch(tc);
+            }
+            else{
+              reset();
+            }
+
+          }
+          thread->increaseLoadStoreInstr(_name);
+          allthreads->increaseLoadStoreInstr(_name);
         }
+        return value;
+      }
+
+    template <class MYVAL, class U>
+      inline void iew_fault(U ptr,ThreadContext *tc,MYVAL *value){
+
+        if(!( tc->getEnabledFI()) )
+          return ;
+        ThreadEnabledFault *thread = tc->getEnabledFIThread();
+        IEWStageInjectedFault *iewFault = NULL;
+        if( thread->getMode() == START && FullSystem && (TheISA::inUserMode(tc))   ){
+          Addr pcAddr = ptr->instAddr();
+
+          bool sigInstr = getSignificance(pcAddr);
+
+          if (sigInstr)
+            return;
 
 
-        Fi_System(Params *p);
-        ~Fi_System();
+          std::string _name = tc->getCpuPtr()->name();
 
-        /*  
-            void add_altered_int_reg(int reg);
-            void add_altered_float_reg(int reg);
-            void add_altered_misc_reg(int reg);
-
-            bool altered_int_reg(int reg);
-            bool altered_float_reg(int reg);
-            bool altered_misc_reg(int reg);
-         */
-
-        int increaseTicks(std :: string curCpu , ThreadEnabledFault *curThread , uint64_t ticks);
-
-        int get_fi_fetch_counters(InjectedFault *p , ThreadEnabledFault &thread,std::string curCpu , uint64_t *exec_time , uint64_t *exec_instr );
-        int get_fi_decode_counters( InjectedFault *p , ThreadEnabledFault &thread,std::string curCpu , uint64_t *fetch_instr , uint64_t *fetch_time );
-        int get_fi_exec_counters(InjectedFault *p , ThreadEnabledFault &thread,std::string curCpu , uint64_t *exec_time , uint64_t *exec_instr );
-        int get_fi_loadstore_counters(InjectedFault *p , ThreadEnabledFault &thread,std::string curCpu , uint64_t *exec_time , uint64_t *exec_instr );
-
-        void getFromFile(std::ifstream &os);
-        bool getCheck(){return check_before_init;}
-        bool getswitchcpu(){return switchcpu;}
-        bool getMainCheckpoint(){return maincheckpoint;}
-        void setmaincheckpoint(bool v){maincheckpoint = v;}
-        void reset();
-        virtual Port* getPort(const std::string &if_name, int idx = 0);
-        virtual void init();
-        virtual void startup();
-
-
-        void stop_fi(ThreadContext *tc, uint64_t id);
-        void start_fi(ThreadContext *tc, uint64_t id);
-        void pause_fi(ThreadContext *tc, uint64_t id);
-        void dump_fi(ThreadContext *tc);
-
-        void rename_ckpt(const char* new_name);
-
-        /* 
-           void monitor_propagation(const int type, ThreadContext *tc,StaticInst *si, int idx,const Addr addr);
-           void stop_monitoring_propagation(const int type, ThreadContext *tc,StaticInst *si, int idx);
-           void stackHandler(ThreadContext *tc,uint64_t NPC);
-           void printStack();
-         */
-
-        void scheduleswitch(ThreadContext *tc);
-        void dump();
-
-        /*
-         *  All the following function get the hardware running thread
-         * and check if a fault is going to be injected during this cycle/instruction
-         * Different function are created depending on the pipeline
-         * stage that the fault is going to manifest.
-         * Furthermore all the executed instructions are increased from this functions
-         */
-
-
-        template <class MYVAL, class U>
-            inline MYVAL lds_fault(U ptr,ThreadContext *tc,MYVAL value,unsigned dataSize){
-
-                if(!( tc->getEnabledFI()))
-                    return value;
-                ThreadEnabledFault *thread = tc->getEnabledFIThread();
-                LoadStoreInjectedFault *loadStoreFault = NULL;
-                if( thread->getMode() == START && FullSystem  && (TheISA::inUserMode(tc))  ){
-                    Addr pcAddr = ptr->instAddr(); //PC address for this instruction
-                    bool sigInstr = getSignificance(pcAddr);
-                    if (sigInstr)
-                        return value;
-
-                    std::string _name = tc->getCpuPtr()->name();
-                    while ((loadStoreFault  = reinterpret_cast<LoadStoreInjectedFault *>(LoadStoreInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
-                        if(loadStoreFault->getValueType() == InjectedFault::FlipBit && loadStoreFault->getValue() > dataSize*8){ 
-                            loadStoreFault->setValue(loadStoreFault->getValue()%(dataSize*8) +1);
-                        }
-                        int succeed = dmtcp_checkpoint();
-                        if ( succeed == 1){
-                            rename_ckpt("lds_ckpt.dmtcp");
-                            value = loadStoreFault->process(value);
-                            thread->setfaulty(1);
-                            DPRINTF(FaultInjection,"LDS: PCAddr:%llx Fault Inserted in thread %d at instruction %s\n",pcAddr,thread->getThreadId(),ptr->getcurInstr()->getName());
-                            scheduleswitch(tc);
-                        }
-                        else{
-                            reset();
-                        }
-
-                    }
-                    thread->increaseLoadStoreInstr(_name);
-                    allthreads->increaseLoadStoreInstr(_name);
-                }
-                return value;
-            }
-
-        template <class MYVAL, class U>
-            inline void iew_fault(U ptr,ThreadContext *tc,MYVAL *value){
-
-                if(!( tc->getEnabledFI()) )
-                    return ;
-                ThreadEnabledFault *thread = tc->getEnabledFIThread();
-                IEWStageInjectedFault *iewFault = NULL;
-                if( thread->getMode() == START && FullSystem && (TheISA::inUserMode(tc))   ){
-                    Addr pcAddr = ptr->instAddr();
-
-                    bool sigInstr = getSignificance(pcAddr);
-
-                    if (sigInstr)
-                        return;
-
-
-                    std::string _name = tc->getCpuPtr()->name();
-
-                    while ((iewFault = reinterpret_cast<IEWStageInjectedFault *>(iewStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
-                        int succeed = dmtcp_checkpoint();
-                        if ( succeed == 1){
-                            rename_ckpt("iew_ckpt.dmtcp");
-                            *value = iewFault->process(*value);
-                            thread->setfaulty(1);
-                            DPRINTF(FaultInjection,"IEW: PCAddr:%llx Fault Inserted in thread %d at instruction %s\n",pcAddr,thread->getThreadId(),ptr->getcurInstr()->getName());
-                            scheduleswitch(tc);
-                        }
-                        else
-                            reset();
-                    }
-                    thread->increaseExecutedInstr(_name);
-                    allthreads->increaseExecutedInstr(_name);
-                }
-
-                return;
-            }
-
-        inline void main_fault(ThreadContext *tc,ThreadEnabledFault *thread, Addr pcAddr){
-            CPUInjectedFault *mainfault = NULL;
-            std::string _name = tc->getCpuPtr()->name();
-
-            if(thread->getMode() != START)
-                return;
-            while ((mainfault = reinterpret_cast<CPUInjectedFault *>(mainInjectedFaultQueue.scan(_name, *thread , pcAddr))) != NULL){
-                int succeed = dmtcp_checkpoint();
-                if ( succeed == 1){
-                    rename_ckpt("fetch_ckpt.dmtcp");
-                    mainfault->process();
-
-                    thread->setfaulty(1);
-                    DPRINTF(FaultInjection,"MAIN: PCAddr:%llx Fault Inserted in thread %d at instruction \n",thread->getThreadId(),pcAddr);
-                    if(string(mainfault->description()).compare("RegisterInjectedFault") != 0)
-                        scheduleswitch(tc);
-                }
-                else
-                    reset();
-            }
-
-        }	
-
-
-        inline TheISA::MachInst fetch_fault(ThreadContext *tc,ThreadEnabledFault *thread, TheISA::MachInst cur_instr,Addr pcAddr){
-
-            GeneralFetchInjectedFault *fetchfault = NULL;
-            std::string _name = tc->getCpuPtr()->name();
-
-            if(thread->getMode() != START)
-                return cur_instr;
-
-            bool sigInstr = getSignificance(pcAddr);
-
-            if (sigInstr)
-                return cur_instr;
-
-            if(FullSystem && TheISA::inUserMode(tc)){	
-                thread->increaseFetchedInstr(_name);
+          while ((iewFault = reinterpret_cast<IEWStageInjectedFault *>(iewStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
+            int succeed = dmtcp_checkpoint();
+            if ( succeed == 1){
+              rename_ckpt("iew_ckpt.dmtcp");
+              *value = iewFault->process(*value);
+              thread->setfaulty(1);
+              DPRINTF(FaultInjection,"IEW: PCAddr:%llx Fault Inserted in thread %d at instruction %s\n",pcAddr,thread->getThreadId(),ptr->getcurInstr()->getName());
+              scheduleswitch(tc);
             }
             else
-                return cur_instr;	
+              reset();
+          }
+          thread->increaseExecutedInstr(_name);
+          allthreads->increaseExecutedInstr(_name);
+        }
 
-            allthreads->increaseFetchedInstr(_name);
-            while ((fetchfault = reinterpret_cast<GeneralFetchInjectedFault *>(fetchStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
-                int succeed = dmtcp_checkpoint();
-                if ( succeed == 1){
-                    rename_ckpt("fetch_ckpt.dmtcp");
-                    cur_instr = fetchfault->process(cur_instr);
-                    DPRINTF(FaultInjection,"Fetch: PCAddr:%llx In thread %d Fault Inserted \n",thread->getThreadId(),pcAddr);
+        return;
+      }
 
-                    thread->setfaulty(1);
-                    scheduleswitch(tc);
-                }
-                else
-                    reset();
-            }
+    inline void main_fault(ThreadContext *tc,ThreadEnabledFault *thread, Addr pcAddr){
+      CPUInjectedFault *mainfault = NULL;
+      std::string _name = tc->getCpuPtr()->name();
 
-            return cur_instr;
+      if(thread->getMode() != START)
+        return;
+      while ((mainfault = reinterpret_cast<CPUInjectedFault *>(mainInjectedFaultQueue.scan(_name, *thread , pcAddr))) != NULL){
+        int succeed = dmtcp_checkpoint();
+        if ( succeed == 1){
+          rename_ckpt("fetch_ckpt.dmtcp");
+          mainfault->process();
+
+          thread->setfaulty(1);
+          DPRINTF(FaultInjection,"MAIN: PCAddr:%llx Fault Inserted in thread %d at instruction \n",thread->getThreadId(),pcAddr);
+          if(string(mainfault->description()).compare("RegisterInjectedFault") != 0)
+            scheduleswitch(tc);
+        }
+        else
+          reset();
+      }
+
+    }	
+
+
+    inline TheISA::MachInst fetch_fault(ThreadContext *tc,ThreadEnabledFault *thread, TheISA::MachInst cur_instr,Addr pcAddr){
+
+      GeneralFetchInjectedFault *fetchfault = NULL;
+      std::string _name = tc->getCpuPtr()->name();
+
+      if(thread->getMode() != START)
+        return cur_instr;
+
+      bool sigInstr = getSignificance(pcAddr);
+
+      if (sigInstr)
+        return cur_instr;
+
+      if(FullSystem && TheISA::inUserMode(tc)){	
+        thread->increaseFetchedInstr(_name);
+      }
+      else
+        return cur_instr;	
+
+      allthreads->increaseFetchedInstr(_name);
+      while ((fetchfault = reinterpret_cast<GeneralFetchInjectedFault *>(fetchStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
+        int succeed = dmtcp_checkpoint();
+        if ( succeed == 1){
+          rename_ckpt("fetch_ckpt.dmtcp");
+          cur_instr = fetchfault->process(cur_instr);
+          DPRINTF(FaultInjection,"Fetch: PCAddr:%llx In thread %d Fault Inserted \n",thread->getThreadId(),pcAddr);
+
+          thread->setfaulty(1);
+          scheduleswitch(tc);
+        }
+        else
+          fi_system->reset();
+      }
+
+      return cur_instr;
+    }
+    /*
+       inline StaticInstPtr decode_fault(ThreadContext *tc,ThreadEnabledFault *thread, StaticInstPtr cur_instr,Addr pcAddr){
+
+       std::string _name = tc->getCpuPtr()->name();
+       RegisterDecodingInjectedFault *decodefault = NULL;
+
+       if(thread->getMode() != START)
+       return cur_instr;
+
+       bool sigInstr = getSignificance(pcAddr);
+
+       if (sigInstr)
+       return cur_instr;
+
+       if(FullSystem && TheISA::inUserMode(tc)){	
+       thread->increaseDecodedInstr(_name);
+       }
+       else
+       return cur_instr;
+
+
+       allthreads->increaseDecodedInstr(_name);
+       while ((decodefault = reinterpret_cast<RegisterDecodingInjectedFault *>(decodeStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
+       int succeed = dmtcp_checkpoint();
+       if ( succeed == 1){
+       rename_ckpt("decode_ckpt.dmtcp");
+       cur_instr = decodefault->process(cur_instr);
+       decodefault->setManifested(true);
+       thread->setfaulty(1);
+       cur_instr->setFaultInjected(true);
+       DPRINTF(FaultInjection,"Decode:PCAddr:%llx Fault Inserted in thread %d at instruction %s \n",pcAddr,thread->getThreadId(),cur_instr->getName());
+       scheduleswitch(tc);
+       }
+       else
+       reset();
+       }	  
+
+
+       return cur_instr;
+       }
+
+*/
+
+    inline RegisterDecodingInjectedFault* decode_fault(ThreadContext *tc,ThreadEnabledFault *thread, StaticInstPtr instr,Addr pcAddr){
+      std::string _name = tc->getCpuPtr()->name();
+      RegisterDecodingInjectedFault *decodefault = NULL;
+      if(thread->getMode() != START)
+        return NULL;
+      bool sigInstr = getSignificance(pcAddr);
+      if (sigInstr)
+        return NULL;
+      if(FullSystem && TheISA::inUserMode(tc)){	
+        thread->increaseDecodedInstr(_name);
+      }
+      else
+        return NULL;
+
+      allthreads->increaseDecodedInstr(_name);
+      while ((decodefault = reinterpret_cast<RegisterDecodingInjectedFault *>(decodeStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
+        DPRINTF(FaultInjection,"Decode:PCAddr:%llx Fault Inserted in thread %d at instruction %s \n",pcAddr,thread->getThreadId(),instr->getName());
+
+        bool val = decodefault->process(instr);
+        if ( val ){
+          thread->setfaulty(1);
+          return decodefault;
         }
         /*
-           inline StaticInstPtr decode_fault(ThreadContext *tc,ThreadEnabledFault *thread, StaticInstPtr cur_instr,Addr pcAddr){
-
-           std::string _name = tc->getCpuPtr()->name();
-           RegisterDecodingInjectedFault *decodefault = NULL;
-
-           if(thread->getMode() != START)
-           return cur_instr;
-
-           bool sigInstr = getSignificance(pcAddr);
-
-           if (sigInstr)
-           return cur_instr;
-
-           if(FullSystem && TheISA::inUserMode(tc)){	
-           thread->increaseDecodedInstr(_name);
-           }
-           else
-           return cur_instr;
-
-
-           allthreads->increaseDecodedInstr(_name);
-           while ((decodefault = reinterpret_cast<RegisterDecodingInjectedFault *>(decodeStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
            int succeed = dmtcp_checkpoint();
            if ( succeed == 1){
            rename_ckpt("decode_ckpt.dmtcp");
@@ -386,109 +434,66 @@ class Fi_System : public MemObject
            }
            else
            reset();
-           }	  
+           */
+      }	  
 
 
-           return cur_instr;
-           }
+      return NULL;
+    }
 
-         */
+    void setStartingPCAddr(Addr vAddr){StartingPCAddr = vAddr;}
+    Addr getStartingPCAddr(){return StartingPCAddr;}
+    void open_meta_file(){
+      meta_input.open(meta_file.c_str(),ifstream::binary);
+      if (!meta_input.is_open() ){
+        DPRINTF(FaultInjection,"Cannot Open meta data file\n");
+        assert(NULL);
+      }
+    }
 
-        inline RegisterDecodingInjectedFault* decode_fault(ThreadContext *tc,ThreadEnabledFault *thread, StaticInstPtr instr,Addr pcAddr){
-            std::string _name = tc->getCpuPtr()->name();
-            RegisterDecodingInjectedFault *decodefault = NULL;
-            if(thread->getMode() != START)
-                return NULL;
-            bool sigInstr = getSignificance(pcAddr);
-            if (sigInstr)
-                return NULL;
-            if(FullSystem && TheISA::inUserMode(tc)){	
-                thread->increaseDecodedInstr(_name);
-            }
-            else
-                return NULL;
-            
-            allthreads->increaseDecodedInstr(_name);
-            while ((decodefault = reinterpret_cast<RegisterDecodingInjectedFault *>(decodeStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
-                DPRINTF(FaultInjection,"Decode:PCAddr:%llx Fault Inserted in thread %d at instruction %s \n",pcAddr,thread->getThreadId(),instr->getName());
-    
-                bool val = decodefault->process(instr);
-                if ( val )
-                    return decodefault;
-                
-/*
-                int succeed = dmtcp_checkpoint();
-                if ( succeed == 1){
-                    rename_ckpt("decode_ckpt.dmtcp");
-                    cur_instr = decodefault->process(cur_instr);
-                    decodefault->setManifested(true);
-                    thread->setfaulty(1);
-                    cur_instr->setFaultInjected(true);
-                    DPRINTF(FaultInjection,"Decode:PCAddr:%llx Fault Inserted in thread %d at instruction %s \n",pcAddr,thread->getThreadId(),cur_instr->getName());
-                    scheduleswitch(tc);
-                }
-                else
-                    reset();
-*/
-            }	  
+    bool getSignificance(Addr PC_addr){
 
+      if(text_start < 0 )
+        return false;
 
-            return NULL;
-        }
+      int offset = PC_addr - StartingPCAddr;
+      bool val;
+      if (offset < 0 ){
+        DPRINTF(FaultInjection, " Something is going very wrong I should never find negative offset\n");
+      }
+      int pos = text_start + offset;
 
-        void setStartingPCAddr(Addr vAddr){StartingPCAddr = vAddr;}
-        Addr getStartingPCAddr(){return StartingPCAddr;}
-        void open_meta_file(){
-            meta_input.open(meta_file.c_str(),ifstream::binary);
-            if (!meta_input.is_open() ){
-                DPRINTF(FaultInjection,"Cannot Open meta data file\n");
-                assert(NULL);
-            }
-        }
+      char byte;
+      meta_input.seekg(pos,std::ios::beg);
+      if (!meta_input.is_open())
+        return false;
+      meta_input.read(&byte,sizeof(char));
 
-        bool getSignificance(Addr PC_addr){
+      switch (byte){
+        case RELIABLE:
+          DPRINTF(FaultInjection, "Reliable Instruction\n");
+          val = true;
+          break;
+        case NON_RELIABLE:
+          DPRINTF(FaultInjection, "Non-Reliable Instruction\n");
+          val = false;
+          break;
+        case NOT_DEFINED :
+          DPRINTF(FaultInjection, "Compiler did not define this Instruction\n");
+          val = true;
+          break;
+        case NOT_SET:
+          DPRINTF(FaultInjection, "Instruction is included from another object file\n");
+          val = true;
+          break;
+        default:
+          DPRINTF(FaultInjection, " I should never reach here\n");
+          val = true;
+          break;
+      }
 
-            if(text_start < 0 )
-                return false;
-
-            int offset = PC_addr - StartingPCAddr;
-            bool val;
-            if (offset < 0 ){
-                DPRINTF(FaultInjection, " Something is going very wrong I should never find negative offset\n");
-            }
-            int pos = text_start + offset;
-
-            char byte;
-            meta_input.seekg(pos,std::ios::beg);
-            if (!meta_input.is_open())
-                return false;
-            meta_input.read(&byte,sizeof(char));
-
-            switch (byte){
-                case RELIABLE:
-                    DPRINTF(FaultInjection, "Reliable Instruction\n");
-                    val = true;
-                    break;
-                case NON_RELIABLE:
-                    DPRINTF(FaultInjection, "Non-Reliable Instruction\n");
-                    val = false;
-                    break;
-                case NOT_DEFINED :
-                    DPRINTF(FaultInjection, "Compiler did not define this Instruction\n");
-                    val = true;
-                    break;
-                case NOT_SET:
-                    DPRINTF(FaultInjection, "Instruction is included from another object file\n");
-                    val = true;
-                    break;
-                default:
-                    DPRINTF(FaultInjection, " I should never reach here\n");
-                    val = true;
-                    break;
-            }
-
-            return val;
-        }
+      return val;
+    }
 
 
 };

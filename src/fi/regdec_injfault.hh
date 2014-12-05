@@ -7,6 +7,13 @@
 #include "fi/o3cpu_injfault.hh"
 #include "cpu/o3/cpu.hh"
 
+enum RegType{
+  INT=0,
+  FLOAT=1,
+  MISC=2,
+  CC=3
+};
+
 /*
  * Insert a fault during decoding stage.
  */
@@ -61,6 +68,8 @@ class RegisterDecodingInjectedFault : public O3CPUInjectedFault
       getChangeToReg() const { return _changeToReg;}
 
     int getOperand() {return operand; }
+
+    int inject( RegType type , int op, ThreadContext *tc );
 
 };
 

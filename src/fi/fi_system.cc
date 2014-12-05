@@ -39,7 +39,9 @@
 
 using namespace std;
 
-
+unsigned fi_IntRegs;
+unsigned fi_FloatRegs;
+unsigned fi_CCRegs;
 
 Fi_System *fi_system;
 

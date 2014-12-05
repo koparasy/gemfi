@@ -1376,9 +1376,12 @@ DefaultFetch<Impl>::fetch(bool &status_change)
 			ppFetch->notify(instruction);
 			numInst++;
             RegisterDecodingInjectedFault *fi_fault;
-            if(enabled_fi)
-				fi_fault = fi_system -> decode_fault(curr_tc,curr_thread,staticInst,thisPC.instAddr());
-            instruction->setRegDecFault(fi_fault);
+            if(enabled_fi){
+      				fi_fault = fi_system -> decode_fault(curr_tc,curr_thread,staticInst,thisPC.instAddr());
+              instruction->setRegDecFault(fi_fault);
+            }
+            else
+              instruction->setRegDecFault(NULL);
 
 
 #if TRACING_ON
