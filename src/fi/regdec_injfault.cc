@@ -37,18 +37,20 @@ RegisterDecodingInjectedFault::inject(RegType type, int op, ThreadContext *tc){
   int checkpoint = dmtcp_checkpoint(); 
   if ( checkpoint == 1){
     fi_system->rename_ckpt("decode_ckpt.dmtcp");
+    int random = rand();
+    DPRINTF(FaultInjection,"Random Value is %d\n",random);
     switch (type){
       case INT:
-        return (rand() % (baseFloatIndex) );
+        return (random % (baseFloatIndex) );
         break;
       case FLOAT:
-        return ( rand() % ( baseCCIndex - baseFloatIndex ) + baseFloatIndex);
+        return ( random % ( baseCCIndex - baseFloatIndex ) + baseFloatIndex);
         break;
       case MISC:
-        return ( rand () % (totalRegs - baseCCIndex) +baseCCIndex);
+        return ( random  % (totalRegs - baseCCIndex) +baseCCIndex);
         break;
       case CC:
-        return ( rand () % (totalRegs - baseCCIndex) +baseCCIndex);
+        return ( random  % (totalRegs - baseCCIndex) +baseCCIndex);
         break;
     }
     fi_system->scheduleswitch(tc);
@@ -88,11 +90,12 @@ bool RegisterDecodingInjectedFault::process(StaticInstPtr staticInst)
 {
     int tried=0;
     bool faultInjected=false;
-    srand(22);
+    srand(time(NULL));
     DPRINTF(FaultInjection, "Setting Faulty Values to Instruction\n");
     int places = staticInst->numSrcRegs() + staticInst->numDestRegs();
     if ( places != 0 ){
         int faulty_operand = rand()%places;
+        DPRINTF(FaultInjection,"Tagged Instruction As faulty Operand: %d , Num Src %d , Num Dest %d\n",faulty_operand, staticInst->numSrcRegs(),staticInst->numDestRegs());
         if ( faulty_operand < staticInst->numSrcRegs() ){
             setSrcOrDst(SrcRegisterInjectedFault);
             operand = faulty_operand;
@@ -107,7 +110,7 @@ bool RegisterDecodingInjectedFault::process(StaticInstPtr staticInst)
     //I will not inject fault since I dont have 
     //any operands to alter, I will try to 
     //inject it on the next instruction.
-
+    DPRINTF(FaultInjection, "Resceduling instruction for next instruction\n");
     int insts = getTiming() + 1;
     Addr addr = getTiming() + (getCPU()->getContext(getTContext())->pcState().nextInstAddr() - getCPU()->getContext(getTContext())->pcState().instAddr());
     increaseTiming(0,insts,addr);
