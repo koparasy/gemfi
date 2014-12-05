@@ -46,6 +46,7 @@
 #include "cpu/thread_context.hh"
 #include "sim/fault_fwd.hh"
 
+#include "debug/FaultInjection.hh"
 // forward declarations
 class Packet;
 
@@ -189,11 +190,28 @@ class StaticInst : public RefCounted
     int8_t _numFPDestRegs;
     int8_t _numIntDestRegs;
     int8_t _numCCDestRegs;
+
+    int _correct_reg;
+    int _index;
+    int _srcOrDest;
     //@}
 
     bool FaultInjected;
   public:
-
+  
+    void correctInst(){
+      /*
+      if ( _srcOrDest ){
+        DPRINTF(FaultInjection,"Dest Register is: %d\n",_correct_reg);
+        _destRegIdx[_index]=_correct_reg;
+      }
+      else{
+        DPRINTF(FaultInjection,"Src Register is: %d\n",_correct_reg);
+        _srcRegIdx[_index]= _correct_reg;
+      }
+    DPRINTF(FaultInjection, " Index %d\n",_index);
+    */
+    }
     /// @name Register information.
     /// The sum of numFPDestRegs() and numIntDestRegs() equals
     /// numDestRegs().  The former two functions are used to track
@@ -346,7 +364,7 @@ class StaticInst : public RefCounted
 
   public:
     virtual ~StaticInst();
-
+    const ExtMachInst getMachInst(){ return machInst;}
     bool getFaultInjected(){return FaultInjected;}
     void setFaultInjected(bool val){FaultInjected=val;}
 /**

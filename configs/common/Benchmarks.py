@@ -67,6 +67,9 @@ class SysConfig:
 
 Benchmarks = {
 	'test':  [SysConfig('test.rcS', '512MB')],
+	'test1':  [SysConfig('test1.rcS', '512MB')],
+	'test2':  [SysConfig('test2.rcS', '512MB')],
+	'test3':  [SysConfig('test3.rcS', '512MB')],
 
     'PovrayBench':  [SysConfig('povray-bench.rcS', '512MB', 'povray.img')],
     'PovrayAutumn': [SysConfig('povray-autumn.rcS', '512MB', 'povray.img')],

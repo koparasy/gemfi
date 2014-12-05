@@ -19,9 +19,10 @@ do
   sec=`echo $sec|sed 's/^0*//'`
   total_time=$((hour*3600+min*60+sec))
   IFS=$OIFS
-  if [ "$total_time" -gt "7200" ]; then
+  if [ "$total_time" -gt "4600" ]; then
     echo "kill my child"
     kill -15 $my_child
+    touch start/killed
   fi
   IFS=$'\t'
   size=$(du -s ./start)

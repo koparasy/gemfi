@@ -76,6 +76,9 @@ enum DependenceTags {
     Max_Reg_Index = Misc_Reg_Base + NumMiscRegs
 };
 
+const int Segment_base_reg= MISCREG_SEG_SEL_BASE;
+const int Segment_end_reg=Segment_base_reg+13;
+
 // semantically meaningful register indices
 //There is no such register in X86
 const int ZeroReg = NUM_INTREGS;

@@ -2,17 +2,18 @@
 #include "fi/faultq.hh"
 #include "fi/regdec_injfault.hh"
 #include "fi/fi_system.hh"
-
+#include "arch/registers.hh"
+#include <time.h>
 using namespace std;
 
-RegisterDecodingInjectedFault::RegisterDecodingInjectedFault( std::ifstream &os)
-	:O3CPUInjectedFault(os)
+  RegisterDecodingInjectedFault::RegisterDecodingInjectedFault( std::ifstream &os)
+:O3CPUInjectedFault(os)
 {
-	string s;
-	os>>s;
-	parseRegDec(s);
-	fi_system->decodeStageInjectedFaultQueue.insert(this);
-	setFaultType(InjectedFault::RegisterDecodingInjectedFault);
+  string s;
+  os>>s;
+  parseRegDec(s);
+  fi_system->decodeStageInjectedFaultQueue.insert(this);
+  setFaultType(InjectedFault::RegisterDecodingInjectedFault);
 }
 
 
@@ -28,7 +29,7 @@ RegisterDecodingInjectedFault::~RegisterDecodingInjectedFault()
 const char *
 RegisterDecodingInjectedFault::description() const
 {
-    return "RegisterDecodingInjectedFault";
+  return "RegisterDecodingInjectedFault";
 }
 
 
@@ -46,70 +47,111 @@ RegisterDecodingInjectedFault::dump() const
   }
 }
 
-StaticInstPtr
+bool RegisterDecodingInjectedFault::injectInputFault(int newSrc, int numOperand, StaticInstPtr si){
+  si->_srcRegIdx[numOperand] = newSrc;
+  return true;
+}
+
+bool RegisterDecodingInjectedFault::injectOutputFault(int newSrc, int numOperand, StaticInstPtr si){
+  si->_destRegIdx[numOperand] = newSrc;
+  return true;
+}
+
+
+  StaticInstPtr
 RegisterDecodingInjectedFault::process(StaticInstPtr staticInst)
 {
+  int tried=0;
+  bool faultInjected=false;
+ srand(time(NULL));
+  while(tried < 2 && ! faultInjected){
+    if (getSrcOrDst() == RegisterDecodingInjectedFault::SrcRegisterInjectedFault&&tried < 2){
+      if ( staticInst->numSrcRegs() == 0){
+        tried++;
+        setSrcOrDst(2);
+      }
+      while ( !faultInjected ){
+        int regToChange=rand()%staticInst->numSrcRegs();
+        if (staticInst->_srcRegIdx[regToChange] < TheISA::FP_Reg_Base ){
+          int NewReg  = rand()%(TheISA::FP_Reg_Base);
+          faultInjected=injectInputFault(NewReg,regToChange,staticInst);
+          DPRINTF(FaultInjection , "Inject Fault To : #Src: Is Integer\n");
+        }
+        else if ( staticInst->_srcRegIdx[regToChange] < TheISA::CC_Reg_Base ){
+          int NewReg  = rand()%(TheISA::CC_Reg_Base - TheISA::FP_Reg_Base) + FP_Reg_Base;
+          faultInjected=injectInputFault(NewReg,regToChange,staticInst);
+          DPRINTF(FaultInjection,"Inject Fault To : #Src: Is FLoating Point\n");
+        }
+        else if (  staticInst->_srcRegIdx[regToChange] > TheISA:: Segment_base_reg &&  staticInst->_srcRegIdx[regToChange] < TheISA::Segment_end_reg  ){
+          int NewReg  = rand()%(TheISA::Segment_end_reg - TheISA::Segment_base_reg) + TheISA::Segment_base_reg;
+          faultInjected=injectInputFault(NewReg,regToChange,staticInst);
+          DPRINTF(FaultInjection, "Inject Fault To : #Src: Is MiscReg \n");
+        }
+      }
+    }
+    if (getSrcOrDst() == RegisterDecodingInjectedFault::DstRegisterInjectedFault ){
+      if ( staticInst->numSrcRegs() == 0){
+        tried++;
+        setSrcOrDst(1);
+      }
 
-  if (getSrcOrDst() == RegisterDecodingInjectedFault::SrcRegisterInjectedFault) {
-    int rTc = getRegToChange() % staticInst->numSrcRegs(); //Make sure the rTC field of the instruction exists
-    if(staticInst->_srcRegIdx[rTc] >= TheISA::FP_Reg_Base)
-	setChangeToReg(getChangeToReg()+TheISA::FP_Reg_Base);
-    staticInst->_srcRegIdx[rTc] = getChangeToReg();
+      while ( !faultInjected ){
+        int regToChange=rand()%staticInst->numDestRegs();
+        if (staticInst->_destRegIdx[regToChange] < TheISA::FP_Reg_Base ){
+          int NewReg  = rand()%(TheISA::FP_Reg_Base);
+          faultInjected=injectInputFault(NewReg,regToChange,staticInst);
+          DPRINTF(FaultInjection , "Inject Fault To : #DestDest : Is Integer\n");
+        }
+        else if ( staticInst->_destRegIdx[regToChange] < TheISA::CC_Reg_Base ){
+          int NewReg  = rand()%(TheISA::CC_Reg_Base - TheISA::FP_Reg_Base) + FP_Reg_Base;
+          faultInjected=injectInputFault(NewReg,regToChange,staticInst);
+          DPRINTF(FaultInjection,"Inject Fault To : #Dest:  Is FLoating Point\n" );
+        }
+        else if (  staticInst->_destRegIdx[regToChange] > TheISA:: Segment_base_reg &&  staticInst->_srcRegIdx[regToChange] < TheISA::Segment_end_reg  ){
+          int NewReg  = rand()%(TheISA::Segment_end_reg - TheISA::Segment_base_reg) + TheISA::Segment_base_reg;
+          faultInjected=injectOutputFault(NewReg,regToChange,staticInst);
+          DPRINTF(FaultInjection, "Inject Fault To : #Dest Is MiscReg \n");
+        }
+      }
+    }
   }
-  else {
-    int rTc = getRegToChange() % staticInst->numDestRegs();
-      if(staticInst->_destRegIdx[rTc] >= TheISA::FP_Reg_Base)
-	setChangeToReg(getChangeToReg()+TheISA::FP_Reg_Base);
-    staticInst->_destRegIdx[rTc] = getChangeToReg();
-  }  
-  
-  if (DTRACE(FaultInjection)) {
-    std::cout << "===RegisterDecodingInjectedFault::process()===\n";
-    std::cout <<"Instruction Type : "<<staticInst->getName()<<"\n";;
-    dump();
-  }
-  
-  
-  check4reschedule();
-
-  if (DTRACE(FaultInjection)) {
-    std::cout << "~==RegisterDecodingInjectedFault::process()===\n";
-  }
+  if ( tried == 2)
+    DPRINTF(FaultInjection,"No Operands to be injected\n");
   return staticInst;
-}
-
-int
-RegisterDecodingInjectedFault::parseRegDec(std::string s)
-{
-  if (DTRACE(FaultInjection)) {
-    std::cout << "RegisterDecodingInjecteFault::parseRegDec()\n";
   }
-  size_t pos;
 
-  if (s.compare(0,3,"Src",0,3) == 0) {
-    setSrcOrDst(RegisterDecodingInjectedFault::SrcRegisterInjectedFault);
- 
-    std::string s2 = s.substr(4);
-    pos = s2.find_first_of(":");
+  int
+    RegisterDecodingInjectedFault::parseRegDec(std::string s)
+    {
+      if (DTRACE(FaultInjection)) {
+        std::cout << "RegisterDecodingInjecteFault::parseRegDec()\n";
+      }
+      size_t pos;
 
-    setRegToChange(s2.substr(0,pos));
-    setChangeToReg(s2.substr(pos+1));
-  }
-  else if (s.compare(0,3,"Dst",0,3) == 0) {
-    setSrcOrDst(RegisterDecodingInjectedFault::DstRegisterInjectedFault);
+      if (s.compare(0,3,"Src",0,3) == 0) {
+        setSrcOrDst(RegisterDecodingInjectedFault::SrcRegisterInjectedFault);
 
-    std::string s2 = s.substr(4);
-    pos = s2.find_first_of(":");
+        std::string s2 = s.substr(4);
+        pos = s2.find_first_of(":");
 
-    setRegToChange(s2.substr(0,pos));
-    setChangeToReg(s2.substr(pos+1));
-    
-  }
-  else {
-    std::cout << "RegisterDecodingInjecteFault::parseRegDec(): " << s << "\n";
-    assert(0);
-    return 1;
-  }
-  
-  return 0;
-}
+        setRegToChange(s2.substr(0,pos));
+        setChangeToReg(s2.substr(pos+1));
+      }
+      else if (s.compare(0,3,"Dst",0,3) == 0) {
+        setSrcOrDst(RegisterDecodingInjectedFault::DstRegisterInjectedFault);
+
+        std::string s2 = s.substr(4);
+        pos = s2.find_first_of(":");
+
+        setRegToChange(s2.substr(0,pos));
+        setChangeToReg(s2.substr(pos+1));
+
+      }
+      else {
+        std::cout << "RegisterDecodingInjecteFault::parseRegDec(): " << s << "\n";
+        assert(0);
+        return 1;
+      }
+
+      return 0;
+    }
