@@ -74,8 +74,8 @@
 
 //~ALTERCODE
 #include "fi/cpu_threadInfo.hh"
-#include "fi/fi_system.hh"
 #include "base/statistics.hh"
+#include "fi/fi_system.hh"
 //~ALTERCODE
 
 
@@ -1366,9 +1366,7 @@ DefaultFetch<Impl>::fetch(bool &status_change)
 
 			//ALTERCODE
 			//inject fault on decoded instruction
-			if(enabled_fi)
-				staticInst = fi_system -> decode_fault(curr_tc,curr_thread,staticInst,thisPC.instAddr());
-			//~ALTERCODE
+						//~ALTERCODE
       if ( staticInst->getFaultInjected())
           decoder[tid]->erase(staticInst);
 
@@ -1377,6 +1375,11 @@ DefaultFetch<Impl>::fetch(bool &status_change)
 						thisPC, nextPC, true);
 			ppFetch->notify(instruction);
 			numInst++;
+            RegisterDecodingInjectedFault *fi_fault;
+            if(enabled_fi)
+				fi_fault = fi_system -> decode_fault(curr_tc,curr_thread,staticInst,thisPC.instAddr());
+            instruction->setRegDecFault(fi_fault);
+
 
 #if TRACING_ON
 			if (DTRACE(O3PipeView)) {

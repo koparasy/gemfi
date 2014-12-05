@@ -24,6 +24,7 @@ class RegisterDecodingInjectedFault : public O3CPUInjectedFault
     RegisterDecodingInjectedFaultType _srcOrDst;
     int _regToChange;
     int _changeToReg;
+    int operand;
 
     int parseRegDec(std::string s);
     void setSrcOrDst(RegisterDecodingInjectedFaultType v) { _srcOrDst = v;}
@@ -31,7 +32,6 @@ class RegisterDecodingInjectedFault : public O3CPUInjectedFault
     void setChangeToReg(std::string v) { _changeToReg = atoi(v.c_str());}
     void setChangeToReg(int v){_changeToReg = v;}
     void setRegToChange(int v) {_regToChange =v;}
-
 
     bool injectInputFault(int newSrc, int numOperand, StaticInstPtr si);
 
@@ -47,7 +47,7 @@ class RegisterDecodingInjectedFault : public O3CPUInjectedFault
 
     virtual TheISA::MachInst process(TheISA::MachInst inst) { std::cout << "O3CPUInjectedFault::manifest() -- virtual\n"; assert(0); return inst;};
     virtual StaticInstPtr process(StaticInstPtr inst , int regNum) { std::cout << "O3CPUInjectedFault::manifest() -- virtual\n"; assert(0); return inst;}; 
-    StaticInstPtr process(StaticInstPtr inst); // StaticInstPtr contains the user visible
+    bool process(StaticInstPtr inst); // StaticInstPtr contains the user visible
     // Destination/source register
     //so set them to the desired one.
 
@@ -59,6 +59,8 @@ class RegisterDecodingInjectedFault : public O3CPUInjectedFault
 
     int 
       getChangeToReg() const { return _changeToReg;}
+
+    int getOperand() {return operand; }
 
 };
 

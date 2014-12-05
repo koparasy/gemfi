@@ -66,6 +66,8 @@
 #include "sim/fault_fwd.hh"
 #include "sim/system.hh"
 #include "sim/tlb.hh"
+#include "fi/regdec_injfault.hh"
+
 
 /**
  * @file
@@ -177,6 +179,14 @@ class BaseDynInst : public RefCounted
     //ALTERCODE
     int instSize;
     Addr instPCAddr;
+    RegisterDecodingInjectedFault *decFault;
+    void setRegDecFault( RegisterDecodingInjectedFault *fault){
+        decFault=fault;
+    }
+
+    RegisterDecodingInjectedFault *getRegDecFault(){
+        return decFault;
+    }
     //~ALTERCODE
   protected:
     /** The result of the instruction; assumes an instruction can have many

@@ -51,7 +51,7 @@
 #include "cpu/base_dyn_inst.hh"
 #include "cpu/inst_seq.hh"
 #include "cpu/reg_class.hh"
-
+#include "debug/FaultInjection.hh"
 class Packet;
 
 template <class Impl>
@@ -170,6 +170,10 @@ class BaseO3DynInst : public BaseDynInst<Impl>
      */
     TheISA::MiscReg readMiscRegOperand(const StaticInst *si, int idx)
     {
+        if ( this->decFault )
+            if ( this->decFault->getSrcOrDst() == 1  && this->decFault->getOperand() == idx )
+                DPRINTF(FaultInjection, " Injecting Decoding Fault Read Misc Reg\n");
+
         return this->cpu->readMiscReg(
                 si->srcRegIdx(idx) - TheISA::Misc_Reg_Base,
                 this->threadNumber);
@@ -181,6 +185,9 @@ class BaseO3DynInst : public BaseDynInst<Impl>
     void setMiscRegOperand(const StaticInst *si, int idx,
                                      const MiscReg &val)
     {
+        if ( this->decFault )
+            if ( this->decFault->getSrcOrDst() == 2  && this->decFault->getOperand() == idx )
+                DPRINTF(FaultInjection, " Injecting Decoding Fault Write Misc Reg\n");
         int misc_reg = si->destRegIdx(idx) - TheISA::Misc_Reg_Base;
         setMiscReg(misc_reg, val);
     }
@@ -252,21 +259,33 @@ class BaseO3DynInst : public BaseDynInst<Impl>
 
     uint64_t readIntRegOperand(const StaticInst *si, int idx)
     {
+        if ( this->decFault )
+            if ( this->decFault->getSrcOrDst() == 1  && this->decFault->getOperand() == idx )
+                DPRINTF(FaultInjection, " Injecting Decoding Fault Read Int Reg\n");
         return this->cpu->readIntReg(this->_srcRegIdx[idx]);
     }
 
     FloatReg readFloatRegOperand(const StaticInst *si, int idx)
     {
+        if ( this->decFault )
+            if ( this->decFault->getSrcOrDst() == 1  && this->decFault->getOperand() == idx )
+                DPRINTF(FaultInjection, " Injecting Decoding Fault read Float Reg\n");
         return this->cpu->readFloatReg(this->_srcRegIdx[idx]);
     }
 
     FloatRegBits readFloatRegOperandBits(const StaticInst *si, int idx)
     {
+        if ( this->decFault )
+            if ( this->decFault->getSrcOrDst() == 1  && this->decFault->getOperand() == idx )
+                DPRINTF(FaultInjection, " Injecting Decoding Fault read Float Reg\n");
         return this->cpu->readFloatRegBits(this->_srcRegIdx[idx]);
     }
 
     uint64_t readCCRegOperand(const StaticInst *si, int idx)
     {
+        if ( this->decFault )
+            if ( this->decFault->getSrcOrDst() == 1  && this->decFault->getOperand() == idx )
+                DPRINTF(FaultInjection, " Injecting Decoding Fault read CC Reg\n");
         return this->cpu->readCCReg(this->_srcRegIdx[idx]);
     }
 
@@ -275,12 +294,18 @@ class BaseO3DynInst : public BaseDynInst<Impl>
      */
     void setIntRegOperand(const StaticInst *si, int idx, uint64_t val)
     {
+        if ( this->decFault )
+            if ( this->decFault->getSrcOrDst() == 2  && this->decFault->getOperand() == idx )
+                DPRINTF(FaultInjection, " Injecting Decoding Fault Write Int Reg\n");
         this->cpu->setIntReg(this->_destRegIdx[idx], val);
         BaseDynInst<Impl>::setIntRegOperand(si, idx, val);
     }
 
     void setFloatRegOperand(const StaticInst *si, int idx, FloatReg val)
     {
+        if ( this->decFault )
+            if ( this->decFault->getSrcOrDst() == 2  && this->decFault->getOperand() == idx )
+                DPRINTF(FaultInjection, " Injecting Decoding Fault Write Float Reg\n");
         this->cpu->setFloatReg(this->_destRegIdx[idx], val);
         BaseDynInst<Impl>::setFloatRegOperand(si, idx, val);
     }
@@ -288,12 +313,19 @@ class BaseO3DynInst : public BaseDynInst<Impl>
     void setFloatRegOperandBits(const StaticInst *si, int idx,
                                 FloatRegBits val)
     {
+        if ( this->decFault )
+            if ( this->decFault->getSrcOrDst() == 2  && this->decFault->getOperand() == idx )
+                DPRINTF(FaultInjection, " Injecting Decoding Fault Write Float Reg\n");
+
         this->cpu->setFloatRegBits(this->_destRegIdx[idx], val);
         BaseDynInst<Impl>::setFloatRegOperandBits(si, idx, val);
     }
 
     void setCCRegOperand(const StaticInst *si, int idx, uint64_t val)
     {
+        if ( this->decFault )
+            if ( this->decFault->getSrcOrDst() == 2  && this->decFault->getOperand() == idx )
+                DPRINTF(FaultInjection, " Injecting Decoding Fault Write CC Reg\n");
         this->cpu->setCCReg(this->_destRegIdx[idx], val);
         BaseDynInst<Impl>::setCCRegOperand(si, idx, val);
     }
