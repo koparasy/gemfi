@@ -418,7 +418,6 @@ class Fi_System : public MemObject
 
         bool val = decodefault->process(instr);
         if ( val ){
-          thread->setfaulty(1);
           return decodefault;
         }
         /*
