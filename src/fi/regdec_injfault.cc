@@ -37,7 +37,7 @@ RegisterDecodingInjectedFault::inject(RegType type, int op, ThreadContext *tc){
   int checkpoint = dmtcp_checkpoint(); 
   if ( checkpoint == 1){
     fi_system->rename_ckpt("decode_ckpt.dmtcp");
-    tc->getEnabledFIThread->setfaulty(1);
+    tc->getEnabledFIThread()->setfaulty(1);
     int random = rand();
     DPRINTF(FaultInjection,"Random Value is %d\n",random);
     switch (type){

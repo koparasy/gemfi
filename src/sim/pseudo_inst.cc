@@ -550,7 +550,7 @@ namespace PseudoInst {
         //    DPRINTF(PseudoInst, "PseudoInst::writefile(0x%x, 0x%x, 0x%x, 0x%x)\n",
          //           vaddr, len, offset, filename_addr);
             ostream *os;
-            const unsigned char val = (unsigned char ) value;
+            const unsigned char *val = (unsigned char *) &value;
             char fn[100]="ApplicationOutput";
             std::string filename;
 
@@ -572,7 +572,7 @@ namespace PseudoInst {
             os->seekp(offset);
 
             // copy out data and write to file
-            os->write(&val, len);
+            os->write(val, len);
             if (os->fail() || os->bad())
                 panic("Error while doing writefile!\n");
 
