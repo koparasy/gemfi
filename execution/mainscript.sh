@@ -19,7 +19,7 @@ if [ ! -d "$workstation/results" ] ; then
 fi
 
 if [ $start_new -eq "1" ] ; then
-  cp -r $HOME/test.rcS ../configs/boot/test.rcS
+  #cp -r $HOME/test.rcS ../configs/boot/test.rcS
   echo "Starting new"
   rm -r /home/dinos/results/*
   cp -r "$HOME/x86/disks/x86root.img" "$workstation/x86/disks/x86root.img"

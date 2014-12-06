@@ -623,8 +623,8 @@ AtomicSimpleCPU::tick()
 	      
 		 //decode faults
 		//ALTERCODE
-		if( enabled_fi )
-		  curStaticInst = fi_system ->decode_fault(curr_tc,curr_thread,curStaticInst,pcState.instAddr());
+        //		if( enabled_fi )
+        //		  curStaticInst = fi_system ->decode_fault(curr_tc,curr_thread,curStaticInst,pcState.instAddr());
 		//ALTERCODE
 
                 fault = curStaticInst->execute(this, traceData);

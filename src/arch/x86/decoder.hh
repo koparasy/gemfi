@@ -224,7 +224,9 @@ namespace X86ISA
             decodePages = NULL;
             instMap = NULL;
         }
-
+        void erase(StaticInstPtr inst){
+         instMap->erase(inst->getMachInst()); 
+        }
             void setM5Reg(HandyM5Reg m5Reg)
             {
                 mode = (X86Mode)(uint64_t)m5Reg.mode;
