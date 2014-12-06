@@ -40,6 +40,7 @@ RegisterDecodingInjectedFault::inject(RegType type, int op, ThreadContext *tc){
     tc->getEnabledFIThread()->setfaulty(1);
     int random = rand();
     DPRINTF(FaultInjection,"Random Value is %d\n",random);
+    fi_system->scheduleswitch(tc);
     switch (type){
       case INT:
         return (random % (baseFloatIndex) );
@@ -54,7 +55,6 @@ RegisterDecodingInjectedFault::inject(RegType type, int op, ThreadContext *tc){
         return ( random  % (totalRegs - baseCCIndex) +baseCCIndex);
         break;
     }
-    fi_system->scheduleswitch(tc);
   }
   else{
     fi_system->reset();
