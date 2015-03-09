@@ -276,7 +276,7 @@ namespace X86ISA
 
             void process();
 //ALTERCODE
-	    void process(ThreadContext *tc, ThreadEnabledFault *thread);
+//	    void process(ThreadContext *tc, ThreadEnabledFault *thread);
 //ALTERCODE
             //Use this to give data to the decoder. This should be used
             //when there is control flow.
@@ -291,6 +291,7 @@ namespace X86ISA
             }
 
 //ALTERCODE
+/*
 	void moreBytes(const PCState &pc, Addr fetchPC, MachInst data, ThreadContext *tc, ThreadEnabledFault *thread)
         {
                 DPRINTF(Decoder, "Getting more bytes.\n");
@@ -300,6 +301,7 @@ namespace X86ISA
                 outOfBytes = false;
                 process(tc,thread);
         }
+        */
 //ALTERCODE
 
             bool needMoreBytes()

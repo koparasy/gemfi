@@ -1283,7 +1283,7 @@ DefaultFetch<Impl>::fetch(bool &status_change)
 		// in the decoder.
 
 		//ALTERCODE
-		if(fi_system->fi_main)
+		if(enabled_fi)
 			fi_system->main_fault(curr_tc,curr_thread,thisPC.instAddr());
 		//~ALTERCODE
 
@@ -1318,7 +1318,7 @@ DefaultFetch<Impl>::fetch(bool &status_change)
 
 			MachInst inst = TheISA::gtoh(cacheInsts[blkOffset]);
 			if( enabled_fi)
-				inst = fi_system->fetch_fault(curr_tc,curr_thread,inst,thisPC.instAddr());
+				inst = fi_system->fetch_fault(curr_tc,curr_thread,inst,fetchAddr);
 
 			decoder[tid]->moreBytes(thisPC, fetchAddr, inst);
 

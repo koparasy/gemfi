@@ -19,6 +19,11 @@
  * 
  */ 
 
+#define NONPROTECTED 0
+#define PROTECTED 1
+#define NOPINST 2
+#define OTHEROBJECT 3
+#define CATEGORIES 4
 
 
 class cpuExecutedTicks ; //forward declaration
@@ -33,10 +38,11 @@ extern std::string allcores;
 
 class cpuExecutedTicks {
 	private:
-		uint64_t instrFetched; //how many instructions has this core fetched for a specific thread
-    uint64_t instrDecoded;
-		uint64_t instrExexuted; // how many instructions has this core executed for a specific thread
-		uint64_t instrLoadStore;
+		uint64_t instrFetched[CATEGORIES]; //how many instructions has this core fetched for a specific thread
+    uint64_t instrDecoded[CATEGORIES];
+		uint64_t instrExexuted[CATEGORIES]; // how many instructions has this core executed for a specific thread
+		uint64_t instrLoadStore[CATEGORIES];
+    
 		/* 
 		 * There is no meaning in counting the ticks of fetch,decode,execute seperately since
 		 * a thread owns the pipeline even if only one instruction is inside the pipeline
@@ -51,26 +57,32 @@ class cpuExecutedTicks {
 
 		void setName(std:: string v){_name = v;} 
 
-		void setInstrFetched(uint64_t v){instrFetched = v;  }
-    void setInstrDecoded(uint64_t v){instrDecoded = v; }
-		void setInstrExecuted(uint64_t v){instrExexuted = v; }
-		void setInstrLoadStore(uint64_t v){instrLoadStore = v;}
+		void setInstrFetched(uint64_t v1, uint64_t v2, uint64_t v3, uint64_t v4){instrFetched[PROTECTED] = v1;  instrFetched[NONPROTECTED] = v2; instrFetched[NOPINST] = v3;  instrFetched[OTHEROBJECT] = v4; }
+    void setInstrDecoded(uint64_t v1, uint64_t v2, uint64_t v3, uint64_t v4){instrDecoded[PROTECTED] = v1; instrDecoded[NONPROTECTED] = v2; instrDecoded[NOPINST] = v3;  instrDecoded[OTHEROBJECT] = v4;}
+		void setInstrExecuted(uint64_t v1, uint64_t v2, uint64_t v3, uint64_t v4){instrExexuted[PROTECTED] = v1;instrExexuted[NONPROTECTED] = v2; instrExexuted[NOPINST] = v3;  instrExexuted[OTHEROBJECT] = v4; }
+		void setInstrLoadStore(uint64_t v1, uint64_t v2, uint64_t v3 , uint64_t v4){instrLoadStore[PROTECTED] = v1;instrLoadStore[NONPROTECTED] = v2; instrLoadStore[NOPINST] = v3;  instrLoadStore[OTHEROBJECT] = v4;}
 
 		void setTicks(uint64_t v){_ticks=v;}
 
-		uint64_t getInstrFetched(){return instrFetched;}
-    uint64_t getInstrDecoded(){return instrDecoded;}
-		uint64_t getInstrExecuted(){return instrExexuted;}
-		uint64_t getInstrLoadStore(){return instrLoadStore;}   
+		uint64_t* getInstrFetched(){return instrFetched;}
+    uint64_t* getInstrDecoded(){return instrDecoded;}
+		uint64_t* getInstrExecuted(){return instrExexuted;}
+		uint64_t* getInstrLoadStore(){return instrLoadStore;}   
+
+
+  	uint64_t getInstrFetched(int id){return instrFetched[id];}
+    uint64_t getInstrDecoded(int id){return instrDecoded[id];}
+		uint64_t getInstrExecuted(int id){return instrExexuted[id];}
+		uint64_t getInstrLoadStore(int id){return instrLoadStore[id];}
 
 		uint64_t getTicks(){return _ticks;}
 
 		std::string getName() {return _name;}
 
-		void increaseFetchInstr() { instrFetched++;}
-    void increaseDecodeInstr(){ instrDecoded++;}
-		void increaseExecInstr() {instrExexuted++;}
-		void increaseLoadStoreInstr(){instrLoadStore++;}
+		void increaseFetchInstr(int mode) { instrFetched[mode]++;}
+    void increaseDecodeInstr(int mode){ instrDecoded[mode]++;}
+		void increaseExecInstr(int mode) { instrExexuted[mode]++;}
+		void increaseLoadStoreInstr(int mode){ instrLoadStore[mode]++;}
 
 
 		void increaseTicks(uint64_t ticks) {_ticks+=ticks;}
@@ -92,6 +104,7 @@ class ThreadEnabledFault {
 	int threadId; // Given when fi_activate_inst is executed 
 	int myId; // different for all threads something like hash id used only for debugging purposes.
 	uint64_t isfaulty;
+  int isInstProtected;
 	protected :
 	std::map<string,cpuExecutedTicks*> cores; // Store all cores which this thread as ever execute an instruction
 	std::map<string,cpuExecutedTicks*>::iterator itcores;
@@ -127,6 +140,9 @@ class ThreadEnabledFault {
 	int increaseLoadStoreInstr(std:: string curCpu);
 
 	int increaseTicks(std :: string curCpu , uint64_t ticks);
+
+  void setInstMode(int val){isInstProtected = val;};
+  int getInstMode(){return isInstProtected;}
 
 
 	void CalculateFetchedTime(std:: string curCpu , uint64_t *fetched_instr,uint64_t *fetched_time);

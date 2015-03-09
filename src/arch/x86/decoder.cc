@@ -69,7 +69,7 @@ Decoder::doResetState()
     }
 }
 
-
+/*
 void
 Decoder::process( ThreadContext * tc, ThreadEnabledFault *thread)
 {
@@ -119,7 +119,7 @@ Decoder::process( ThreadContext * tc, ThreadEnabledFault *thread)
         }
     }
 }
-
+*/
 
 void
 Decoder::process()

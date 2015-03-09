@@ -747,11 +747,12 @@ namespace PseudoInst {
     void init_fi_system(ThreadContext *tc,uint64_t start, uint64_t stop)
     {
 
- //       Addr pStart =  vtophys(tc,start);
- //       Addr pStop = vtophys(tc,stop);
+//        Addr pStart =  vtophys(tc,start);
+//        Addr pStop = vtophys(tc,stop);
 
-   //     DPRINTF(FaultInjection,"Cur PC address %llx (%llx,%llx) to physical (%llx, %llx)\n",tc->pcState().instAddr(),start,stop, pStart, pStop);
-        fi_system->setStartingPCAddr(0);
+        DPRINTF(FaultInjection,"Cur PC address %llx (%llx,%llx) to physical (%llx,%llx)\n",tc->pcState().instAddr(),start,stop);
+        fi_system->setStartingPCAddr(start);
+        fi_system->setStopPCAddr(stop);
 
 
         if(!FullSystem)
@@ -771,6 +772,7 @@ namespace PseudoInst {
                 std::cout<<"Succesfuuly restored just before Initializing fault Injection \n";        }
         }
         fi_system->reset();
+        fi_system->open_meta_file();
 
 
     }

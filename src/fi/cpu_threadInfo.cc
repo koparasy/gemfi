@@ -14,10 +14,10 @@ std::string allcores = string("all");
 cpuExecutedTicks:: cpuExecutedTicks(std:: string name)
 {
   setName(name);
-  setInstrFetched(0);
-  setInstrDecoded(0);
-  setInstrExecuted(0);
-  setInstrLoadStore(0);
+  setInstrFetched(0,0,0,0);
+  setInstrDecoded(0,0,0,0);
+  setInstrExecuted(0,0,0,0);
+  setInstrLoadStore(0,0,0,0);
   setTicks(0);
 }
 
@@ -45,7 +45,7 @@ ThreadEnabledFault::ThreadEnabledFault(int threadId, std::string name)
   cores.insert(pair<string,cpuExecutedTicks*> (allcores,all));
   isfaulty=0;
   cores.insert(pair<string,cpuExecutedTicks*>(name, new cpuExecutedTicks(name)));
-
+  isInstProtected = 1;
   setThreadId(threadId);
   setMyid();
   setMagicInstVirtualAddr(-1);
@@ -94,12 +94,12 @@ int ThreadEnabledFault:: increaseTicks(std:: string curCpu, uint64_t ticks)
 int ThreadEnabledFault:: increaseFetchedInstr(std:: string curCpu)
 {
   assert( all != NULL);
-  all->increaseFetchInstr();
+  all->increaseFetchInstr((int) isInstProtected);
   itcores = cores.find(curCpu);
   if ( itcores == cores.end())
     cores[curCpu] = new cpuExecutedTicks(curCpu);
   else
-    cores[curCpu]->increaseFetchInstr();
+    cores[curCpu]->increaseFetchInstr((int) isInstProtected);
   return 1;
 
 }
@@ -107,12 +107,12 @@ int ThreadEnabledFault:: increaseFetchedInstr(std:: string curCpu)
 int ThreadEnabledFault:: increaseDecodedInstr(std:: string curCpu)
 {
   assert( all != NULL);
-  all->increaseDecodeInstr();
+  all->increaseDecodeInstr((int) isInstProtected);
   itcores = cores.find(curCpu);
   if ( itcores == cores.end())
     cores[curCpu] = new cpuExecutedTicks(curCpu);
   else
-    cores[curCpu]->increaseDecodeInstr();
+    cores[curCpu]->increaseDecodeInstr( (int) isInstProtected );
   return 1;
 
 }
@@ -122,12 +122,12 @@ int ThreadEnabledFault:: increaseDecodedInstr(std:: string curCpu)
 int ThreadEnabledFault:: increaseExecutedInstr(std:: string curCpu)
 {
   assert(all != NULL);
-  all->increaseExecInstr();
+  all->increaseExecInstr((int) isInstProtected);
   itcores = cores.find(curCpu);
   if ( itcores == cores.end())
     cores[curCpu] = new cpuExecutedTicks(curCpu);
   else
-    cores[curCpu]->increaseExecInstr();
+    cores[curCpu]->increaseExecInstr((int) isInstProtected);
   return 1;
 }
 
@@ -135,12 +135,12 @@ int ThreadEnabledFault:: increaseExecutedInstr(std:: string curCpu)
 int ThreadEnabledFault:: increaseLoadStoreInstr(std:: string curCpu)
 {
   assert(all != NULL);
-  all->increaseLoadStoreInstr();
+  all->increaseLoadStoreInstr((int) isInstProtected);
   itcores = cores.find(curCpu);
   if ( itcores == cores.end())
     cores[curCpu] = new cpuExecutedTicks(curCpu);
   else
-    cores[curCpu]->increaseLoadStoreInstr();
+    cores[curCpu]->increaseLoadStoreInstr((int) isInstProtected);
   return 1;
 }
 
@@ -149,16 +149,24 @@ int ThreadEnabledFault:: increaseLoadStoreInstr(std:: string curCpu)
 
 void ThreadEnabledFault:: CalculateFetchedTime(std::string curCpu , uint64_t *fetched_instr , uint64_t *fetched_time )
 {
+  uint64_t *vals;
+  int i;
   assert( all != NULL);
   if(curCpu.compare("all")==0){
     *fetched_time  =  all->getTicks();
-    *fetched_instr =  all->getInstrFetched();
+    vals =  all->getInstrFetched(); 
+    *fetched_instr = 0;
+    for ( i = 0 ; i < CATEGORIES; i++)
+      *(fetched_instr)+=vals[i];
   }
   else{
     itcores = cores.find(curCpu);
     if(itcores != cores.end()){
       *fetched_time = itcores->second->getTicks();
-      *fetched_instr = itcores->second->getInstrFetched();
+      vals  = itcores->second->getInstrFetched();
+      *fetched_instr = 0;
+      for ( i = 0 ; i < CATEGORIES; i++)
+        (*fetched_instr)+=vals[i];
     }
     return;
   }
@@ -166,16 +174,26 @@ void ThreadEnabledFault:: CalculateFetchedTime(std::string curCpu , uint64_t *fe
 
 void ThreadEnabledFault:: CalculateDecodedTime(std::string curCpu , uint64_t *fetched_instr , uint64_t *fetched_time )
 {
+  uint64_t *vals;
+  int i;
   assert( all != NULL);
   if(curCpu.compare("all")==0){
     *fetched_time  =  all->getTicks();
-    *fetched_instr =  all->getInstrDecoded();
+    vals =  all->getInstrDecoded(); 
+    *fetched_instr = 0;
+    for ( i = 0 ; i < CATEGORIES; i++)
+      (*fetched_instr)+=vals[i];
+
   }
   else{
     itcores = cores.find(curCpu);
     if(itcores != cores.end()){
       *fetched_time = itcores->second->getTicks();
-      *fetched_instr = itcores->second->getInstrDecoded();
+      vals= itcores->second->getInstrDecoded(); 
+    *fetched_instr = 0;
+    for ( i = 0 ; i < CATEGORIES; i++)
+      (*fetched_instr)+=vals[i];
+
     }
     return;
   }
@@ -184,16 +202,26 @@ void ThreadEnabledFault:: CalculateDecodedTime(std::string curCpu , uint64_t *fe
 
 void ThreadEnabledFault:: CalculateExecutedTime(std::string curCpu  , uint64_t *exec_instr , uint64_t *exec_time)
 {
+  uint64_t *vals;
+  int i;
   assert( all != NULL);
   if(curCpu.compare("all")==0){
     *exec_time  =  all->getTicks();
-    *exec_instr =  all->getInstrExecuted();
+    vals =  all->getInstrExecuted(); 
+    *exec_instr = 0;
+    for ( i = 0 ; i < CATEGORIES; i++)
+      (*exec_instr)+=vals[i];
+
   }
   else{
     itcores = cores.find(curCpu);
     if(itcores != cores.end()){
       *exec_time = itcores->second->getTicks();
-      *exec_instr = itcores->second->getInstrExecuted();
+      vals = itcores->second->getInstrExecuted(); 
+    *exec_instr = 0;
+    for ( i = 0 ; i < CATEGORIES; i++)
+      (*exec_instr) +=vals[i];
+
     }
   }
   return;
@@ -203,16 +231,24 @@ void ThreadEnabledFault:: CalculateExecutedTime(std::string curCpu  , uint64_t *
 
 void ThreadEnabledFault:: CalculateLoadStoreTime(std::string curCpu  , uint64_t *exec_instr , uint64_t *exec_time)
 {
+  uint64_t *vals;
+  int i;
   assert( all != NULL);
   if(curCpu.compare("all")==0){
     *exec_time  =  all->getTicks();
-    *exec_instr =  all->getInstrLoadStore();
+    vals =  all->getInstrLoadStore();
+    (*exec_instr) = 0;
+    for ( i = 0 ; i < CATEGORIES; i++)
+      (*exec_instr)+=vals[i];
   }
   else{
     itcores = cores.find(curCpu);
     if(itcores != cores.end()){
       *exec_time = itcores->second->getTicks();
-      *exec_instr = itcores->second->getInstrLoadStore();
+      vals = itcores->second->getInstrLoadStore(); 
+      (*exec_instr) = 0;
+    for ( i = 0 ; i < CATEGORIES; i++)
+      (*exec_instr)+=vals[i];
     }
   }
   return;
@@ -226,10 +262,15 @@ void ThreadEnabledFault:: print_time(){
     std::cout<<"THREAD ID: "<<getThreadId()<<"\n";
     for(itcores = cores.begin(); itcores!=cores.end() ; ++itcores){
       std::cout<<"CORE:"<<itcores->second->getName()<<"\n";
-      std::cout<<"Fetched Instr: "<< itcores->second->getInstrFetched() <<"\n";
-      std::cout<<"Decoded Instr: "<< itcores->second->getInstrDecoded() <<"\n";
-      std::cout<<"Executed Instr: "<< itcores->second->getInstrExecuted() <<"\n";
-      std::cout<<"LoadStore Instr: "<< itcores->second->getInstrLoadStore() <<"\n";
+      std::cout<<"Pipeline Stage\t NonProtected\t Protected\t NOP \t Other object file\n";
+      std::cout<<"Fetch \t "<< itcores->second->getInstrFetched(0) <<"\t "<< itcores->second->getInstrFetched(1) <<"\t "<< itcores->second->getInstrFetched(2)<<"\t "<< itcores->second->getInstrFetched(3)<< "\n";
+      std::cout<<"Decode \t "<< itcores->second->getInstrDecoded(0) <<"\t "<< itcores->second->getInstrDecoded(1) <<"\t "<< itcores->second->getInstrDecoded(2)<<"\t "<< itcores->second->getInstrDecoded(3)<< "\n";
+      std::cout<<"IEW \t "<< itcores->second->getInstrExecuted(0) <<"\t "<< itcores->second->getInstrExecuted(1) <<"\t "<< itcores->second->getInstrExecuted(2)<<"\t "<< itcores->second->getInstrExecuted(3)<< "\n";
+      std::cout<<"MEM \t "<< itcores->second->getInstrLoadStore(0) <<"\t "<< itcores->second->getInstrLoadStore(1) <<"\t "<< itcores->second->getInstrLoadStore(2)<<"\t "<< itcores->second->getInstrLoadStore(3)<< "\n";
+
+      //     std::cout<<"Decoded Instr: NonProtected: "<< itcores->second->getInstrDecoded(0) <<" Protected: "<< itcores->second->getInstrDecoded(1) <<"\n";
+      //     std::cout<<"Executed Instr: NonProtected: "<< itcores->second->getInstrExecuted(0) <<" Protected: "<< itcores->second->getInstrExecuted(1) <<"\n";
+      //     std::cout<<"LoadStore Instr: NonProtected: "<< itcores->second->getInstrLoadStore(0) <<" Protected: "<< itcores->second->getInstrLoadStore(1) <<"\n";
       std::cout<<"Ticks : "<< itcores->second->getTicks() <<"\n";
     }
 
