@@ -22,7 +22,7 @@ if [ $start_new -eq "1" ] ; then
   cp -r /srv/homes/koparasy/test.rcS ../configs/boot/test.rcS
   echo "Starting new"
   rm -r /home/dinos/results/*
-  cp -r "/srv/homes/koparasy/x86" "$workstation"
+#  cp -r "/srv/homes/koparasy/x86" "$workstation"
   rm -r core*
   for (( i = 0 ; i < $num_cores; i++))
   do
