@@ -34,11 +34,11 @@ RegisterDecodingInjectedFault::inject(RegType type, int op, ThreadContext *tc){
   int baseFloatIndex = fi_IntRegs;
   int baseCCIndex = fi_IntRegs + fi_FloatRegs;
   int totalRegs = fi_IntRegs + fi_FloatRegs + fi_CCRegs;
-  int checkpoint = dmtcp_checkpoint(); 
-  if ( checkpoint == 1){
-    fi_system->rename_ckpt("decode_ckpt.dmtcp");
+//  int checkpoint = dmtcp_checkpoint(); 
+//  if ( checkpoint == 1){
+//   fi_system->rename_ckpt("decode_ckpt.dmtcp");
     tc->getEnabledFIThread()->setfaulty(1);
-    int random =135172574; //rand();
+    int random =rand();
     DPRINTF(FaultInjection,"Random Value is %d\n",random);
     fi_system->scheduleswitch(tc);
     switch (type){
@@ -55,11 +55,6 @@ RegisterDecodingInjectedFault::inject(RegType type, int op, ThreadContext *tc){
         return ( random  % (totalRegs - baseCCIndex) +baseCCIndex);
         break;
     }
-  }
-  else{
-    fi_system->reset();
-    return op;
-  }
   return op;
 }
 

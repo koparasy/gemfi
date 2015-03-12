@@ -349,24 +349,24 @@ class Fi_System : public MemObject
       GeneralFetchInjectedFault *fetchfault = NULL;
       std::string _name = tc->getCpuPtr()->name();
       if(thread->getMode() != START)
-          return cur_instr;
+        return cur_instr;
       if(FullSystem && TheISA::inUserMode(tc)){	
-          thread->increaseFetchedInstr(_name);
-        }
+        thread->increaseFetchedInstr(_name);
+      }
       else
-          return cur_instr;	
+        return cur_instr;	
 
 
       instr = (char*) (&cur_instr) ; // Getting address of next byte of the current fetched cache block
       //THIS IS AGLY I SHOULD FIX IT 
       for ( i = 0 ; i < sizeof(TheISA::MachInst) ; i++){
         pcAddr +=i; // Checking Whether next cache line is protected or not.
-        
+
         //   DPRINTF(FaultInjection,"FETCH\n");
         int sigInstr = getSignificance(pcAddr);
         thread->setInstMode(sigInstr);
 
-             allthreads->setInstMode(sigInstr);
+        allthreads->setInstMode(sigInstr);
         allthreads->increaseFetchedInstr(_name);
         while ((fetchfault = reinterpret_cast<GeneralFetchInjectedFault *>(fetchStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
           int succeed = dmtcp_checkpoint();
@@ -454,31 +454,22 @@ class Fi_System : public MemObject
       allthreads->increaseDecodedInstr(_name);
       while ((decodefault = reinterpret_cast<RegisterDecodingInjectedFault *>(decodeStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
         DPRINTF(FaultInjection,"Decode:PCAddr:%llx Fault Inserted in thread %d at instruction %s \n",pcAddr,thread->getThreadId(),instr->getName());
-
-        bool val = decodefault->process(instr);
-        if ( val ){
-          if ((sigInstr == NONPROTECTED || sigInstr == NOPINST) )  {
-            DPRINTF(FaultInjection, "INJECTING IN NON-PROTECTED INSTRUCTION\n");
+        int succeed = dmtcp_checkpoint();
+        if ( succeed == 1){
+          bool val = decodefault->process(instr);
+          if ( val ){
+            if ((sigInstr == NONPROTECTED || sigInstr == NOPINST) )  {
+              DPRINTF(FaultInjection, "INJECTING IN NON-PROTECTED INSTRUCTION\n");
+            }
+            else{
+              DPRINTF(FaultInjection, "INJECTING IN PROTECTED INSTRUCTION\n");
+            }
+            return decodefault;
           }
-          else{
-            DPRINTF(FaultInjection, "INJECTING IN PROTECTED INSTRUCTION\n");
-          }
-          return decodefault;
         }
-        /*
-           int succeed = dmtcp_checkpoint();
-           if ( succeed == 1){
-           rename_ckpt("decode_ckpt.dmtcp");
-           cur_instr = decodefault->process(cur_instr);
-           decodefault->setManifested(true);
-           thread->setfaulty(1);
-           cur_instr->setFaultInjected(true);
-           DPRINTF(FaultInjection,"Decode:PCAddr:%llx Fault Inserted in thread %d at instruction %s \n",pcAddr,thread->getThreadId(),cur_instr->getName());
-           scheduleswitch(tc);
-           }
-           else
-           reset();
-           */
+        else{
+          fi_system->reset();
+        }
       }	  
 
 
