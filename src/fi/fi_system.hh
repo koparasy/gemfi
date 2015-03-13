@@ -356,7 +356,8 @@ class Fi_System : public MemObject
       else
         return cur_instr;	
 
-
+      
+      allthreads->increaseFetchedInstr(_name);
       instr = (char*) (&cur_instr) ; // Getting address of next byte of the current fetched cache block
       //THIS IS AGLY I SHOULD FIX IT 
       for ( i = 0 ; i < sizeof(TheISA::MachInst) ; i++){
@@ -365,9 +366,8 @@ class Fi_System : public MemObject
         //   DPRINTF(FaultInjection,"FETCH\n");
         int sigInstr = getSignificance(pcAddr);
         thread->setInstMode(sigInstr);
-
         allthreads->setInstMode(sigInstr);
-        allthreads->increaseFetchedInstr(_name);
+        
         while ((fetchfault = reinterpret_cast<GeneralFetchInjectedFault *>(fetchStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
           int succeed = dmtcp_checkpoint();
           if ( succeed == 1){
