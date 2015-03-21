@@ -1109,7 +1109,7 @@ DefaultFetch<Impl>::buildInst(ThreadID tid, StaticInstPtr staticInst,
 
 
   if (staticInst->getFaultInjected()){
-   staticInst->correctInst();
+//   staticInst->correctInst();
    staticInst->setFaultInjected(false);
    DPRINTF(FaultInjection,"Removing Instruction One more time\n");
   }

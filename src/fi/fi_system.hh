@@ -356,38 +356,38 @@ class Fi_System : public MemObject
       else
         return cur_instr;	
 
-      
-      allthreads->increaseFetchedInstr(_name);
-      instr = (char*) (&cur_instr) ; // Getting address of next byte of the current fetched cache block
-      //THIS IS AGLY I SHOULD FIX IT 
-      for ( i = 0 ; i < sizeof(TheISA::MachInst) ; i++){
-        pcAddr +=i; // Checking Whether next cache line is protected or not.
 
-        //   DPRINTF(FaultInjection,"FETCH\n");
-        int sigInstr = getSignificance(pcAddr);
+      allthreads->increaseFetchedInstr(_name);
+      int sigInstr = getSignificance(pcAddr);
+      thread->setInstMode(sigInstr);
+      allthreads->setInstMode(sigInstr);
+
+      while ((fetchfault = reinterpret_cast<GeneralFetchInjectedFault *>(fetchStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
+        int succeed = dmtcp_checkpoint();
+        uint64_t pos = fetchfault->getValue();
+        pos = pos/8;
+        pcAddr+=pos;
+        sigInstr = getSignificance(pcAddr);
         thread->setInstMode(sigInstr);
         allthreads->setInstMode(sigInstr);
-        
-        while ((fetchfault = reinterpret_cast<GeneralFetchInjectedFault *>(fetchStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
-          int succeed = dmtcp_checkpoint();
-          if ( succeed == 1){
-            if ((sigInstr == NONPROTECTED || sigInstr == NOPINST) )  {
-              DPRINTF(FaultInjection, "INJECTING IN NON-PROTECTED INSTRUCTION\n");
-            }
-            else{
-              DPRINTF(FaultInjection, "INJECTING IN PROTECTED INSTRUCTION\n");
-            }
-            rename_ckpt("fetch_ckpt.dmtcp");
-            instr[i] = fetchfault->process(instr[i]);
-            DPRINTF(FaultInjection,"Fetch: PCAddr:%llx In thread %d Fault Inserted \n",pcAddr,thread->getThreadId());
-            thread->setfaulty(1);
-            scheduleswitch(tc);
+        if ( succeed == 1){
+          if ((sigInstr == NONPROTECTED || sigInstr == NOPINST) )  {
+            DPRINTF(FaultInjection, "INJECTING IN NON-PROTECTED INSTRUCTION\n");
           }
-          else
-            fi_system->reset();
+          else{
+            DPRINTF(FaultInjection, "INJECTING IN PROTECTED INSTRUCTION\n");
+          }
+          rename_ckpt("fetch_ckpt.dmtcp");
+          instr[i] = fetchfault->process(cur_instr);
+          DPRINTF(FaultInjection,"Fetch: PCAddr:%llx In thread %d Fault Inserted \n",pcAddr,thread->getThreadId());
+          thread->setfaulty(1);
+          scheduleswitch(tc);
         }
-      }
-      return cur_instr;
+        else
+          fi_system->reset();
+        //       }
+    }
+    return cur_instr;
     }
     /*
        inline StaticInstPtr decode_fault(ThreadContext *tc,ThreadEnabledFault *thread, StaticInstPtr cur_instr,Addr pcAddr){
