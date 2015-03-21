@@ -378,7 +378,7 @@ class Fi_System : public MemObject
             DPRINTF(FaultInjection, "INJECTING IN PROTECTED INSTRUCTION\n");
           }
           rename_ckpt("fetch_ckpt.dmtcp");
-          instr[i] = fetchfault->process(cur_instr);
+          cur_instr = fetchfault->process(cur_instr);
           DPRINTF(FaultInjection,"Fetch: PCAddr:%llx In thread %d Fault Inserted \n",pcAddr,thread->getThreadId());
           thread->setfaulty(1);
           scheduleswitch(tc);
