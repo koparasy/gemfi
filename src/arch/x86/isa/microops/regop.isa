@@ -52,7 +52,7 @@ def template MicroRegOpExecute {{
             %(op_rd)s;
 
             IntReg result M5_VAR_USED;
-	    IntReg fi_temp M5_VAR_USED;
+	          IntReg fi_temp M5_VAR_USED;
             if(%(cond_check)s)
             {
                 %(code)s;

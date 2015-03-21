@@ -109,7 +109,6 @@ namespace X86ISA
     //ALTERCODE
     typedef Addr Fi_PCB;
     
-//     bool operator < (const Fi_PCB &a, const Fi_PCB &b);
     Fi_PCB getFiThread(ThreadContext *tc);
     //~ALTERCODE
 }

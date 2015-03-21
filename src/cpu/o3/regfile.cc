@@ -33,7 +33,7 @@
 
 #include "cpu/o3/free_list.hh"
 #include "cpu/o3/regfile.hh"
-
+#include "fi/fi_system.hh"
 
 PhysRegFile::PhysRegFile(unsigned _numPhysicalIntRegs,
                          unsigned _numPhysicalFloatRegs,
@@ -53,6 +53,9 @@ PhysRegFile::PhysRegFile(unsigned _numPhysicalIntRegs,
         warn("Non-zero number of physical CC regs specified, even though\n"
              "    ISA does not use them.\n");
     }
+    fi_IntRegs = _numPhysicalIntRegs;
+    fi_FloatRegs = _numPhysicalFloatRegs;
+    fi_CCRegs = _numPhysicalCCRegs;
 }
 
 

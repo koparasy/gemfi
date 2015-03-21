@@ -74,8 +74,8 @@
 
 //~ALTERCODE
 #include "fi/cpu_threadInfo.hh"
-#include "fi/fi_system.hh"
 #include "base/statistics.hh"
+#include "fi/fi_system.hh"
 //~ALTERCODE
 
 
@@ -1096,6 +1096,9 @@ DefaultFetch<Impl>::buildInst(ThreadID tid, StaticInstPtr staticInst,
 		StaticInstPtr curMacroop, TheISA::PCState thisPC,
 		TheISA::PCState nextPC, bool trace)
 {
+  if (staticInst->getFaultInjected())
+    DPRINTF(FaultInjection,"Creating Faulty Instruction One more time\n");
+
 	// Get a sequence number.
 	InstSeqNum seq = cpu->getAndIncrementInstSeq();
 
@@ -1103,6 +1106,13 @@ DefaultFetch<Impl>::buildInst(ThreadID tid, StaticInstPtr staticInst,
 	DynInstPtr instruction =
 		new DynInst(staticInst, curMacroop, thisPC, nextPC, seq, cpu);
 	instruction->setTid(tid);
+
+
+  if (staticInst->getFaultInjected()){
+//   staticInst->correctInst();
+   staticInst->setFaultInjected(false);
+   DPRINTF(FaultInjection,"Removing Instruction One more time\n");
+  }
 
 	instruction->setASID(tid);
 
@@ -1273,7 +1283,7 @@ DefaultFetch<Impl>::fetch(bool &status_change)
 		// in the decoder.
 
 		//ALTERCODE
-		if(fi_system->fi_main)
+		if(enabled_fi)
 			fi_system->main_fault(curr_tc,curr_thread,thisPC.instAddr());
 		//~ALTERCODE
 
@@ -1308,7 +1318,7 @@ DefaultFetch<Impl>::fetch(bool &status_change)
 
 			MachInst inst = TheISA::gtoh(cacheInsts[blkOffset]);
 			if( enabled_fi)
-				inst = fi_system->fetch_fault(curr_tc,curr_thread,inst,thisPC.instAddr());
+				inst = fi_system->fetch_fault(curr_tc,curr_thread,inst,fetchAddr);
 
 			decoder[tid]->moreBytes(thisPC, fetchAddr, inst);
 
@@ -1356,15 +1366,23 @@ DefaultFetch<Impl>::fetch(bool &status_change)
 
 			//ALTERCODE
 			//inject fault on decoded instruction
-			if(enabled_fi)
-				staticInst = fi_system -> decode_fault(curr_tc,curr_thread,staticInst,thisPC.instAddr());
-			//~ALTERCODE
+						//~ALTERCODE
+      if ( staticInst->getFaultInjected())
+          decoder[tid]->erase(staticInst);
 
 			DynInstPtr instruction =
 				buildInst(tid, staticInst, curMacroop,
 						thisPC, nextPC, true);
 			ppFetch->notify(instruction);
 			numInst++;
+            RegisterDecodingInjectedFault *fi_fault;
+            if(enabled_fi){
+      				fi_fault = fi_system -> decode_fault(curr_tc,curr_thread,staticInst,thisPC.instAddr());
+              instruction->setRegDecFault(fi_fault);
+            }
+            else
+              instruction->setRegDecFault(NULL);
+
 
 #if TRACING_ON
 			if (DTRACE(O3PipeView)) {

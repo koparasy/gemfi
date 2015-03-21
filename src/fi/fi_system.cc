@@ -39,7 +39,9 @@
 
 using namespace std;
 
-
+unsigned fi_IntRegs;
+unsigned fi_FloatRegs;
+unsigned fi_CCRegs;
 
 Fi_System *fi_system;
 
@@ -616,7 +618,7 @@ Fi_System::scheduleswitch(ThreadContext *tc){
     if(getswitchcpu()){
         Fi_SystemEvent *switching = new Fi_SystemEvent(tc);
         switching->setticks(curTick());
-	Tick when = curTick() + 1000 * SimClock::Int::ns;
+	Tick when = curTick() + 10000 * SimClock::Int::ns;
         mainEventQueue[0]->schedule(switching,when,true);
         DPRINTF(FaultInjection,"EVENT IS scheduled for %i\n",when);
         setswitchcpu(false);

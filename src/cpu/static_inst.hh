@@ -46,6 +46,12 @@
 #include "cpu/thread_context.hh"
 #include "sim/fault_fwd.hh"
 
+
+//~ALTERCODE
+#include "debug/FaultInjection.hh"
+//#include "fi/regdec_injfault.hh"
+//ALTERCODE
+
 // forward declarations
 class Packet;
 
@@ -59,7 +65,7 @@ class AtomicSimpleCPU;
 class TimingSimpleCPU;
 class InorderCPU;
 class SymbolTable;
-
+class RegisterDecodingInjectedFault;
 namespace Trace {
     class InstRecord;
 }
@@ -168,6 +174,11 @@ class StaticInst : public RefCounted
         IsSquashAfter, ///< Squash all uncommitted state after executed
         NumFlags
     };
+    //ALTERCODE
+    RegisterDecodingInjectedFault *decFault;
+    //~ALTERCODE
+    
+    
 
   protected:
 
@@ -189,11 +200,28 @@ class StaticInst : public RefCounted
     int8_t _numFPDestRegs;
     int8_t _numIntDestRegs;
     int8_t _numCCDestRegs;
+
+    int _correct_reg;
+    int _index;
+    int _srcOrDest;
     //@}
 
     bool FaultInjected;
   public:
 
+    //ALTERCODE
+    void setRegDecFault( RegisterDecodingInjectedFault *fault){
+        decFault=fault;
+    }
+
+    RegisterDecodingInjectedFault *getRegDecFault(){
+        return decFault;
+    }
+
+    RegisterDecodingInjectedFault *getRegDecFault() const{
+        return decFault;
+    }
+    //~ALTERCODE
     /// @name Register information.
     /// The sum of numFPDestRegs() and numIntDestRegs() equals
     /// numDestRegs().  The former two functions are used to track
@@ -346,7 +374,7 @@ class StaticInst : public RefCounted
 
   public:
     virtual ~StaticInst();
-
+    const ExtMachInst getMachInst(){ return machInst;}
     bool getFaultInjected(){return FaultInjected;}
     void setFaultInjected(bool val){FaultInjected=val;}
 /**

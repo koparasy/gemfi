@@ -550,7 +550,7 @@ namespace PseudoInst {
         //    DPRINTF(PseudoInst, "PseudoInst::writefile(0x%x, 0x%x, 0x%x, 0x%x)\n",
          //           vaddr, len, offset, filename_addr);
             ostream *os;
-            const unsigned char val = (unsigned char ) value;
+            const unsigned char *val = (unsigned char *) &value;
             char fn[100]="ApplicationOutput";
             std::string filename;
 
@@ -572,7 +572,7 @@ namespace PseudoInst {
             os->seekp(offset);
 
             // copy out data and write to file
-            os->write(&val, len);
+            os->write(val, len);
             if (os->fail() || os->bad())
                 panic("Error while doing writefile!\n");
 
@@ -747,11 +747,12 @@ namespace PseudoInst {
     void init_fi_system(ThreadContext *tc,uint64_t start, uint64_t stop)
     {
 
- //       Addr pStart =  vtophys(tc,start);
- //       Addr pStop = vtophys(tc,stop);
+//        Addr pStart =  vtophys(tc,start);
+//        Addr pStop = vtophys(tc,stop);
 
-   //     DPRINTF(FaultInjection,"Cur PC address %llx (%llx,%llx) to physical (%llx, %llx)\n",tc->pcState().instAddr(),start,stop, pStart, pStop);
-        fi_system->setStartingPCAddr(0);
+        DPRINTF(FaultInjection,"Cur PC address %llx (%llx,%llx) to physical (%llx,%llx)\n",tc->pcState().instAddr(),start,stop);
+        fi_system->setStartingPCAddr(start);
+        fi_system->setStopPCAddr(stop);
 
 
         if(!FullSystem)
@@ -771,6 +772,7 @@ namespace PseudoInst {
                 std::cout<<"Succesfuuly restored just before Initializing fault Injection \n";        }
         }
         fi_system->reset();
+        fi_system->open_meta_file();
 
 
     }

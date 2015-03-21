@@ -242,7 +242,7 @@ def template LoadCompleteAcc {{
         %(op_decl)s;
 
         getMem(pkt, Mem, traceData);
-	if(fi_system->fi_loadstore) Mem = fi_system->lds_fault(xc,xc->tcBase(),Mem);
+	if(fi_system->fi_loadstore) Mem = fi_system->lds_fault(xc,xc->tcBase(),Mem,sizeof(Mem));
         if (fault == NoFault) {
             %(memacc_code)s;
         }
@@ -273,7 +273,7 @@ def template StoreExecute {{
         }
 
         if (fault == NoFault) {
-	  if(fi_system->fi_loadstore) Mem = fi_system->lds_fault(xc,xc->tcBase(),Mem);
+	  if(fi_system->fi_loadstore) Mem = fi_system->lds_fault(xc,xc->tcBase(),Mem,sizeof(Mem));
             fault = writeMemAtomic(xc, traceData, Mem, EA,
                     memAccessFlags, NULL);
         }
@@ -308,7 +308,7 @@ def template StoreCondExecute {{
         }
 
         if (fault == NoFault) {
-	  if(fi_system->fi_loadstore) Mem = fi_system->lds_fault(xc,xc->tcBase(),Mem);
+	  if(fi_system->fi_loadstore) Mem = fi_system->lds_fault(xc,xc->tcBase(),Mem,sizeof(Mem));
             fault = writeMemAtomic(xc, traceData, Mem, EA,
                     memAccessFlags, &write_result);
         }
@@ -342,7 +342,7 @@ def template StoreInitiateAcc {{
         }
 
         if (fault == NoFault) {
-	  if(fi_system->fi_loadstore) Mem = fi_system->lds_fault(xc,xc->tcBase(),Mem);
+	  if(fi_system->fi_loadstore) Mem = fi_system->lds_fault(xc,xc->tcBase(),Mem,sizeof(Mem));
             fault = writeMemTiming(xc, traceData, Mem, EA,
                     memAccessFlags, NULL);
         }

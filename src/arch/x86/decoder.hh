@@ -224,7 +224,9 @@ namespace X86ISA
             decodePages = NULL;
             instMap = NULL;
         }
-
+        void erase(StaticInstPtr inst){
+         instMap->erase(inst->getMachInst()); 
+        }
             void setM5Reg(HandyM5Reg m5Reg)
             {
                 mode = (X86Mode)(uint64_t)m5Reg.mode;
@@ -274,7 +276,7 @@ namespace X86ISA
 
             void process();
 //ALTERCODE
-	    void process(ThreadContext *tc, ThreadEnabledFault *thread);
+//	    void process(ThreadContext *tc, ThreadEnabledFault *thread);
 //ALTERCODE
             //Use this to give data to the decoder. This should be used
             //when there is control flow.
@@ -289,6 +291,7 @@ namespace X86ISA
             }
 
 //ALTERCODE
+/*
 	void moreBytes(const PCState &pc, Addr fetchPC, MachInst data, ThreadContext *tc, ThreadEnabledFault *thread)
         {
                 DPRINTF(Decoder, "Getting more bytes.\n");
@@ -298,6 +301,7 @@ namespace X86ISA
                 outOfBytes = false;
                 process(tc,thread);
         }
+        */
 //ALTERCODE
 
             bool needMoreBytes()

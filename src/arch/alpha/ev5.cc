@@ -44,126 +44,126 @@
 
 namespace AlphaISA {
 
-////////////////////////////////////////////////////////////////////////
-//
-//  Machine dependent functions
-//
-void
-initCPU(ThreadContext *tc, int cpuId)
-{
-    initIPRs(tc, cpuId);
+  ////////////////////////////////////////////////////////////////////////
+  //
+  //  Machine dependent functions
+  //
+  void
+    initCPU(ThreadContext *tc, int cpuId)
+    {
+      initIPRs(tc, cpuId);
 
-    tc->setIntReg(16, cpuId);
-    tc->setIntReg(0, cpuId);
+      tc->setIntReg(16, cpuId);
+      tc->setIntReg(0, cpuId);
 
-    AlphaFault *reset = new ResetFault;
+      AlphaFault *reset = new ResetFault;
 
-    tc->pcState(tc->readMiscRegNoEffect(IPR_PAL_BASE) + reset->vect());
+      tc->pcState(tc->readMiscRegNoEffect(IPR_PAL_BASE) + reset->vect());
 
-    delete reset;
-}
-
-template <class CPU>
-void
-zeroRegisters(CPU *cpu)
-{
-    // Insure ISA semantics
-    // (no longer very clean due to the change in setIntReg() in the
-    // cpu model.  Consider changing later.)
-    cpu->thread->setIntReg(ZeroReg, 0);
-    cpu->thread->setFloatReg(ZeroReg, 0.0);
-}
-
-////////////////////////////////////////////////////////////////////////
-//
-//
-//
-void
-initIPRs(ThreadContext *tc, int cpuId)
-{
-    for (int i = 0; i < NumInternalProcRegs; ++i) {
-        tc->setMiscRegNoEffect(i, 0);
+      delete reset;
     }
 
-    tc->setMiscRegNoEffect(IPR_PAL_BASE, PalBase);
-    tc->setMiscRegNoEffect(IPR_MCSR, 0x6);
-    tc->setMiscRegNoEffect(IPR_PALtemp16, cpuId);
-}
+  template <class CPU>
+    void
+    zeroRegisters(CPU *cpu)
+    {
+      // Insure ISA semantics
+      // (no longer very clean due to the change in setIntReg() in the
+      // cpu model.  Consider changing later.)
+      cpu->thread->setIntReg(ZeroReg, 0);
+      cpu->thread->setFloatReg(ZeroReg, 0.0);
+    }
 
-MiscReg
-ISA::readIpr(int idx, ThreadContext *tc)
-{
-    uint64_t retval = 0;        // return value, default 0
+  ////////////////////////////////////////////////////////////////////////
+  //
+  //
+  //
+  void
+    initIPRs(ThreadContext *tc, int cpuId)
+    {
+      for (int i = 0; i < NumInternalProcRegs; ++i) {
+        tc->setMiscRegNoEffect(i, 0);
+      }
 
-    switch (idx) {
-      case IPR_PALtemp0:
-      case IPR_PALtemp1:
-      case IPR_PALtemp2:
-      case IPR_PALtemp3:
-      case IPR_PALtemp4:
-      case IPR_PALtemp5:
-      case IPR_PALtemp6:
-      case IPR_PALtemp7:
-      case IPR_PALtemp8:
-      case IPR_PALtemp9:
-      case IPR_PALtemp10:
-      case IPR_PALtemp11:
-      case IPR_PALtemp12:
-      case IPR_PALtemp13:
-      case IPR_PALtemp14:
-      case IPR_PALtemp15:
-      case IPR_PALtemp16:
-      case IPR_PALtemp17:
-      case IPR_PALtemp18:
-      case IPR_PALtemp19:
-      case IPR_PALtemp20:
-      case IPR_PALtemp21:
-      case IPR_PALtemp22:
-      case IPR_PALtemp23:
-      case IPR_PAL_BASE:
+      tc->setMiscRegNoEffect(IPR_PAL_BASE, PalBase);
+      tc->setMiscRegNoEffect(IPR_MCSR, 0x6);
+      tc->setMiscRegNoEffect(IPR_PALtemp16, cpuId);
+    }
 
-      case IPR_IVPTBR:
-      case IPR_DC_MODE:
-      case IPR_MAF_MODE:
-      case IPR_ISR:
-      case IPR_EXC_ADDR:
-      case IPR_IC_PERR_STAT:
-      case IPR_DC_PERR_STAT:
-      case IPR_MCSR:
-      case IPR_ASTRR:
-      case IPR_ASTER:
-      case IPR_SIRR:
-      case IPR_ICSR:
-      case IPR_ICM:
-      case IPR_DTB_CM:
-      case IPR_IPLR:
-      case IPR_INTID:
-      case IPR_PMCTR:
-        // no side-effect
-        retval = ipr[idx];
-        break;
+  MiscReg
+    ISA::readIpr(int idx, ThreadContext *tc)
+    {
+      uint64_t retval = 0;        // return value, default 0
 
-      case IPR_CC:
-        retval |= ipr[idx] & ULL(0xffffffff00000000);
-        retval |= tc->getCpuPtr()->curCycle()  & ULL(0x00000000ffffffff);
-        break;
+      switch (idx) {
+        case IPR_PALtemp0:
+        case IPR_PALtemp1:
+        case IPR_PALtemp2:
+        case IPR_PALtemp3:
+        case IPR_PALtemp4:
+        case IPR_PALtemp5:
+        case IPR_PALtemp6:
+        case IPR_PALtemp7:
+        case IPR_PALtemp8:
+        case IPR_PALtemp9:
+        case IPR_PALtemp10:
+        case IPR_PALtemp11:
+        case IPR_PALtemp12:
+        case IPR_PALtemp13:
+        case IPR_PALtemp14:
+        case IPR_PALtemp15:
+        case IPR_PALtemp16:
+        case IPR_PALtemp17:
+        case IPR_PALtemp18:
+        case IPR_PALtemp19:
+        case IPR_PALtemp20:
+        case IPR_PALtemp21:
+        case IPR_PALtemp22:
+        case IPR_PALtemp23:
+        case IPR_PAL_BASE:
 
-      case IPR_VA:
-        retval = ipr[idx];
-        break;
+        case IPR_IVPTBR:
+        case IPR_DC_MODE:
+        case IPR_MAF_MODE:
+        case IPR_ISR:
+        case IPR_EXC_ADDR:
+        case IPR_IC_PERR_STAT:
+        case IPR_DC_PERR_STAT:
+        case IPR_MCSR:
+        case IPR_ASTRR:
+        case IPR_ASTER:
+        case IPR_SIRR:
+        case IPR_ICSR:
+        case IPR_ICM:
+        case IPR_DTB_CM:
+        case IPR_IPLR:
+        case IPR_INTID:
+        case IPR_PMCTR:
+          // no side-effect
+          retval = ipr[idx];
+          break;
 
-      case IPR_VA_FORM:
-      case IPR_MM_STAT:
-      case IPR_IFAULT_VA_FORM:
-      case IPR_EXC_MASK:
-      case IPR_EXC_SUM:
-        retval = ipr[idx];
-        break;
+        case IPR_CC:
+          retval |= ipr[idx] & ULL(0xffffffff00000000);
+          retval |= tc->getCpuPtr()->curCycle()  & ULL(0x00000000ffffffff);
+          break;
 
-      case IPR_DTB_PTE:
-        {
+        case IPR_VA:
+          retval = ipr[idx];
+          break;
+
+        case IPR_VA_FORM:
+        case IPR_MM_STAT:
+        case IPR_IFAULT_VA_FORM:
+        case IPR_EXC_MASK:
+        case IPR_EXC_SUM:
+          retval = ipr[idx];
+          break;
+
+        case IPR_DTB_PTE:
+          {
             TlbEntry &entry
-                = tc->getDTBPtr()->index(!tc->misspeculating());
+              = tc->getDTBPtr()->index(!tc->misspeculating());
 
             retval |= ((uint64_t)entry.ppn & ULL(0x7ffffff)) << 32;
             retval |= ((uint64_t)entry.xre & ULL(0xf)) << 8;
@@ -172,361 +172,367 @@ ISA::readIpr(int idx, ThreadContext *tc)
             retval |= ((uint64_t)entry.fonw & ULL(0x1))<< 2;
             retval |= ((uint64_t)entry.asma & ULL(0x1)) << 4;
             retval |= ((uint64_t)entry.asn & ULL(0x7f)) << 57;
-        }
-        break;
+          }
+          break;
 
-        // write only registers
-      case IPR_HWINT_CLR:
-      case IPR_SL_XMIT:
-      case IPR_DC_FLUSH:
-      case IPR_IC_FLUSH:
-      case IPR_ALT_MODE:
-      case IPR_DTB_IA:
-      case IPR_DTB_IAP:
-      case IPR_ITB_IA:
-      case IPR_ITB_IAP:
-        panic("Tried to read write only register %d\n", idx);
-        break;
+          // write only registers
+        case IPR_HWINT_CLR:
+        case IPR_SL_XMIT:
+        case IPR_DC_FLUSH:
+        case IPR_IC_FLUSH:
+        case IPR_ALT_MODE:
+        case IPR_DTB_IA:
+        case IPR_DTB_IAP:
+        case IPR_ITB_IA:
+        case IPR_ITB_IAP:
+          panic("Tried to read write only register %d\n", idx);
+          break;
 
-      default:
-        // invalid IPR
-        panic("Tried to read from invalid ipr %d\n", idx);
-        break;
+        default:
+          // invalid IPR
+          panic("Tried to read from invalid ipr %d\n", idx);
+          break;
+      }
+
+      return retval;
     }
 
-    return retval;
-}
+  // Cause the simulator to break when changing to the following IPL
+  int break_ipl = -1;
 
-// Cause the simulator to break when changing to the following IPL
-int break_ipl = -1;
-
-void
-ISA::setIpr(int idx, uint64_t val, ThreadContext *tc)
-{
-    if (tc->misspeculating())
+  void
+    ISA::setIpr(int idx, uint64_t val, ThreadContext *tc)
+    {
+      if (tc->misspeculating())
         return;
 
-    switch (idx) {
-      case IPR_PALtemp0:
-      case IPR_PALtemp1:
-      case IPR_PALtemp2:
-      case IPR_PALtemp3:
-      case IPR_PALtemp4:
-      case IPR_PALtemp5:
-      case IPR_PALtemp6:
-      case IPR_PALtemp7:
-      case IPR_PALtemp8:
-      case IPR_PALtemp9:
-      case IPR_PALtemp10:
-      case IPR_PALtemp11:
-      case IPR_PALtemp12:
-      case IPR_PALtemp13:
-      case IPR_PALtemp14:
-      case IPR_PALtemp15:
-      case IPR_PALtemp16:
-      case IPR_PALtemp17:
-      case IPR_PALtemp18:
-      case IPR_PALtemp19:
-      case IPR_PALtemp20:
-      case IPR_PALtemp21:
-      case IPR_PALtemp22:
-      case IPR_PAL_BASE:
-      case IPR_IC_PERR_STAT:
-      case IPR_DC_PERR_STAT:
-      case IPR_PMCTR:
-        // write entire quad w/ no side-effect
-        ipr[idx] = val;
-        break;
+      switch (idx) {
+        case IPR_PALtemp0:
+        case IPR_PALtemp1:
+        case IPR_PALtemp2:
+        case IPR_PALtemp3:
+        case IPR_PALtemp4:
+        case IPR_PALtemp5:
+        case IPR_PALtemp6:
+        case IPR_PALtemp7:
+        case IPR_PALtemp8:
+        case IPR_PALtemp9:
+        case IPR_PALtemp10:
+        case IPR_PALtemp11:
+        case IPR_PALtemp12:
+        case IPR_PALtemp13:
+        case IPR_PALtemp14:
+        case IPR_PALtemp15:
+        case IPR_PALtemp16:
+        case IPR_PALtemp17:
+        case IPR_PALtemp18:
+        case IPR_PALtemp19:
+        case IPR_PALtemp20:
+        case IPR_PALtemp21:
+        case IPR_PALtemp22:
+        case IPR_PAL_BASE:
+        case IPR_IC_PERR_STAT:
+        case IPR_DC_PERR_STAT:
+        case IPR_PMCTR:
+          // write entire quad w/ no side-effect
+          ipr[idx] = val;
+          break;
 
-      case IPR_CC_CTL:
-        // This IPR resets the cycle counter.  We assume this only
-        // happens once... let's verify that.
-        assert(ipr[idx] == 0);
-        ipr[idx] = 1;
-        break;
+        case IPR_CC_CTL:
+          // This IPR resets the cycle counter.  We assume this only
+          // happens once... let's verify that.
+          assert(ipr[idx] == 0);
+          ipr[idx] = 1;
+          break;
 
-      case IPR_CC:
-        // This IPR only writes the upper 64 bits.  It's ok to write
-        // all 64 here since we mask out the lower 32 in rpcc (see
-        // isa_desc).
-        ipr[idx] = val;
-        break;
+        case IPR_CC:
+          // This IPR only writes the upper 64 bits.  It's ok to write
+          // all 64 here since we mask out the lower 32 in rpcc (see
+          // isa_desc).
+          ipr[idx] = val;
+          break;
 
-      case IPR_PALtemp23:
-        // write entire quad w/ no side-effect
-        if (tc->getKernelStats())
+        case IPR_PALtemp23:
+          // write entire quad w/ no side-effect
+          if (tc->getKernelStats())
             tc->getKernelStats()->context(ipr[idx], val, tc);
-	
-	fi_system->fi_activation_iter = fi_system->fi_activation.find(val);
-	if(fi_system->fi_activation_iter != fi_system->fi_activation.end()){
-	  tc->setEnabledFI(true);
-	  tc->setEnabledFIThread(fi_system->fi_activation_iter->second);
-	}else{
-	  tc->setEnabledFI(false);
-	  tc->setEnabledFIThread(NULL);
-	}
-	
-        ipr[idx] = val;
-        break;
+          //ALTERCODE
+          fi_system->fi_activation_iter = fi_system->fi_activation.find(val);
+          if(fi_system->fi_activation_iter != fi_system->fi_activation.end()){
+            if(fi_system->fi_activation_iter->second->getMode() == START){
+              tc->setEnabledFI(true);
+              tc->setEnabledFIThread(fi_system->fi_activation_iter->second);
+            }
+            else{
+              tc->setEnabledFI(false);
+              tc->setEnabledFIThread(NULL);
+            }
+          }else{
+            tc->setEnabledFI(false);
+            tc->setEnabledFIThread(NULL);
+          }
+          //~ALTERCODE	
+          ipr[idx] = val;
+          break;
 
-      case IPR_DTB_PTE:
-        // write entire quad w/ no side-effect, tag is forthcoming
-        ipr[idx] = val;
-        break;
+        case IPR_DTB_PTE:
+          // write entire quad w/ no side-effect, tag is forthcoming
+          ipr[idx] = val;
+          break;
 
-      case IPR_EXC_ADDR:
-        // second least significant bit in PC is always zero
-        ipr[idx] = val & ~2;
-        break;
+        case IPR_EXC_ADDR:
+          // second least significant bit in PC is always zero
+          ipr[idx] = val & ~2;
+          break;
 
-      case IPR_ASTRR:
-      case IPR_ASTER:
-        // only write least significant four bits - privilege mask
-        ipr[idx] = val & 0xf;
-        break;
+        case IPR_ASTRR:
+        case IPR_ASTER:
+          // only write least significant four bits - privilege mask
+          ipr[idx] = val & 0xf;
+          break;
 
-      case IPR_IPLR:
+        case IPR_IPLR:
 #ifdef DEBUG
-        if (break_ipl != -1 && break_ipl == (int)(val & 0x1f))
+          if (break_ipl != -1 && break_ipl == (int)(val & 0x1f))
             Debug::breakpoint();
 #endif
 
-        // only write least significant five bits - interrupt level
-        ipr[idx] = val & 0x1f;
-        if (tc->getKernelStats())
+          // only write least significant five bits - interrupt level
+          ipr[idx] = val & 0x1f;
+          if (tc->getKernelStats())
             tc->getKernelStats()->swpipl(ipr[idx]);
-        break;
+          break;
 
-      case IPR_DTB_CM:
-        if (val & 0x18) {
+        case IPR_DTB_CM:
+          if (val & 0x18) {
             if (tc->getKernelStats())
-                tc->getKernelStats()->mode(Kernel::user, tc);
-        } else {
+              tc->getKernelStats()->mode(Kernel::user, tc);
+          } else {
             if (tc->getKernelStats())
-                tc->getKernelStats()->mode(Kernel::kernel, tc);
-        }
+              tc->getKernelStats()->mode(Kernel::kernel, tc);
+          }
 
-      case IPR_ICM:
-        // only write two mode bits - processor mode
-        ipr[idx] = val & 0x18;
-        break;
+        case IPR_ICM:
+          // only write two mode bits - processor mode
+          ipr[idx] = val & 0x18;
+          break;
 
-      case IPR_ALT_MODE:
-        // only write two mode bits - processor mode
-        ipr[idx] = val & 0x18;
-        break;
+        case IPR_ALT_MODE:
+          // only write two mode bits - processor mode
+          ipr[idx] = val & 0x18;
+          break;
 
-      case IPR_MCSR:
-        // more here after optimization...
-        ipr[idx] = val;
-        break;
+        case IPR_MCSR:
+          // more here after optimization...
+          ipr[idx] = val;
+          break;
 
-      case IPR_SIRR:
-        // only write software interrupt mask
-        ipr[idx] = val & 0x7fff0;
-        break;
+        case IPR_SIRR:
+          // only write software interrupt mask
+          ipr[idx] = val & 0x7fff0;
+          break;
 
-      case IPR_ICSR:
-        ipr[idx] = val & ULL(0xffffff0300);
-        break;
+        case IPR_ICSR:
+          ipr[idx] = val & ULL(0xffffff0300);
+          break;
 
-      case IPR_IVPTBR:
-      case IPR_MVPTBR:
-        ipr[idx] = val & ULL(0xffffffffc0000000);
-        break;
+        case IPR_IVPTBR:
+        case IPR_MVPTBR:
+          ipr[idx] = val & ULL(0xffffffffc0000000);
+          break;
 
-      case IPR_DC_TEST_CTL:
-        ipr[idx] = val & 0x1ffb;
-        break;
+        case IPR_DC_TEST_CTL:
+          ipr[idx] = val & 0x1ffb;
+          break;
 
-      case IPR_DC_MODE:
-      case IPR_MAF_MODE:
-        ipr[idx] = val & 0x3f;
-        break;
+        case IPR_DC_MODE:
+        case IPR_MAF_MODE:
+          ipr[idx] = val & 0x3f;
+          break;
 
-      case IPR_ITB_ASN:
-        ipr[idx] = val & 0x7f0;
-        break;
+        case IPR_ITB_ASN:
+          ipr[idx] = val & 0x7f0;
+          break;
 
-      case IPR_DTB_ASN:
-        ipr[idx] = val & ULL(0xfe00000000000000);
-        break;
+        case IPR_DTB_ASN:
+          ipr[idx] = val & ULL(0xfe00000000000000);
+          break;
 
-      case IPR_EXC_SUM:
-      case IPR_EXC_MASK:
-        // any write to this register clears it
-        ipr[idx] = 0;
-        break;
+        case IPR_EXC_SUM:
+        case IPR_EXC_MASK:
+          // any write to this register clears it
+          ipr[idx] = 0;
+          break;
 
-      case IPR_INTID:
-      case IPR_SL_RCV:
-      case IPR_MM_STAT:
-      case IPR_ITB_PTE_TEMP:
-      case IPR_DTB_PTE_TEMP:
-        // read-only registers
-        panic("Tried to write read only ipr %d\n", idx);
+        case IPR_INTID:
+        case IPR_SL_RCV:
+        case IPR_MM_STAT:
+        case IPR_ITB_PTE_TEMP:
+        case IPR_DTB_PTE_TEMP:
+          // read-only registers
+          panic("Tried to write read only ipr %d\n", idx);
 
-      case IPR_HWINT_CLR:
-      case IPR_SL_XMIT:
-      case IPR_DC_FLUSH:
-      case IPR_IC_FLUSH:
-        // the following are write only
-        ipr[idx] = val;
-        break;
+        case IPR_HWINT_CLR:
+        case IPR_SL_XMIT:
+        case IPR_DC_FLUSH:
+        case IPR_IC_FLUSH:
+          // the following are write only
+          ipr[idx] = val;
+          break;
 
-      case IPR_DTB_IA:
-        // really a control write
-        ipr[idx] = 0;
+        case IPR_DTB_IA:
+          // really a control write
+          ipr[idx] = 0;
 
-        tc->getDTBPtr()->flushAll();
-        break;
+          tc->getDTBPtr()->flushAll();
+          break;
 
-      case IPR_DTB_IAP:
-        // really a control write
-        ipr[idx] = 0;
+        case IPR_DTB_IAP:
+          // really a control write
+          ipr[idx] = 0;
 
-        tc->getDTBPtr()->flushProcesses();
-        break;
+          tc->getDTBPtr()->flushProcesses();
+          break;
 
-      case IPR_DTB_IS:
-        // really a control write
-        ipr[idx] = val;
-
-        tc->getDTBPtr()->flushAddr(val, DTB_ASN_ASN(ipr[IPR_DTB_ASN]));
-        break;
-
-      case IPR_DTB_TAG: {
-          struct TlbEntry entry;
-
-          // FIXME: granularity hints NYI...
-          if (DTB_PTE_GH(ipr[IPR_DTB_PTE]) != 0)
-              panic("PTE GH field != 0");
-
-          // write entire quad
+        case IPR_DTB_IS:
+          // really a control write
           ipr[idx] = val;
 
-          // construct PTE for new entry
-          entry.ppn = DTB_PTE_PPN(ipr[IPR_DTB_PTE]);
-          entry.xre = DTB_PTE_XRE(ipr[IPR_DTB_PTE]);
-          entry.xwe = DTB_PTE_XWE(ipr[IPR_DTB_PTE]);
-          entry.fonr = DTB_PTE_FONR(ipr[IPR_DTB_PTE]);
-          entry.fonw = DTB_PTE_FONW(ipr[IPR_DTB_PTE]);
-          entry.asma = DTB_PTE_ASMA(ipr[IPR_DTB_PTE]);
-          entry.asn = DTB_ASN_ASN(ipr[IPR_DTB_ASN]);
+          tc->getDTBPtr()->flushAddr(val, DTB_ASN_ASN(ipr[IPR_DTB_ASN]));
+          break;
 
-          // insert new TAG/PTE value into data TLB
-          tc->getDTBPtr()->insert(val, entry);
+        case IPR_DTB_TAG: {
+                            struct TlbEntry entry;
+
+                            // FIXME: granularity hints NYI...
+                            if (DTB_PTE_GH(ipr[IPR_DTB_PTE]) != 0)
+                              panic("PTE GH field != 0");
+
+                            // write entire quad
+                            ipr[idx] = val;
+
+                            // construct PTE for new entry
+                            entry.ppn = DTB_PTE_PPN(ipr[IPR_DTB_PTE]);
+                            entry.xre = DTB_PTE_XRE(ipr[IPR_DTB_PTE]);
+                            entry.xwe = DTB_PTE_XWE(ipr[IPR_DTB_PTE]);
+                            entry.fonr = DTB_PTE_FONR(ipr[IPR_DTB_PTE]);
+                            entry.fonw = DTB_PTE_FONW(ipr[IPR_DTB_PTE]);
+                            entry.asma = DTB_PTE_ASMA(ipr[IPR_DTB_PTE]);
+                            entry.asn = DTB_ASN_ASN(ipr[IPR_DTB_ASN]);
+
+                            // insert new TAG/PTE value into data TLB
+                            tc->getDTBPtr()->insert(val, entry);
+                          }
+                          break;
+
+        case IPR_ITB_PTE: {
+                            struct TlbEntry entry;
+
+                            // FIXME: granularity hints NYI...
+                            if (ITB_PTE_GH(val) != 0)
+                              panic("PTE GH field != 0");
+
+                            // write entire quad
+                            ipr[idx] = val;
+
+                            // construct PTE for new entry
+                            entry.ppn = ITB_PTE_PPN(val);
+                            entry.xre = ITB_PTE_XRE(val);
+                            entry.xwe = 0;
+                            entry.fonr = ITB_PTE_FONR(val);
+                            entry.fonw = ITB_PTE_FONW(val);
+                            entry.asma = ITB_PTE_ASMA(val);
+                            entry.asn = ITB_ASN_ASN(ipr[IPR_ITB_ASN]);
+
+                            // insert new TAG/PTE value into data TLB
+                            tc->getITBPtr()->insert(ipr[IPR_ITB_TAG], entry);
+                          }
+                          break;
+
+        case IPR_ITB_IA:
+                          // really a control write
+                          ipr[idx] = 0;
+
+                          tc->getITBPtr()->flushAll();
+                          break;
+
+        case IPR_ITB_IAP:
+                          // really a control write
+                          ipr[idx] = 0;
+
+                          tc->getITBPtr()->flushProcesses();
+                          break;
+
+        case IPR_ITB_IS:
+                          // really a control write
+                          ipr[idx] = val;
+
+                          tc->getITBPtr()->flushAddr(val, ITB_ASN_ASN(ipr[IPR_ITB_ASN]));
+                          break;
+
+        default:
+                          // invalid IPR
+                          panic("Tried to write to invalid ipr %d\n", idx);
       }
-        break;
 
-      case IPR_ITB_PTE: {
-          struct TlbEntry entry;
-
-          // FIXME: granularity hints NYI...
-          if (ITB_PTE_GH(val) != 0)
-              panic("PTE GH field != 0");
-
-          // write entire quad
-          ipr[idx] = val;
-
-          // construct PTE for new entry
-          entry.ppn = ITB_PTE_PPN(val);
-          entry.xre = ITB_PTE_XRE(val);
-          entry.xwe = 0;
-          entry.fonr = ITB_PTE_FONR(val);
-          entry.fonw = ITB_PTE_FONW(val);
-          entry.asma = ITB_PTE_ASMA(val);
-          entry.asn = ITB_ASN_ASN(ipr[IPR_ITB_ASN]);
-
-          // insert new TAG/PTE value into data TLB
-          tc->getITBPtr()->insert(ipr[IPR_ITB_TAG], entry);
-      }
-        break;
-
-      case IPR_ITB_IA:
-        // really a control write
-        ipr[idx] = 0;
-
-        tc->getITBPtr()->flushAll();
-        break;
-
-      case IPR_ITB_IAP:
-        // really a control write
-        ipr[idx] = 0;
-
-        tc->getITBPtr()->flushProcesses();
-        break;
-
-      case IPR_ITB_IS:
-        // really a control write
-        ipr[idx] = val;
-
-        tc->getITBPtr()->flushAddr(val, ITB_ASN_ASN(ipr[IPR_ITB_ASN]));
-        break;
-
-      default:
-        // invalid IPR
-        panic("Tried to write to invalid ipr %d\n", idx);
+      // no error...
     }
 
-    // no error...
-}
-
-void
-copyIprs(ThreadContext *src, ThreadContext *dest)
-{
-    for (int i = 0; i < NumInternalProcRegs; ++i)
+  void
+    copyIprs(ThreadContext *src, ThreadContext *dest)
+    {
+      for (int i = 0; i < NumInternalProcRegs; ++i)
         dest->setMiscRegNoEffect(i, src->readMiscRegNoEffect(i));
-}
+    }
 
 } // namespace AlphaISA
 
 using namespace AlphaISA;
 
-Fault
+  Fault
 SimpleThread::hwrei()
 {
-    PCState pc = pcState();
-    if (!(pc.pc() & 0x3))
-        return new UnimplementedOpcodeFault;
+  PCState pc = pcState();
+  if (!(pc.pc() & 0x3))
+    return new UnimplementedOpcodeFault;
 
-    pc.npc(readMiscRegNoEffect(IPR_EXC_ADDR));
-    pcState(pc);
+  pc.npc(readMiscRegNoEffect(IPR_EXC_ADDR));
+  pcState(pc);
 
-    CPA::cpa()->swAutoBegin(tc, pc.npc());
+  CPA::cpa()->swAutoBegin(tc, pc.npc());
 
-    if (!misspeculating()) {
-        if (kernelStats)
-            kernelStats->hwrei();
-    }
+  if (!misspeculating()) {
+    if (kernelStats)
+      kernelStats->hwrei();
+  }
 
-    // FIXME: XXX check for interrupts? XXX
-    return NoFault;
+  // FIXME: XXX check for interrupts? XXX
+  return NoFault;
 }
 
 /**
  * Check for special simulator handling of specific PAL calls.
  * If return value is false, actual PAL call will be suppressed.
  */
-bool
+  bool
 SimpleThread::simPalCheck(int palFunc)
 {
-    if (kernelStats)
-        kernelStats->callpal(palFunc, tc);
+  if (kernelStats)
+    kernelStats->callpal(palFunc, tc);
 
-    switch (palFunc) {
-      case PAL::halt:
-        halt();
-        if (--System::numSystemsRunning == 0)
-            exitSimLoop("all cpus halted");
-        break;
+  switch (palFunc) {
+    case PAL::halt:
+      halt();
+      if (--System::numSystemsRunning == 0)
+        exitSimLoop("all cpus halted");
+      break;
 
-      case PAL::bpt:
-      case PAL::bugchk:
-        if (system->breakpoint())
-            return false;
-        break;
-    }
+    case PAL::bpt:
+    case PAL::bugchk:
+      if (system->breakpoint())
+        return false;
+      break;
+  }
 
-    return true;
+  return true;
 }
