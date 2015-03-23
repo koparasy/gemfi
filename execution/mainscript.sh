@@ -18,15 +18,16 @@ if [ ! -d "$workstation/results" ] ; then
   mkdir -p $workstation/results
 fi
 
+rm -r core*
+for (( i = 0 ; i < $num_cores; i++))
+do
+    mkdir core$i
+done
 
 if [ $start_new -eq "1" ] ; then
   echo "Starting new"
   cp -r "$workstation/build/x86" "$workstation"
-  rm -r core*
-  for (( i = 0 ; i < $num_cores; i++))
-  do
-    mkdir core$i
-  done
+
 fi
 
 my_childs=""
