@@ -58,7 +58,7 @@ fi
 
 if [ ! -f "$checkpoint_dir/maincheckpoint/maincheckpoint.dmtcp" ]; then
   echo "$checkpoint_dir/maincheckpoint/maincheckpoint.dmtcp checkpoint does not exist creating"
-dmtcp_checkpoint ./../../build/X86/gem5.opt --debug-flags=FaultInjection --remote-gdb-port=-1 -r -d start/ ../../configs/example/fs.py --caches --fi-in input -b test -M 1 --switch-on-fault=1 --repeat-switch=1
+dmtcp_checkpoint ./../../build/X86/gem5.opt --debug-flags=FaultInjection --remote-gdb-port=-1 -r -d start/ ../../configs/example/fs.py --caches --fi-in input -b test --text-start 0 --meta-in=./../../metadata.dat -M 1 --switch-on-fault=1 --repeat-switch=1
   result=$?
   if [ "$result" -eq "1" ]; then
     echo "Checkpoint created">>"$my_core"

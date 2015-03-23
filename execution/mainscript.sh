@@ -9,7 +9,7 @@ terminate(){
 start_new=$1
 num_cores=$2
 script=$3
-
+metadata=$4
 
 workstation="/scratch"
 my_pid="$workstation/mypid.txt"
@@ -23,6 +23,7 @@ fi
 
 if [ $start_new -eq "1" ] ; then
   cp -r $workstation/build/$script ../configs/boot/test.rcS
+  cp $workstation/build/$metdata ../metadata.dat
   echo "Starting new"
   cp -r "$workstation/build/x86" "$workstation"
   rm -r core*
