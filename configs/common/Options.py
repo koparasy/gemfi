@@ -152,17 +152,23 @@ def addCommonOptions(parser):
                       help="SimPoint interval in num of instructions")
 
                       
-                      #fault Injection Options
+    #fault Injection Options
     parser.add_option("--fi-in",action="store",type="string",dest="fi_input",default=None,
     help="file to read input for fi_system")
-    parser.add_option("--meta-in",action="store",type="string",dest="meta_file",default=None,
+    parser.add_option("--meta-in",action="store",type="string",dest="meta_file",default="",
     help="file providing extra meta information\n");
     parser.add_option("-M","--exit-on-first-checkpoint",action="store",type="int",dest="exit_on_checkpoint",default=0,
     help="Exit simulation after first checkpoint")
     parser.add_option("--switch-on-fault",action="store",type="int",dest="switch_on_fault",default=1,
     help="Switch cpu from detailed to atomic after fault Injection")
+    parser.add_option("--checkpoint-on-fault",action="store",type="int",dest="checkpoint_on_fault",default=0,
+    help="Checkpoint Before Injecting A fault")
     parser.add_option("--text-start",action="store", type="int", dest="text_start",default=0,
     help=" Specify start of the .text section in the meta data file");
+
+
+
+
     # Checkpointing options
     ###Note that performing checkpointing via python script files will override
     ###checkpoint instructions built into binaries.

@@ -1,0 +1,656 @@
+45c45
+<         Fault %(class_name)s::execute(%(CPU_exec_context)s *xc,
+---
+>         Fault %(class_name)s::execute(CPU_EXEC_CONTEXT *xc,
+54a55
+> 
+76c77
+<         Fault %(class_name)s::execute(%(CPU_exec_context)s *xc,
+---
+>         Fault %(class_name)s::execute(CPU_EXEC_CONTEXT *xc,
+85c86
+< 	    IntReg fi_temp M5_VAR_USED;
+---
+> 	          IntReg fi_temp M5_VAR_USED;
+134c135
+<     inline %(class_name)s::%(class_name)s(
+---
+>     %(class_name)s::%(class_name)s(
+148c149
+<     inline %(class_name)s::%(class_name)s(
+---
+>     %(class_name)s::%(class_name)s(
+508,517c509,510
+<         code = ''' 
+< 	  fi_temp = merge(DestReg, result = (psrc1 + op2), dataSize);
+< 	  fi_system->iew_fault(xc,xc->tcBase(),&fi_temp);
+< 	  DestReg = fi_temp;
+< 	'''
+<         big_code = ''' 
+<         result = (psrc1 + op2) & mask(dataSize * 8);
+< 	fi_system->iew_fault(xc,xc->tcBase(),&result);
+< 	DestReg = result;
+< 	'''
+---
+>         code = 'DestReg = merge(DestReg, result = (psrc1 + op2), dataSize);'
+>         big_code = 'DestReg = result = (psrc1 + op2) & mask(dataSize * 8);'
+520,529c513,514
+<         code = '''
+< 	  fi_temp = merge(DestReg, result = (psrc1 | op2), dataSize);
+< 	  fi_system->iew_fault(xc,xc->tcBase(),&fi_temp);
+< 	  DestReg = fi_temp;
+< 	  '''
+<         big_code = '''
+< 	  DestReg = result = (psrc1 | op2) & mask(dataSize * 8);
+< 	  fi_system->iew_fault(xc,xc->tcBase(),&result);
+< 	  DestReg = result;
+< 	'''
+---
+>         code = 'DestReg = merge(DestReg, result = (psrc1 | op2), dataSize);'
+>         big_code = 'DestReg = result = (psrc1 | op2) & mask(dataSize * 8);'
+534,536c519
+<             fi_temp = merge(DestReg, result = (psrc1 + op2 + flags.cf), dataSize);
+< 	    fi_system->iew_fault(xc,xc->tcBase(),&fi_temp);
+< 	    DestReg = result;
+---
+>             DestReg = merge(DestReg, result = (psrc1 + op2 + flags.cf), dataSize);
+541,542d523
+< 	    fi_system->iew_fault(xc,xc->tcBase(),&result);
+< 	    DestReg = result;
+548,550c529
+<             fi_temp= merge(DestReg, result = (psrc1 - op2 - flags.cf), dataSize);
+< 	    fi_system->iew_fault(xc,xc->tcBase(),&result);
+< 	    DestReg = fi_temp;
+---
+>             DestReg = merge(DestReg, result = (psrc1 - op2 - flags.cf), dataSize);
+554,556c533
+<             result = (psrc1 - op2 - flags.cf) & mask(dataSize * 8);
+< 	    fi_system->iew_fault(xc,xc->tcBase(),&result);
+< 	    DestReg = result;
+---
+>             DestReg = result = (psrc1 - op2 - flags.cf) & mask(dataSize * 8);
+560,569c537,538
+<         code = '''
+<         fi_temp= merge(DestReg, result = (psrc1 & op2), dataSize);
+<         fi_system->iew_fault(xc,xc->tcBase(),&result);
+< 	DestReg = fi_temp;
+< 	'''
+<         big_code = '''
+<         result = (psrc1 & op2) & mask(dataSize * 8);
+< 	fi_system->iew_fault(xc,xc->tcBase(),&result);
+< 	DestReg = result;
+< 	'''
+---
+>         code = 'DestReg = merge(DestReg, result = (psrc1 & op2), dataSize)'
+>         big_code = 'DestReg = result = (psrc1 & op2) & mask(dataSize * 8)'
+572,581c541,542
+<         code = '''
+< 	  fi_temp = merge(DestReg, result = (psrc1 - op2), dataSize);
+< 	  fi_system->iew_fault(xc,xc->tcBase(), &fi_temp);
+< 	  DestReg =fi_temp;
+< 	'''
+<         big_code = '''
+< 	    result = (psrc1 - op2) & mask(dataSize * 8);
+< 	    fi_system->iew_fault(xc, xc->tcBase(), &result);
+< 	    DestReg = result;
+< 	  '''
+---
+>         code = 'DestReg = merge(DestReg, result = (psrc1 - op2), dataSize)'
+>         big_code = 'DestReg = result = (psrc1 - op2) & mask(dataSize * 8)'
+584,593c545,546
+<         code = '''
+< 	    fi_temp = merge(DestReg, result = (psrc1 ^ op2), dataSize);
+< 	    fi_system -> iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	    DestReg =  fi_temp;
+< 	  '''
+<         big_code = '''
+< 	  result = (psrc1 ^ op2) & mask(dataSize * 8);
+< 	  fi_system->iew_fault(xc, xc->tcBase(), &result);
+< 	  DestReg = result;
+< 	  '''
+---
+>         code = 'DestReg = merge(DestReg, result = (psrc1 ^ op2), dataSize)'
+>         big_code = 'DestReg = result = (psrc1 ^ op2) & mask(dataSize * 8)'
+599,603c552
+<             
+<             fi_temp =  psrc1 * op2;
+< 	    fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	    ProdLow = fi_temp;
+< 	    
+---
+>             ProdLow = psrc1 * op2;
+618,621c567
+< 	    
+< 	    fi_temp = hiResult;
+< 	    fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+<             ProdHi = fi_temp; 
+---
+>             ProdHi = hiResult;
+638,640c584
+<             fi_temp = psrc1 * op2;
+< 	    fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	    ProdLow = fi_temp;
+---
+>             ProdLow = psrc1 * op2;
+647c591
+< 	    fi_temp = ((psrc1_l * psrc2_h + psrc1_h * psrc2_l +
+---
+>             ProdHi = ((psrc1_l * psrc2_h + psrc1_h * psrc2_l +
+650,651d593
+< 	    fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	    ProdHi = fi_temp;      
+664,672c606,607
+<         code = '''fi_temp = merge(SrcReg1, ProdLow, dataSize);
+< 	  fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	  DestReg =  fi_temp;
+< 	'''
+<         big_code = '''
+<         fi_temp = ProdLow & mask(dataSize * 8);
+< 	fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	DestReg = fi_temp;
+< 	'''
+---
+>         code = 'DestReg = merge(SrcReg1, ProdLow, dataSize);'
+>         big_code = 'DestReg = ProdLow & mask(dataSize * 8);'
+680,689c615,616
+<         code = '''
+< 	  fi_temp =  merge(SrcReg1, ProdHi, dataSize);
+< 	  fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	  DestReg = fi_temp;
+< 	  '''
+<         big_code = '''
+< 	  DestReg = ProdHi & mask(dataSize * 8);
+< 	  fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	  fi_temp = DestReg;
+< 	  '''
+---
+>         code = 'DestReg = merge(SrcReg1, ProdHi, dataSize);'
+>         big_code = 'DestReg = ProdHi & mask(dataSize * 8);'
+707c634
+<                 fault = new DivideByZero;
+---
+>                 fault = std::make_shared<DivideByZero>();
+711,714d637
+< 		fi_system->iew_fault(xc,xc->tcBase(), &remainder);
+< 		fi_system->iew_fault(xc,xc->tcBase(), &quotient);
+< 		fi_system->iew_fault(xc,xc->tcBase(), &divisor);
+< 		
+734c657
+<                 fault = new DivideByZero;
+---
+>                 fault = std::make_shared<DivideByZero>();
+774,776d696
+<             fi_system->iew_fault(xc,xc->tcBase(), &remainder);
+< 	    fi_system->iew_fault(xc,xc->tcBase(), &quotient);
+< 	    fi_system->iew_fault(xc,xc->tcBase(), &remaining);
+790,798c710,711
+<         code = '''
+<         fi_temp =merge(SrcReg1, Quotient, dataSize);
+< 	fi_system->iew_fault(xc,xc->tcBase(), &fi_temp);
+< 	DestReg = fi_temp;
+< 	'''
+<         big_code = '''fi_temp = Quotient & mask(dataSize * 8);
+< 	fi_system->iew_fault(xc,xc->tcBase(), &fi_temp);
+< 	DestReg = fi_temp;
+< 	'''
+---
+>         code = 'DestReg = merge(SrcReg1, Quotient, dataSize);'
+>         big_code = 'DestReg = Quotient & mask(dataSize * 8);'
+801,810c714,715
+<         code = '''
+<         fi_temp = merge(SrcReg1, Remainder, dataSize);
+< 	fi_system->iew_fault(xc,xc->tcBase(),&fi_temp);
+< 	DestReg = fi_temp;
+< 	'''
+<         big_code = '''
+< 	  fi_temp =  Remainder & mask(dataSize * 8);
+< 	  fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	  DestReg = fi_temp;
+< 	  '''
+---
+>         code = 'DestReg = merge(SrcReg1, Remainder, dataSize);'
+>         big_code = 'DestReg = Remainder & mask(dataSize * 8);'
+813,818c718,719
+< 	code = ''' 
+< 	  fi_temp = merge(SrcReg1, op2, dataSize);
+< 	  fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	  DestReg = fi_temp;
+< 	'''
+<         else_code = '''fi_system->iew_fault(xc, xc->tcBase(), &DestReg ) ; DestReg = DestReg;'''
+---
+>         code = 'DestReg = merge(SrcReg1, op2, dataSize)'
+>         else_code = 'DestReg = DestReg;'
+825,827c726
+<             fi_temp = merge(DestReg, psrc1 << shiftAmt, dataSize);
+< 	    fi_system->iew_fault(xc, xc->tcBase(),&fi_temp);
+< 	    DestReg = fi_temp;
+---
+>             DestReg = merge(DestReg, psrc1 << shiftAmt, dataSize);
+831,833c730
+<             fi_temp = (psrc1 << shiftAmt) & mask(dataSize * 8);
+< 	    fi_system->iew_fault(xc, xc->tcBase(),&fi_temp);
+< 	    DestReg = fi_temp;
+---
+>             DestReg = (psrc1 << shiftAmt) & mask(dataSize * 8);
+878,880c775
+<             fi_temp = merge(DestReg, (psrc1 >> shiftAmt) & logicalMask, dataSize);
+< 	    fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	    DestReg = fi_temp;
+---
+>             DestReg = merge(DestReg, (psrc1 >> shiftAmt) & logicalMask, dataSize);
+885,887c780
+<             fi_temp = (psrc1 >> shiftAmt) & logicalMask;
+< 	    fi_system->iew_fault(xc , xc->tcBase(), &fi_temp);
+< 	    DestReg = fi_temp;
+---
+>             DestReg = (psrc1 >> shiftAmt) & logicalMask;
+928,930c821
+< 		fi_temp =  merge(DestReg, (psrc1 >> shiftAmt) | arithMask, dataSize);
+< 		fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 		DestReg = fi_temp;
+---
+>             DestReg = merge(DestReg, (psrc1 >> shiftAmt) | arithMask, dataSize);
+936,938c827
+< 	      fi_temp = ((psrc1 >> shiftAmt) | arithMask) & mask(dataSize * 8);
+< 	      fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	      DestReg = fi_temp;
+---
+>             DestReg = ((psrc1 >> shiftAmt) | arithMask) & mask(dataSize * 8);
+976,978c865
+< 		fi_temp = merge(DestReg, top | bottom, dataSize);
+< 		fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 		DestReg = fi_temp;
+---
+>                 DestReg = merge(DestReg, top | bottom, dataSize);
+980,982c867
+<                 fi_temp = merge(DestReg, DestReg, dataSize);
+< 		fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 		DestReg = fi_temp;
+---
+>                 DestReg = merge(DestReg, DestReg, dataSize);
+1027,1029c912
+<                 fi_temp = merge(DestReg, top | bottom, dataSize);
+< 		fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 		DestReg = fi_temp;
+---
+>                 DestReg = merge(DestReg, top | bottom, dataSize);
+1031,1033c914
+<                 fi_temp = merge(DestReg, DestReg, dataSize);
+< 		fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 		DestReg = fi_temp;
+---
+>                 DestReg = merge(DestReg, DestReg, dataSize);
+1077,1079c958
+<                 fi_temp = merge(DestReg, top | bottom, dataSize);
+< 		fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 		DestReg = fi_temp;
+---
+>                 DestReg = merge(DestReg, top | bottom, dataSize);
+1081,1083c960
+<                 fi_temp = merge(DestReg, DestReg, dataSize);
+< 		fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 		DestReg = fi_temp;
+---
+>                 DestReg = merge(DestReg, DestReg, dataSize);
+1130,1132c1007
+<                 fi_temp = merge(DestReg, top | bottom, dataSize);
+< 		fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 		DestReg = fi_temp;
+---
+>                 DestReg = merge(DestReg, top | bottom, dataSize);
+1134,1136c1009
+<                fi_temp = merge(DestReg, DestReg, dataSize);
+< 		fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 		DestReg = fi_temp;
+---
+>                 DestReg = merge(DestReg, DestReg, dataSize);
+1186d1058
+<             fi_system->iew_fault(xc, xc->tcBase(), &result);
+1253d1124
+<             fi_system->iew_fault(xc, xc->tcBase(), &result);
+1300,1303c1171
+<         code = '''
+<         DoubleBits = psrc1 ^ op2;
+< 	fi_system->iew_fault(xc, xc->tcBase(), &DoubleBits);
+< 	'''
+---
+>         code = 'DoubleBits = psrc1 ^ op2;'
+1306,1308c1174
+<         code = ''' NRIP = psrc1 + sop2 + CSBase;
+< 	  fi_system->iew_fault(xc,xc->tcBase(), &NRIP);
+< 	'''
+---
+>         code = 'NRIP = psrc1 + sop2 + CSBase;'
+1338,1342c1204
+<         code = '''
+<         fi_temp = NRIP - CSBase;
+< 	fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	DestReg = fi_temp;
+< 	'''
+---
+>         code = 'DestReg = NRIP - CSBase;'
+1345,1349c1207
+<         code = '''
+< 	      fi_temp = ccFlagBits | cfofBits | dfBit | ecfBit | ezfBit;
+< 	      fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	      DestReg = fi_temp;
+< 	    '''
+---
+>         code = 'DestReg = ccFlagBits | cfofBits | dfBit | ecfBit | ezfBit;'
+1353c1211
+<             fi_temp = ccFlagBits | cfofBits | dfBit |
+---
+>             DestReg = ccFlagBits | cfofBits | dfBit |
+1355,1356d1212
+< 	    fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	    DestReg = fi_temp;
+1363,1365c1219
+<             fi_temp = merge(DestReg, flag, dataSize);
+< 	    fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	    DestReg = fi_temp;
+---
+>             DestReg = merge(DestReg, flag, dataSize);
+1372,1374c1226
+<             fi_temp = flag & mask(dataSize * 8);
+< 	    fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	    DestReg = fi_temp;
+---
+>             DestReg = flag & mask(dataSize * 8);
+1390,1392c1242
+<             fi_temp = merge(DestReg, flag, dataSize);
+< 	    fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	    DestReg = fi_temp;
+---
+>             DestReg = merge(DestReg, flag, dataSize);
+1402,1404c1252
+<             fi_temp = flag & mask(dataSize * 8);
+< 	    fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	    DestReg = fi_temp;
+---
+>             DestReg = flag & mask(dataSize * 8);
+1421,1423c1269
+< 	    fi_temp = merge(DestReg, val, dataSize);
+< 	    fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	    DestReg = fi_temp;
+---
+>             DestReg = merge(DestReg, val, dataSize);
+1433,1435c1279
+< 	    fi_temp = val & mask(dataSize * 8);
+< 	    fi_system->iew_fault(xc, xc->tcBase(), &fi_temp);
+< 	    DestReg = fi_temp;
+---
+>             DestReg = val & mask(dataSize * 8);
+1453,1462c1297,1298
+<         code = '''
+<         fi_temp =  merge(DestReg, bits(psrc1, op2, 0), dataSize);
+< 	fi_system->iew_fault(xc,xc->tcBase(), &fi_temp);
+< 	DestReg = fi_temp;
+< 	'''
+<         big_code = '''
+<         fi_temp = bits(psrc1, op2, 0) & mask(dataSize * 8);
+< 	fi_system->iew_fault(xc,xc->tcBase(), &fi_temp);
+< 	DestReg = fi_temp;
+< 	'''
+---
+>         code = 'DestReg = merge(DestReg, bits(psrc1, op2, 0), dataSize);'
+>         big_code = 'DestReg = bits(psrc1, op2, 0) & mask(dataSize * 8);'
+1472c1308
+<                 fault = new InvalidOpcode();
+---
+>                 fault = std::make_shared<InvalidOpcode>();
+1474c1310
+<                 fault = new DebugException();
+---
+>                 fault = std::make_shared<DebugException>();
+1479,1480c1315,1316
+<         code = rdrCode % "fi_temp = merge(DestReg, DebugSrc1, dataSize); fi_system->iew_fault(xc,xc->tcBase(), &fi_temp); DestReg = fi_temp;"
+< 	big_code = rdrCode % "fi_temp = DebugSrc1 & mask(dataSize * 8); fi_system->iew_fault(xc,xc->tcBase(), &fi_temp); DestReg = fi_temp;"
+---
+>         code = rdrCode % "DestReg = merge(DestReg, DebugSrc1, dataSize);"
+>         big_code = rdrCode % "DestReg = DebugSrc1 & mask(dataSize * 8);"
+1490c1326
+<                 fault = new InvalidOpcode();
+---
+>                 fault = std::make_shared<InvalidOpcode>();
+1493c1329
+<                 fault = new GeneralProtection(0);
+---
+>                 fault = std::make_shared<GeneralProtection>(0);
+1495c1331
+<                 fault = new DebugException();
+---
+>                 fault = std::make_shared<DebugException>();
+1497,1499c1333
+< 	      fi_temp = psrc1;
+< 	      fi_system->iew_fault(xc,xc->tcBase(), &fi_temp);
+< 	      DebugDest = fi_temp;
+---
+>                 DebugDest = psrc1;
+1509c1343
+<                 fault = new InvalidOpcode();
+---
+>                 fault = std::make_shared<InvalidOpcode>();
+1514,1515c1348,1349
+<         code = rdcrCode % "fi_temp = merge(DestReg, ControlSrc1, dataSize); fi_system->iew_fault(xc,xc->tcBase(), &fi_temp); DestReg = fi_temp;"
+< 	big_code = rdcrCode % "fi_temp = ControlSrc1 & mask(dataSize * 8); fi_system->iew_fault(xc,xc->tcBase(), &fi_temp); DestReg = fi_temp;"
+---
+>         code = rdcrCode % "DestReg = merge(DestReg, ControlSrc1, dataSize);"
+>         big_code = rdcrCode % "DestReg = ControlSrc1 & mask(dataSize * 8);"
+1523c1357
+<                 fault = new InvalidOpcode();
+---
+>                 fault = std::make_shared<InvalidOpcode>();
+1541c1375
+<                             fault = new GeneralProtection(0);
+---
+>                             fault = std::make_shared<GeneralProtection>(0);
+1554c1388
+<                             fault = new GeneralProtection(0);
+---
+>                             fault = std::make_shared<GeneralProtection>(0);
+1560c1394
+<                             fault = new GeneralProtection(0);
+---
+>                             fault = std::make_shared<GeneralProtection>(0);
+1563c1397
+<                     fault = new GenericISA::M5PanicFault(
+---
+>                     fault = std::make_shared<GenericISA::M5PanicFault>(
+1566,1569c1400
+<                 
+<                 fi_temp = newVal;
+< 		fi_system->iew_fault(xc,xc->tcBase(), &fi_temp);
+< 		ControlDest = fi_temp;
+---
+>                 ControlDest = newVal;
+1582,1583c1413
+< 	    fi_system->iew_fault(xc,xc->tcBase(),&psrc1);
+< 	    SegBaseDest = psrc1;
+---
+>             SegBaseDest = psrc1;
+1588,1589c1418
+<         fi_system->iew_fault(xc,xc->tcBase(),&psrc1);
+< 	SegLimitDest = psrc1;
+---
+>             SegLimitDest = psrc1;
+1594,1595c1423
+<         fi_system->iew_fault(xc,xc->tcBase(),&psrc1);
+<         SegSelDest = psrc1;
+---
+>             SegSelDest = psrc1;
+1600,1601c1428
+<         fi_system->iew_fault(xc,xc->tcBase(),&psrc1);
+< 	SegAttrDest = psrc1;
+---
+>             SegAttrDest = psrc1;
+1605,1613c1432,1433
+<         code = '''
+< 	  fi_temp = merge(DestReg, SegBaseSrc1, dataSize);
+< 	  fi_system->iew_fault(xc,xc->tcBase(),&fi_temp);
+< 	  DestReg = fi_temp;	
+< 	'''
+<         big_code = '''
+< 	  fi_temp =  SegBaseSrc1 & mask(dataSize * 8);
+< 	  fi_system->iew_fault(xc,xc->tcBase(), &fi_temp);
+< 	  DestReg= fi_temp;'''
+---
+>         code = 'DestReg = merge(DestReg, SegBaseSrc1, dataSize);'
+>         big_code = 'DestReg = SegBaseSrc1 & mask(dataSize * 8);'
+1616,1624c1436,1437
+< 	code = '''
+< 	fi_temp = merge(DestReg, SegLimitSrc1, dataSize);
+< 	fi_system->iew_fault(xc,xc->tcBase(), &fi_temp);
+< 	DestReg= fi_temp;
+< 	'''
+<         big_code = '''
+<         fi_temp = SegLimitSrc1 & mask(dataSize * 8);
+< 	fi_system->iew_fault(xc,xc->tcBase(), &fi_temp);
+< 	DestReg= fi_temp;'''
+---
+>         code = 'DestReg = merge(DestReg, SegLimitSrc1, dataSize);'
+>         big_code = 'DestReg = SegLimitSrc1 & mask(dataSize * 8);'
+1627,1636c1440,1441
+<         code = '''
+< 	  fi_temp = merge(DestReg, SegAttrSrc1, dataSize);
+< 	  fi_system->iew_fault(xc,xc->tcBase(), &fi_temp);
+< 	  DestReg= fi_temp;
+< 	  '''
+<         big_code = '''
+< 	  fi_temp = SegAttrSrc1 & mask(dataSize * 8);
+< 	  fi_system->iew_fault(xc,xc->tcBase(), &fi_temp);
+< 	  DestReg= fi_temp;
+< 	'''
+---
+>         code = 'DestReg = merge(DestReg, SegAttrSrc1, dataSize);'
+>         big_code = 'DestReg = SegAttrSrc1 & mask(dataSize * 8);'
+1639,1648c1444,1445
+<         code = '''
+< 	    fi_temp = merge(DestReg, SegSelSrc1, dataSize);
+< 	    fi_system->iew_fault(xc,xc->tcBase(), &fi_temp);
+< 	    DestReg= fi_temp;
+< 	    '''
+<         big_code = '''
+< 	  fi_temp = SegSelSrc1 & mask(dataSize * 8);
+< 	  fi_system->iew_fault(xc,xc->tcBase(), &fi_temp);
+< 	  DestReg= fi_temp;
+< 	  '''
+---
+>         code = 'DestReg = merge(DestReg, SegSelSrc1, dataSize);'
+>         big_code = 'DestReg = SegSelSrc1 & mask(dataSize * 8);'
+1655,1657c1452
+<             fi_temp= MiscRegSrc1;
+< 	    fi_system->iew_fault(xc,xc->tcBase(), &fi_temp);
+< 	    DestReg= fi_temp;
+---
+>             DestReg = MiscRegSrc1;
+1665,1667c1460
+< 	    fi_temp = SrcReg1;
+< //	    fi_system->iew_fault(xc,xc->tcBase(), &fi_temp);
+< 	    MiscRegDest= fi_temp;
+---
+>             MiscRegDest = SrcReg1;
+1688c1481
+<                     fault = new GeneralProtection(0);
+---
+>                     fault = std::make_shared<GeneralProtection>(0);
+1690c1483
+<                     fault = new GeneralProtection(0);
+---
+>                     fault = std::make_shared<GeneralProtection>(0);
+1694c1487,1488
+<                 fault = new GenericISA::M5PanicFault("CS checks for far "
+---
+>                 fault = std::make_shared<GenericISA::M5PanicFault>(
+>                         "CS checks for far "
+1700c1494
+<                     fault = new GeneralProtection(selector);
+---
+>                     fault = std::make_shared<GeneralProtection>(selector);
+1708c1502
+<                     fault = new GeneralProtection(0);
+---
+>                     fault = std::make_shared<GeneralProtection>(0);
+1714c1508
+<                         fault = new StackFault(selector);
+---
+>                         fault = std::make_shared<StackFault>(selector);
+1719c1513
+<                         fault = new GeneralProtection(selector);
+---
+>                         fault = std::make_shared<GeneralProtection>(selector);
+1723c1517
+<                     fault = new GeneralProtection(selector);
+---
+>                     fault = std::make_shared<GeneralProtection>(selector);
+1733c1527
+<                         fault = new GeneralProtection(selector);
+---
+>                         fault = std::make_shared<GeneralProtection>(selector);
+1735c1529
+<                         fault = new SegmentNotPresent(selector);
+---
+>                         fault = std::make_shared<SegmentNotPresent>(selector);
+1742c1536
+<                         fault = new GeneralProtection(selector);
+---
+>                         fault = std::make_shared<GeneralProtection>(selector);
+1745c1539,1540
+<                     fault = new GenericISA::M5PanicFault("Interrupt CS "
+---
+>                     fault = std::make_shared<GenericISA::M5PanicFault>(
+>                             "Interrupt CS "
+1751c1546
+<                     fault = new GeneralProtection(selector);
+---
+>                     fault = std::make_shared<GeneralProtection>(selector);
+1756c1551
+<                     fault = new SegmentNotPresent(selector);
+---
+>                     fault = std::make_shared<SegmentNotPresent>(selector);
+1760c1555
+<                     fault = new GeneralProtection(selector);
+---
+>                     fault = std::make_shared<GeneralProtection>(selector);
+1765c1560
+<                     fault = new GeneralProtection(selector);
+---
+>                     fault = std::make_shared<GeneralProtection>(selector);
+1770c1565
+<                     fault = new SegmentNotPresent(selector);
+---
+>                     fault = std::make_shared<SegmentNotPresent>(selector);
+1772c1567
+<                     fault = new GeneralProtection(selector);
+---
+>                     fault = std::make_shared<GeneralProtection>(selector);
+1776c1571
+<                 fault = new GenericISA::M5PanicFault(
+---
+>                 fault = std::make_shared<GenericISA::M5PanicFault>(
+1810c1605
+<                 fault = new GenericISA::M5PanicFault(
+---
+>                 fault = std::make_shared<GenericISA::M5PanicFault>(
+1813,1814c1608
+<   //          fi_system->iew_fault(xc,xc->tcBase(),&target);
+< 	    DestReg = target;
+---
+>             DestReg = target;
+1819,1820c1613
+<     //    fi_system->iew_fault(xc,xc->tcBase(),&psrc1);
+< 	TscOp = psrc1;
+---
+>             TscOp = psrc1;
+1825,1826c1618
+<       //  fi_system->iew_fault(xc,xc->tcBase(),&TscOp);
+< 	DestReg = TscOp;
+---
+>             DestReg = TscOp;
+1844c1636
+<                         fault = new GenericISA::M5PanicFault(
+---
+>                         fault = std::make_shared<GenericISA::M5PanicFault>(
+1861c1653
+<                             fault = new GenericISA::M5PanicFault(
+---
+>                             fault = std::make_shared<GenericISA::M5PanicFault>(
