@@ -19,7 +19,7 @@ if [ ! -d "$workstation/results" ] ; then
 fi
 
 if [ $start_new -eq "1" ] ; then
-  cp -r /srv/homes/koparasy/test.rcS ../configs/boot/test.rcS
+#  cp -r /srv/homes/koparasy/test.rcS ../configs/boot/test.rcS
   echo "Starting new"
   rm -r /home/dinos/results/*
 #  cp -r "/srv/homes/koparasy/x86" "$workstation"

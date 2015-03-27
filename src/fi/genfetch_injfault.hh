@@ -24,11 +24,11 @@ public:
   
   void dump() const;
 
-  char process(char val); // The MachInst is the pure binary form 
+//  char process(char val); // The MachInst is the pure binary form 
 						    //of the instruction so insert the 
 						    //fault just before fetching the instruction
 
-  TheISA::MachInst process(TheISA::MachInst inst){ std::cout << "O3CPUInjectedFault::manifest() -- virtual\n"; assert(0); return inst;}
+  TheISA::MachInst process(TheISA::MachInst inst); 
   StaticInstPtr process(StaticInstPtr inst) { std::cout << "O3CPUInjectedFault::manifest() -- virtual\n"; assert(0); return inst;};
   StaticInstPtr process(StaticInstPtr inst , int regNum) { std::cout << "O3CPUInjectedFault::manifest() -- virtual\n"; assert(0); return inst;};
 };

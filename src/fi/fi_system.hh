@@ -139,6 +139,7 @@ class Fi_System : public MemObject
 
     bool check_before_init;
     bool switchcpu;
+    bool checkPointBeforeFault;
     bool maincheckpoint;
 
     int get_core_fetched_time(std::string Cpu,uint64_t* time,uint64_t *instr);
@@ -148,6 +149,10 @@ class Fi_System : public MemObject
 
     void setcheck(bool v){check_before_init=v;};
     void setswitchcpu(bool v) {switchcpu = v;}
+
+    void setCheckBeforeFI(bool v){checkPointBeforeFault =v;};
+    bool getCheckBeforeFI() {return checkPointBeforeFault;}
+    int checkpointOnFault();
 
 
     void delete_faults();
@@ -227,11 +232,7 @@ class Fi_System : public MemObject
         LoadStoreInjectedFault *loadStoreFault = NULL;
         if( thread->getMode() == START && FullSystem  && (TheISA::inUserMode(tc))  ){
           Addr pcAddr = ptr->instAddr(); //PC address for this instruction
-          //          DPRINTF(FaultInjection,"LDS\n");
           int sigInstr = getSignificance(pcAddr);
-          if (!sigInstr)
-            DPRINTF(FaultInjection,"LDS: PCAddr:%llx Should be protected at instruction %s\n",pcAddr,ptr->getcurInstr()->getName());
-
           std::string _name = tc->getCpuPtr()->name();
           thread->setInstMode(sigInstr);
           allthreads->setInstMode(sigInstr);
@@ -242,14 +243,8 @@ class Fi_System : public MemObject
             if(loadStoreFault->getValueType() == InjectedFault::FlipBit && loadStoreFault->getValue() > dataSize*8){ 
               loadStoreFault->setValue(loadStoreFault->getValue()%(dataSize*8) +1);
             }
-            int succeed = dmtcp_checkpoint();
+            int succeed = checkpointOnFault();
             if ( succeed == 1){
-              if ((sigInstr == NONPROTECTED || sigInstr == NOPINST) )  {
-                DPRINTF(FaultInjection, "INJECTING IN NON-PROTECTED INSTRUCTION\n");
-              }
-              else{
-                DPRINTF(FaultInjection, "INJECTING IN PROTECTED INSTRUCTION\n");
-              }
               rename_ckpt("lds_ckpt.dmtcp");
               value = loadStoreFault->process(value);
               thread->setfaulty(1);
@@ -275,7 +270,6 @@ class Fi_System : public MemObject
         if( thread->getMode() == START && FullSystem && (TheISA::inUserMode(tc))   ){
           Addr pcAddr = ptr->instAddr();
 
-          //         DPRINTF(FaultInjection,"IEW\n");
           int sigInstr = getSignificance(pcAddr);
 
           thread->setInstMode(sigInstr);
@@ -287,17 +281,10 @@ class Fi_System : public MemObject
           allthreads->increaseExecutedInstr(_name);
 
           while ((iewFault = reinterpret_cast<IEWStageInjectedFault *>(iewStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
-            int succeed = dmtcp_checkpoint();
+            int succeed = checkpointOnFault();
             if ( succeed == 1){
               rename_ckpt("iew_ckpt.dmtcp");
               *value = iewFault->process(*value);
-              if ((sigInstr == NONPROTECTED || sigInstr == NOPINST) )  {
-                DPRINTF(FaultInjection, "INJECTING IN NON-PROTECTED INSTRUCTION\n");
-              }
-              else{
-                DPRINTF(FaultInjection, "INJECTING IN PROTECTED INSTRUCTION\n");
-              }
-              thread->setfaulty(1);
               DPRINTF(FaultInjection,"IEW: PCAddr:%llx Fault Inserted in thread %d at instruction %s\n",pcAddr,thread->getThreadId(),ptr->getcurInstr()->getName());
               scheduleswitch(tc);
             }
@@ -316,22 +303,14 @@ class Fi_System : public MemObject
       if(thread->getMode() != START)
         return;
 
-      //    DPRINTF(FaultInjection,"MAIN\n");
       int sigInstr = getSignificance(pcAddr);
 
       thread->setInstMode(sigInstr);
       while ((mainfault = reinterpret_cast<CPUInjectedFault *>(mainInjectedFaultQueue.scan(_name, *thread , pcAddr))) != NULL){
-        int succeed = dmtcp_checkpoint();
+        int succeed = checkpointOnFault();
         if ( succeed == 1){
           rename_ckpt("fetch_ckpt.dmtcp");
           mainfault->process();
-          if ((sigInstr == NONPROTECTED || sigInstr == NOPINST) )  {
-            DPRINTF(FaultInjection, "INJECTING IN NON-PROTECTED INSTRUCTION\n");
-          }
-          else{
-            DPRINTF(FaultInjection, "INJECTING IN PROTECTED INSTRUCTION\n");
-          }
-          thread->setfaulty(1);
           DPRINTF(FaultInjection,"MAIN: PCAddr:%llx Fault Inserted in thread %d at instruction \n",thread->getThreadId(),pcAddr);
           if(string(mainfault->description()).compare("RegisterInjectedFault") != 0)
             scheduleswitch(tc);
@@ -344,8 +323,6 @@ class Fi_System : public MemObject
 
 
     inline TheISA::MachInst fetch_fault(ThreadContext *tc,ThreadEnabledFault *thread, TheISA::MachInst cur_instr,Addr pcAddr){
-      int i;
-      char *instr;
       GeneralFetchInjectedFault *fetchfault = NULL;
       std::string _name = tc->getCpuPtr()->name();
       if(thread->getMode() != START)
@@ -363,20 +340,11 @@ class Fi_System : public MemObject
       allthreads->setInstMode(sigInstr);
 
       while ((fetchfault = reinterpret_cast<GeneralFetchInjectedFault *>(fetchStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
-        int succeed = dmtcp_checkpoint();
-        uint64_t pos = fetchfault->getValue();
-        pos = pos/8;
-        pcAddr+=pos;
-        sigInstr = getSignificance(pcAddr);
-        thread->setInstMode(sigInstr);
-        allthreads->setInstMode(sigInstr);
+        int succeed = checkpointOnFault();
         if ( succeed == 1){
-          if ((sigInstr == NONPROTECTED || sigInstr == NOPINST) )  {
-            DPRINTF(FaultInjection, "INJECTING IN NON-PROTECTED INSTRUCTION\n");
-          }
-          else{
-            DPRINTF(FaultInjection, "INJECTING IN PROTECTED INSTRUCTION\n");
-          }
+          sigInstr = getSignificance(pcAddr);
+          thread->setInstMode(sigInstr);
+          allthreads->setInstMode(sigInstr);
           rename_ckpt("fetch_ckpt.dmtcp");
           cur_instr = fetchfault->process(cur_instr);
           DPRINTF(FaultInjection,"Fetch: PCAddr:%llx In thread %d Fault Inserted \n",pcAddr,thread->getThreadId());
@@ -385,66 +353,21 @@ class Fi_System : public MemObject
         }
         else
           fi_system->reset();
-        //       }
+      }
+      return cur_instr;
     }
-    return cur_instr;
-    }
-    /*
-       inline StaticInstPtr decode_fault(ThreadContext *tc,ThreadEnabledFault *thread, StaticInstPtr cur_instr,Addr pcAddr){
-
-       std::string _name = tc->getCpuPtr()->name();
-       RegisterDecodingInjectedFault *decodefault = NULL;
-
-       if(thread->getMode() != START)
-       return cur_instr;
-
-       int sigInstr = getSignificance(pcAddr);
-
-       if (sigInstr)
-       return cur_instr;
-
-       if(FullSystem && TheISA::inUserMode(tc)){	
-       thread->increaseDecodedInstr(_name);
-       }
-       else
-       return cur_instr;
-
-
-       allthreads->increaseDecodedInstr(_name);
-       while ((decodefault = reinterpret_cast<RegisterDecodingInjectedFault *>(decodeStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
-       int succeed = dmtcp_checkpoint();
-       if ( succeed == 1){
-       rename_ckpt("decode_ckpt.dmtcp");
-       cur_instr = decodefault->process(cur_instr);
-       decodefault->setManifested(true);
-       thread->setfaulty(1);
-       cur_instr->setFaultInjected(true);
-       DPRINTF(FaultInjection,"Decode:PCAddr:%llx Fault Inserted in thread %d at instruction %s \n",pcAddr,thread->getThreadId(),cur_instr->getName());
-       scheduleswitch(tc);
-       }
-       else
-       reset();
-       }	  
-
-
-       return cur_instr;
-       }
-
-*/
 
     inline RegisterDecodingInjectedFault* decode_fault(ThreadContext *tc,ThreadEnabledFault *thread, StaticInstPtr instr,Addr pcAddr){
       std::string _name = tc->getCpuPtr()->name();
       RegisterDecodingInjectedFault *decodefault = NULL;
       if(thread->getMode() != START)
         return NULL;
-      //      DPRINTF(FaultInjection,"DECODE\n");
-      //
+
       int sigInstr = getSignificance(pcAddr);
       thread->setInstMode(sigInstr);
       allthreads->setInstMode(sigInstr);
 
-      //      if (sigInstr)
-      //        return NULL;
+
       if(FullSystem && TheISA::inUserMode(tc)){	
         thread->increaseDecodedInstr(_name);
       }
@@ -454,16 +377,10 @@ class Fi_System : public MemObject
       allthreads->increaseDecodedInstr(_name);
       while ((decodefault = reinterpret_cast<RegisterDecodingInjectedFault *>(decodeStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
         DPRINTF(FaultInjection,"Decode:PCAddr:%llx Fault Inserted in thread %d at instruction %s \n",pcAddr,thread->getThreadId(),instr->getName());
-        int succeed = dmtcp_checkpoint();
+        int succeed = checkpointOnFault();
         if ( succeed == 1){
           bool val = decodefault->process(instr);
           if ( val ){
-            if ((sigInstr == NONPROTECTED || sigInstr == NOPINST) )  {
-              DPRINTF(FaultInjection, "INJECTING IN NON-PROTECTED INSTRUCTION\n");
-            }
-            else{
-              DPRINTF(FaultInjection, "INJECTING IN PROTECTED INSTRUCTION\n");
-            }
             return decodefault;
           }
         }
@@ -481,6 +398,8 @@ class Fi_System : public MemObject
     Addr getStartingPCAddr(){return StartingPCAddr;}
     Addr getStopPCAddr(){return StopPCAddr;}
     void open_meta_file(){
+      if (meta_file.empty())
+        return;
       meta_input.open(meta_file.c_str(),ifstream::binary);
       if (!meta_input.is_open() ){
         DPRINTF(FaultInjection,"Cannot Open meta data file\n");
@@ -489,41 +408,7 @@ class Fi_System : public MemObject
     }
 
     int getSignificance(Addr PC_addr){
-
-      if(text_start < 0 )
-        return 2;
-
-      if(PC_addr > StopPCAddr )
-        return 2;
-      unsigned int offset = PC_addr - StartingPCAddr;
-      int val;
-      if (offset < 0 ){
-        DPRINTF(FaultInjection, " Something is going very wrong I should never find negative offset\n");
-      }
-
-      unsigned char byte;
-      meta_input.clear();
-      meta_input.seekg(offset,std::ios::beg);
-      if (!meta_input.is_open())
-        return 2;
-
-      meta_input.read(( char*) &byte,sizeof(unsigned char));
-      if (byte == NONPROTECTED){
-        //        DPRINTF(FaultInjection, "Non-Reliable Instruction\n");
-        val = 0;
-      }
-      else if (byte == PROTECTED ){
-        //        DPRINTF(FaultInjection, "Reliable Instruction\n");
-        val = 1;
-      }
-      else if (byte == NOPINST) {
-        //        DPRINTF(FaultInjection, "Compiler did not define this Instruction\n");
-        val = 2; //NOPINST INSTRUCTION
-      }
-      else {
-        val = 3;//NOT IN THIS OBJCECT FILE
-      }
-      return val; 
+      return 0; 
     }
 
 

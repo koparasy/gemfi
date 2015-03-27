@@ -313,6 +313,6 @@ if options.timesync:
 if options.frame_capture:
     VncServer.frame_capture = True
 m5.disableAllListeners()
-test_sys.fi_system=Fi_System(input_fi=options.fi_input,check_before_init=options.exit_on_checkpoint,fi_switch=options.switch_on_fault,text_start=options.text_start,meta_file=options.meta_file)
+test_sys.fi_system=Fi_System(input_fi=options.fi_input,check_before_init=options.exit_on_checkpoint,fi_switch=options.switch_on_fault,text_start=options.text_start,meta_file=options.meta_file,checkBeforeFI=options.checkpoint_on_fault)
 Simulation.setWorkCountOptions(test_sys, options)
 Simulation.run(options, root, test_sys, FutureClass)

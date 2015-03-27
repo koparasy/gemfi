@@ -8,5 +8,6 @@ class Fi_System(MemObject):
   fi_switch=Param.Bool(True,"Switch to atomic after fault injection")
   meta_file=Param.String("","Input File Name");
   text_start=Param.Int(-1,"Text section offset in binary file");
+  checkBeforeFI=Param.Bool(True," Checkpoint just before injecting a fault");
   
   

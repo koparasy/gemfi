@@ -32,15 +32,15 @@ void GeneralFetchInjectedFault::dump() const
   }
 }
 
-char
-GeneralFetchInjectedFault::process(char byte)
+TheISA::MachInst
+GeneralFetchInjectedFault::process(TheISA::MachInst inst)
 {
   TheISA::MachInst retInst = 0;
 
   DPRINTF(FaultInjection, "===GeneralFetchStageInjectedFault::process()===\n");
   dump();
   
-  retInst = manifest(byte, getValue(), getValueType());
+  retInst = manifest(inst, getValue(), getValueType());
 
   check4reschedule();
 
