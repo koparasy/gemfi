@@ -8,6 +8,7 @@ terminate(){
 
 start_new=$1
 num_cores=$2
+delete_core=$3
 
 workstation="/scratch"
 my_pid="$workstation/mypid.txt"
@@ -18,11 +19,13 @@ if [ ! -d "$workstation/results" ] ; then
   mkdir -p $workstation/results
 fi
 
+if [ $delete_core -eq "1" ]; then
 rm -r core*
 for (( i = 0 ; i < $num_cores; i++))
 do
     mkdir core$i
 done
+fi
 
 if [ $start_new -eq "1" ] ; then
   echo "Starting new"
