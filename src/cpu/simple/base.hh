@@ -377,7 +377,7 @@ class BaseSimpleCPU : public BaseCPU
           if ( srcReg != si->srcRegIdx(idx))
             DPRINTF(FaultInjection, " Injecting Decoding Fault read CC Reg\n");
         }
-         StaticInst *inst = const_cast<StaticInst *>(si);
+        StaticInst *inst = const_cast<StaticInst *>(si);
         inst->setRegDecFault(NULL);
       }
       //~ALTERCODE
