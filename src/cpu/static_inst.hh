@@ -46,7 +46,12 @@
 #include "cpu/thread_context.hh"
 #include "sim/fault_fwd.hh"
 
+
+//~ALTERCODE
 #include "debug/FaultInjection.hh"
+//#include "fi/regdec_injfault.hh"
+//ALTERCODE
+
 // forward declarations
 class Packet;
 
@@ -60,7 +65,7 @@ class AtomicSimpleCPU;
 class TimingSimpleCPU;
 class InorderCPU;
 class SymbolTable;
-
+class RegisterDecodingInjectedFault;
 namespace Trace {
     class InstRecord;
 }
@@ -169,6 +174,11 @@ class StaticInst : public RefCounted
         IsSquashAfter, ///< Squash all uncommitted state after executed
         NumFlags
     };
+    //ALTERCODE
+    RegisterDecodingInjectedFault *decFault;
+    //~ALTERCODE
+    
+    
 
   protected:
 
@@ -198,20 +208,20 @@ class StaticInst : public RefCounted
 
     bool FaultInjected;
   public:
-  
-    void correctInst(){
-      /*
-      if ( _srcOrDest ){
-        DPRINTF(FaultInjection,"Dest Register is: %d\n",_correct_reg);
-        _destRegIdx[_index]=_correct_reg;
-      }
-      else{
-        DPRINTF(FaultInjection,"Src Register is: %d\n",_correct_reg);
-        _srcRegIdx[_index]= _correct_reg;
-      }
-    DPRINTF(FaultInjection, " Index %d\n",_index);
-    */
+
+    //ALTERCODE
+    void setRegDecFault( RegisterDecodingInjectedFault *fault){
+        decFault=fault;
     }
+
+    RegisterDecodingInjectedFault *getRegDecFault(){
+        return decFault;
+    }
+
+    RegisterDecodingInjectedFault *getRegDecFault() const{
+        return decFault;
+    }
+    //~ALTERCODE
     /// @name Register information.
     /// The sum of numFPDestRegs() and numIntDestRegs() equals
     /// numDestRegs().  The former two functions are used to track

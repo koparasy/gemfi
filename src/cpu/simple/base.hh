@@ -60,6 +60,9 @@
 #include "sim/full_system.hh"
 #include "sim/system.hh"
 
+//ALTERCODE
+//#include "fi/regdec_injfault.hh"
+//~ALTERCODE
 // forward declarations
 class Checkpoint;
 class Process;
@@ -68,12 +71,12 @@ class ThreadContext;
 
 namespace TheISA
 {
-    class DTB;
-    class ITB;
+  class DTB;
+  class ITB;
 }
 
 namespace Trace {
-    class InstRecord;
+  class InstRecord;
 }
 
 struct BaseSimpleCPUParams;
@@ -93,12 +96,12 @@ class BaseSimpleCPU : public BaseCPU
     Trace::InstRecord *traceData;
 
     inline void checkPcEventQueue() {
-        Addr oldpc, pc = thread->instAddr();
-        do {
-            oldpc = pc;
-            system->pcEventQueue.service(tc);
-            pc = thread->instAddr();
-        } while (oldpc != pc);
+      Addr oldpc, pc = thread->instAddr();
+      do {
+        oldpc = pc;
+        system->pcEventQueue.service(tc);
+        pc = thread->instAddr();
+      } while (oldpc != pc);
     }
 
   public:
@@ -130,17 +133,17 @@ class BaseSimpleCPU : public BaseCPU
   protected:
 
     enum Status {
-        Idle,
-        Running,
-        Faulting,
-        ITBWaitResponse,
-        IcacheRetry,
-        IcacheWaitResponse,
-        IcacheWaitSwitch,
-        DTBWaitResponse,
-        DcacheRetry,
-        DcacheWaitResponse,
-        DcacheWaitSwitch,
+      Idle,
+      Running,
+      Faulting,
+      ITBWaitResponse,
+      IcacheRetry,
+      IcacheWaitResponse,
+      IcacheWaitSwitch,
+      DTBWaitResponse,
+      DcacheRetry,
+      DcacheWaitResponse,
+      DcacheWaitSwitch,
     };
 
     Status _status;
@@ -188,25 +191,25 @@ class BaseSimpleCPU : public BaseCPU
 
     void countInst()
     {
-        if (!curStaticInst->isMicroop() || curStaticInst->isLastMicroop()) {
-            numInst++;
-            numInsts++;
-        }
-        numOp++;
-        numOps++;
+      if (!curStaticInst->isMicroop() || curStaticInst->isLastMicroop()) {
+        numInst++;
+        numInsts++;
+      }
+      numOp++;
+      numOps++;
 
-        system->totalNumInsts++;
-        thread->funcExeInst++;
+      system->totalNumInsts++;
+      thread->funcExeInst++;
     }
 
     virtual Counter totalInsts() const
     {
-        return numInst - startNumInst;
+      return numInst - startNumInst;
     }
 
     virtual Counter totalOps() const
     {
-        return numOp - startNumOp;
+      return numOp - startNumOp;
     }
 
     //number of integer alu accesses
@@ -285,13 +288,13 @@ class BaseSimpleCPU : public BaseCPU
 
     void serializeThread(std::ostream &os, ThreadID tid);
     void unserializeThread(Checkpoint *cp, const std::string &section,
-                           ThreadID tid);
+        ThreadID tid);
 
     // These functions are only used in CPU models that split
     // effective address computation from the actual memory access.
     void setEA(Addr EA) { panic("BaseSimpleCPU::setEA() not implemented\n"); }
     Addr getEA()        { panic("BaseSimpleCPU::getEA() not implemented\n");
-        M5_DUMMY_RETURN}
+      M5_DUMMY_RETURN}
 
     // The register accessor methods provide the index of the
     // instruction's operand (e.g., 0 or 1), not the architectural
@@ -306,66 +309,171 @@ class BaseSimpleCPU : public BaseCPU
 
     uint64_t readIntRegOperand(const StaticInst *si, int idx)
     {
-        numIntRegReads++;
-        return thread->readIntReg(si->srcRegIdx(idx));
+      //ALTERCODE
+      int srcReg = si->srcRegIdx(idx);
+      RegisterDecodingInjectedFault *fault;
+      if ( (fault = si->getRegDecFault()) ){
+        if ( fault->getSrcOrDst() == 1  && fault->getOperand() == idx ){
+          srcReg = fault->inject( INT, srcReg , tcBase());
+          if ( srcReg != si->srcRegIdx(idx))
+            DPRINTF(FaultInjection, " Injecting Decoding Fault read Int Reg\n");
+        }
+        StaticInst *inst = const_cast<StaticInst *>(si);
+        inst->setRegDecFault(NULL);
+      }
+      //~ALTERCODE
+      numIntRegReads++;
+      return thread->readIntReg(srcReg);
     }
 
     FloatReg readFloatRegOperand(const StaticInst *si, int idx)
     {
-        numFpRegReads++;
-        int reg_idx = si->srcRegIdx(idx) - TheISA::FP_Reg_Base;
-        return thread->readFloatReg(reg_idx);
+      numFpRegReads++;
+      // ALTERCODE
+      int srcReg = si->srcRegIdx(idx);
+      RegisterDecodingInjectedFault *fault;
+      if ( (fault = si->getRegDecFault()) ){
+        if ( fault->getSrcOrDst() == 1  && fault->getOperand() == idx ){
+          srcReg = fault->inject( FLOAT , srcReg , tcBase());
+          if ( srcReg != si->srcRegIdx(idx))
+            DPRINTF(FaultInjection, " Injecting Decoding Fault read Float Reg\n");
+        }
+        StaticInst *inst = const_cast<StaticInst *>(si);
+        inst->setRegDecFault(NULL);
+      }
+      //~ALTERCODE
+      int reg_idx = srcReg - TheISA::FP_Reg_Base;
+      return thread->readFloatReg(reg_idx);
     }
 
     FloatRegBits readFloatRegOperandBits(const StaticInst *si, int idx)
     {
-        numFpRegReads++;
-        int reg_idx = si->srcRegIdx(idx) - TheISA::FP_Reg_Base;
-        return thread->readFloatRegBits(reg_idx);
+      numFpRegReads++;
+      // ALTERCODE
+      int srcReg = si->srcRegIdx(idx);
+      RegisterDecodingInjectedFault *fault;
+      if ( (fault = si->getRegDecFault()) ){
+        if ( fault->getSrcOrDst() == 1  && fault->getOperand() == idx ){
+          srcReg = fault->inject( FLOAT , srcReg , tcBase());
+          if ( srcReg != si->srcRegIdx(idx))
+            DPRINTF(FaultInjection, " Injecting Decoding Fault read Float  Reg\n");
+        }
+        StaticInst *inst = const_cast<StaticInst *>(si);
+        inst->setRegDecFault(NULL);
+      }
+      //~ALTERCODE
+      int reg_idx = srcReg - TheISA::FP_Reg_Base;
+      return thread->readFloatRegBits(reg_idx);
     }
 
     CCReg readCCRegOperand(const StaticInst *si, int idx)
     {
-        numCCRegReads++;
-        int reg_idx = si->srcRegIdx(idx) - TheISA::CC_Reg_Base;
-        return thread->readCCReg(reg_idx);
+      // ALTERCODE
+      int srcReg = si->srcRegIdx(idx);
+      RegisterDecodingInjectedFault *fault;
+      if (( fault = si->getRegDecFault()) ){
+        if ( fault->getSrcOrDst() == 1  && fault->getOperand() == idx ){
+          srcReg = fault->inject( CC , srcReg , tcBase());
+          if ( srcReg != si->srcRegIdx(idx))
+            DPRINTF(FaultInjection, " Injecting Decoding Fault read CC Reg\n");
+        }
+        StaticInst *inst = const_cast<StaticInst *>(si);
+        inst->setRegDecFault(NULL);
+      }
+      //~ALTERCODE
+
+      numCCRegReads++;
+      int reg_idx = srcReg - TheISA::CC_Reg_Base;
+      return thread->readCCReg(reg_idx);
     }
 
     void setIntRegOperand(const StaticInst *si, int idx, uint64_t val)
     {
-        numIntRegWrites++;
-        thread->setIntReg(si->destRegIdx(idx), val);
+      // ALTERCODE
+      int destReg = si->destRegIdx(idx);
+      RegisterDecodingInjectedFault *fault;
+      if (( fault = si->getRegDecFault()) ){
+        if ( fault->getSrcOrDst() == 2  && fault->getOperand() == idx ){
+          destReg = fault->inject( INT, destReg , tcBase());
+          if ( destReg != si->destRegIdx(idx))
+            DPRINTF(FaultInjection, " Injecting Decoding Fault Write Int Reg\n");
+        }
+        StaticInst *inst = const_cast<StaticInst *>(si);
+        inst->setRegDecFault(NULL);
+      }
+      //~ALTERCODE
+      numIntRegWrites++;
+      thread->setIntReg(destReg, val);
     }
 
     void setFloatRegOperand(const StaticInst *si, int idx, FloatReg val)
     {
-        numFpRegWrites++;
-        int reg_idx = si->destRegIdx(idx) - TheISA::FP_Reg_Base;
-        thread->setFloatReg(reg_idx, val);
+      numFpRegWrites++;
+      // ALTERCODE
+      int destReg = si->destRegIdx(idx);
+      RegisterDecodingInjectedFault *fault;
+      if (( fault = si->getRegDecFault() )){
+        if ( fault->getSrcOrDst() == 2  && fault->getOperand() == idx ){
+          destReg = fault->inject( FLOAT, destReg , tcBase());
+          if ( destReg != si->destRegIdx(idx))
+            DPRINTF(FaultInjection, " Injecting Decoding Write Float Reg\n");
+        }
+        StaticInst *inst = const_cast<StaticInst *>(si);
+        inst->setRegDecFault(NULL);
+      }
+      //~ALTERCODE
+      int reg_idx = destReg - TheISA::FP_Reg_Base;
+      thread->setFloatReg(reg_idx, val);
     }
 
     void setFloatRegOperandBits(const StaticInst *si, int idx,
-                                FloatRegBits val)
+        FloatRegBits val)
     {
-        numFpRegWrites++;
-        int reg_idx = si->destRegIdx(idx) - TheISA::FP_Reg_Base;
-        thread->setFloatRegBits(reg_idx, val);
+      numFpRegWrites++;
+      // ALTERCODE
+      int destReg = si->destRegIdx(idx);
+      RegisterDecodingInjectedFault *fault;
+      if (( fault = si->getRegDecFault()) ){
+        if ( fault->getSrcOrDst() == 2  && fault->getOperand() == idx ){
+          destReg = fault->inject( FLOAT, destReg , tcBase());
+          if ( destReg != si->destRegIdx(idx))
+            DPRINTF(FaultInjection, " Injecting Decoding Fault Write Float Reg\n");
+        }
+        StaticInst *inst = const_cast<StaticInst *>(si);
+        inst->setRegDecFault(NULL);
+      }
+      //~ALTERCODE
+      int reg_idx = destReg - TheISA::FP_Reg_Base;
+      thread->setFloatRegBits(reg_idx, val);
     }
 
     void setCCRegOperand(const StaticInst *si, int idx, CCReg val)
     {
-        numCCRegWrites++;
-        int reg_idx = si->destRegIdx(idx) - TheISA::CC_Reg_Base;
-        thread->setCCReg(reg_idx, val);
+      numCCRegWrites++;
+      // ALTERCODE
+      int destReg = si->destRegIdx(idx);
+      RegisterDecodingInjectedFault *fault;
+      if (( fault = si->getRegDecFault()) ){
+        if ( fault->getSrcOrDst() == 2  && fault->getOperand() == idx ){
+          destReg = fault->inject( CC , destReg , tcBase());
+          if ( destReg != si->destRegIdx(idx))
+            DPRINTF(FaultInjection, " Injecting Decoding Fault Write CC  Reg\n");
+        }
+        StaticInst *inst = const_cast<StaticInst *>(si);
+        inst->setRegDecFault(NULL);
+      }
+      //~ALTERCODE
+      int reg_idx = destReg - TheISA::CC_Reg_Base;
+      thread->setCCReg(reg_idx, val);
     }
 
     bool readPredicate() { return thread->readPredicate(); }
     void setPredicate(bool val)
     {
-        thread->setPredicate(val);
-        if (traceData) {
-            traceData->setPredicate(val);
-        }
+      thread->setPredicate(val);
+      if (traceData) {
+        traceData->setPredicate(val);
+      }
     }
     TheISA::PCState pcState() { return thread->pcState(); }
     void pcState(const TheISA::PCState &val) { thread->pcState(val); }
@@ -375,71 +483,71 @@ class BaseSimpleCPU : public BaseCPU
 
     MiscReg readMiscRegNoEffect(int misc_reg)
     {
-        return thread->readMiscRegNoEffect(misc_reg);
+      return thread->readMiscRegNoEffect(misc_reg);
     }
 
     MiscReg readMiscReg(int misc_reg)
     {
-        numIntRegReads++;
-        return thread->readMiscReg(misc_reg);
+      numIntRegReads++;
+      return thread->readMiscReg(misc_reg);
     }
 
     void setMiscReg(int misc_reg, const MiscReg &val)
     {
-        numIntRegWrites++;
-        return thread->setMiscReg(misc_reg, val);
+      numIntRegWrites++;
+      return thread->setMiscReg(misc_reg, val);
     }
 
     MiscReg readMiscRegOperand(const StaticInst *si, int idx)
     {
-        numIntRegReads++;
-        int reg_idx = si->srcRegIdx(idx) - TheISA::Misc_Reg_Base;
-        return thread->readMiscReg(reg_idx);
+      numIntRegReads++;
+      int reg_idx = si->srcRegIdx(idx) - TheISA::Misc_Reg_Base;
+      return thread->readMiscReg(reg_idx);
     }
 
     void setMiscRegOperand(
-            const StaticInst *si, int idx, const MiscReg &val)
+        const StaticInst *si, int idx, const MiscReg &val)
     {
-        numIntRegWrites++;
-        int reg_idx = si->destRegIdx(idx) - TheISA::Misc_Reg_Base;
-        return thread->setMiscReg(reg_idx, val);
+      numIntRegWrites++;
+      int reg_idx = si->destRegIdx(idx) - TheISA::Misc_Reg_Base;
+      return thread->setMiscReg(reg_idx, val);
     }
 
     void demapPage(Addr vaddr, uint64_t asn)
     {
-        thread->demapPage(vaddr, asn);
+      thread->demapPage(vaddr, asn);
     }
 
     void demapInstPage(Addr vaddr, uint64_t asn)
     {
-        thread->demapInstPage(vaddr, asn);
+      thread->demapInstPage(vaddr, asn);
     }
 
     void demapDataPage(Addr vaddr, uint64_t asn)
     {
-        thread->demapDataPage(vaddr, asn);
+      thread->demapDataPage(vaddr, asn);
     }
 
     unsigned readStCondFailures() {
-        return thread->readStCondFailures();
+      return thread->readStCondFailures();
     }
 
     void setStCondFailures(unsigned sc_failures) {
-        thread->setStCondFailures(sc_failures);
+      thread->setStCondFailures(sc_failures);
     }
 
-     MiscReg readRegOtherThread(int regIdx, ThreadID tid = InvalidThreadID)
-     {
-        panic("Simple CPU models do not support multithreaded "
-              "register access.\n");
-     }
+    MiscReg readRegOtherThread(int regIdx, ThreadID tid = InvalidThreadID)
+    {
+      panic("Simple CPU models do not support multithreaded "
+          "register access.\n");
+    }
 
-     void setRegOtherThread(int regIdx, const MiscReg &val,
-                            ThreadID tid = InvalidThreadID)
-     {
-        panic("Simple CPU models do not support multithreaded "
-              "register access.\n");
-     }
+    void setRegOtherThread(int regIdx, const MiscReg &val,
+        ThreadID tid = InvalidThreadID)
+    {
+      panic("Simple CPU models do not support multithreaded "
+          "register access.\n");
+    }
 
     //Fault CacheOp(uint8_t Op, Addr EA);
 
@@ -447,13 +555,13 @@ class BaseSimpleCPU : public BaseCPU
     bool simPalCheck(int palFunc) { return thread->simPalCheck(palFunc); }
 
     void
-    syscall(int64_t callnum)
-    {
+      syscall(int64_t callnum)
+      {
         if (FullSystem)
-            panic("Syscall emulation isn't available in FS mode.\n");
+          panic("Syscall emulation isn't available in FS mode.\n");
 
         thread->syscall(callnum);
-    }
+      }
 
     bool misspeculating() { return thread->misspeculating(); }
     ThreadContext *tcBase() { return tc; }
@@ -461,7 +569,7 @@ class BaseSimpleCPU : public BaseCPU
     //ALTERCODE
     StaticInstPtr getcurInstr(){return curStaticInst;}
     //~ALTERCODE
-    
+
   private:
     TheISA::PCState pred_pc;
 };
