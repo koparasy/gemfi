@@ -5,7 +5,7 @@ echo "starting  NEW simulation"
 #./dct_noprotection 64 64 0 2
 #./ 100 0.00001 40 23 2
 #./jacobi_NoSigNoSanity 100 0.00001 40 23 2
-./kmeans_NoProtection -n 2 -i 100 -g 1
+./kmeans_NoProtect -n 2 -i 100 -g 1
 #./jacobi_software 500 0.00001 70 23 2
 #./dct_mit 512 512 lena512.raw out.raw
 #./blackscholesO0 1 in_16.txt output.txt 12
