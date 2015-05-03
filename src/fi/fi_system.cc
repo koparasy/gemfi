@@ -188,6 +188,7 @@ Fi_System:: getFromFile(std::ifstream &os){
 
   while(os.good()){
     os>>check;		
+    DPRINTF(FaultInjection,"I read %s\n",check);
     if(check.compare("CPUInjectedFault") ==0){
       new CPUInjectedFault(os);
     }
@@ -221,10 +222,12 @@ Fi_System:: getFromFile(std::ifstream &os){
     else if(check.compare("LoadStoreInjectedFault")==0){
       new LoadStoreInjectedFault(os);
     }
-    else{
-      if (DTRACE(FaultInjection)) {
-        std::cout << "No such Object: "<<check<<"\n";
+    else if (check.compare("END")==0){
+        DPRINTF(FaultInjection,"Finished Reading Files\n");
+        break;
       }
+    else{ 
+      assert(0&&"THIS SHOULD NEVER HAPPEN WHEN PARSING FAULTS\n");
     }
   }
 }
