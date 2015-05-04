@@ -217,12 +217,14 @@ InjectedFaultQueue::insert(InjectedFault *f)
       tail->nxt = f;
       f->prv = tail;
       tail = f;
+      f->nxt=NULL;
       return;
     }
     else if (p==head) {//element inserted in the beginning
       head->prv = f;
       f->nxt = head;
       head = f;
+      f->prv=NULL;
       return;
     }
     else {//element inserted between two other elements

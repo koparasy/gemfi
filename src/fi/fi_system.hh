@@ -376,9 +376,9 @@ class Fi_System : public MemObject
 
       allthreads->increaseDecodedInstr(_name);
       while ((decodefault = reinterpret_cast<RegisterDecodingInjectedFault *>(decodeStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
-        DPRINTF(FaultInjection,"Decode:PCAddr:%llx Fault Inserted in thread %d at instruction %s \n",pcAddr,thread->getThreadId(),instr->getName());
         int succeed = checkpointOnFault();
         if ( succeed == 1){
+          DPRINTF(FaultInjection,"Decode:PCAddr:%llx Fault Inserted in thread %d at instruction %s \n",pcAddr,thread->getThreadId(),instr->getName());
           rename_ckpt("decode_ckpt.dmtcp");
           bool val = decodefault->process(instr);
           if ( val ){
