@@ -206,7 +206,7 @@ def template MicroStoreInitiateAcc {{
 
         if(fault == NoFault)
         {
-	  fi_system ->lds_fault(xc,xc->tcBase(),&Mem,dataSize);
+	  fi_system ->lds_fault(xc,xc->tcBase(),Mem,dataSize);
             fault = writeMemTiming(xc, traceData, Mem, dataSize, EA,
                     memFlags, NULL);
         }
