@@ -131,6 +131,14 @@ int ThreadEnabledFault:: increaseExecutedInstr(std:: string curCpu)
   return 1;
 }
 
+void ThreadEnabledFault::reset_counters(){
+	for(itcores = cores.begin(); itcores!=cores.end() ; ++itcores){
+		itcores->second->setInstrFetched(0,0,0,0);
+		itcores->second->setInstrDecoded(0,0,0,0);
+		itcores->second->setInstrExecuted(0,0,0,0);
+		itcores->second->setInstrLoadStore(0,0,0,0);
+	}
+}
 
 int ThreadEnabledFault:: increaseLoadStoreInstr(std:: string curCpu)
 {

@@ -544,7 +544,7 @@ AtomicSimpleCPU::tick()
   }
 
   if(enabled_fi)
-    fi_system->increaseTicks(name(),curr_thread, clockEdge(Cycles(1)));
+    fi_system->increaseTicks(name(),curr_thread, 1);
 
   for (int i = 0; i < width || locked; ++i) {
     numCycles++;

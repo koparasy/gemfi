@@ -84,6 +84,10 @@ O3ThreadContext<Impl>::takeOverFrom(ThreadContext *old_context)
 
     thread->noSquashFromTC = false;
     thread->trapPending = false;
+    //ALTERCODE
+	thread->setEnabledFI(old_context->getEnabledFI());
+	thread->setEnabledFIThread(old_context->getEnabledFIThread());
+    //ALTERCODE
 }
 
 template <class Impl>
