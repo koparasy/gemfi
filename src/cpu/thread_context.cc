@@ -172,7 +172,11 @@ takeOverFrom(ThreadContext &ntc, ThreadContext &otc)
     ntc.copyArchRegs(&otc);
     ntc.setContextId(otc.contextId());
     ntc.setThreadId(otc.threadId());
-
+//ALTERCODE
+    ntc.setEnabledFIThread(otc.getEnabledFIThread());
+    ntc.setEnabledFI(otc.getEnabledFI());
+   
+//~ALTERCODE
     if (FullSystem) {
         assert(ntc.getSystemPtr() == otc.getSystemPtr());
 

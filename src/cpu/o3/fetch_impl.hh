@@ -1245,7 +1245,7 @@ DefaultFetch<Impl>::fetch(bool &status_change)
 	}
 
 	if(enabled_fi)
-		fi_system->increaseTicks(cpu->name(),curr_thread, cpu->clockEdge(Cycles(1)));
+		fi_system->increaseTicks(cpu->name(),curr_thread, 1);
 
 	//~ALTERCODE
 

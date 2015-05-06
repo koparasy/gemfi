@@ -294,7 +294,7 @@ Fi_System:: reset()
     if (DTRACE(FaultInjection)) {
       std::cout << "~Fi_System::Reading New Faults \n";
     }
-    dump();
+ //   dump();
   }
 }
 
@@ -468,6 +468,8 @@ Fi_System::scheduleswitch(ThreadContext *tc){
 void Fi_System::start_fi(ThreadContext *tc,  uint64_t threadid){
   Addr _tmpAddr  = TheISA::getFiThread(tc);
   fi_activation_iter = fi_activation.find(_tmpAddr);
+  static int number_of_starts=0;
+  DPRINTF(FaultInjection,"Got start (#%d) Reguest: Thread_id:%llx, Task_id:%d\n",++number_of_starts,_tmpAddr, threadid);
   if (fi_activation_iter == fi_activation.end()  ) {
     std::string _name = tc->getCpuPtr()->name();
     if(allthreads == NULL){
@@ -509,6 +511,9 @@ void Fi_System::pause_fi(ThreadContext *tc,uint64_t threadid)
   static int number_of_pauses=0;
   Addr _tmpAddr  = TheISA::getFiThread(tc);
   fi_activation_iter = fi_activation.find(_tmpAddr);
+  DPRINTF(FaultInjection,"Got Pause (#%d) Reguest: Thread_id:%llx, Task_id:%d\n",++number_of_pauses,_tmpAddr, threadid);
+  tc->getEnabledFIThread()->print_time();
+  tc->getEnabledFIThread()->reset_counters();
   if (fi_activation_iter == fi_activation.end()) {
     DPRINTF(FaultInjection,"I have not enabled fault injection going to ignore stop request\n");
   }
@@ -518,9 +523,9 @@ void Fi_System::pause_fi(ThreadContext *tc,uint64_t threadid)
     fi_enable--;
     tc->setEnabledFIThread(NULL);
   }
-  if( (number_of_pauses++)%100 == 99){
-    DPRINTF(FaultInjection,"Paused one more time %d\n",number_of_pauses);
-  }
+//  if( (number_of_pauses++)%100 == 99){
+//    DPRINTF(FaultInjection,"Paused one more time %d\n",number_of_pauses);
+// }
 }
 
 void Fi_System:: stop_fi(ThreadContext *tc, uint64_t req){
@@ -579,5 +584,6 @@ void Fi_System::rename_ckpt(const char* new_name){
 int Fi_System::checkpointOnFault(){
   if ( getCheckBeforeFI () )
     return dmtcp_checkpoint();
-  return 1;
+  return 0;
+ 
 }
