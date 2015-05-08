@@ -87,9 +87,11 @@ Fi_System *fi_system;
   if(in_name.size() > 1){
     if ( BinaryFile ){
       input.open (in_name.c_str(), ifstream::in|ios::binary);
-      getFromBinaryFile(input);
+      if (input.good())
+	      getFromBinaryFile(input);
     }
     else{
+      if (input.good())
       input.open (in_name.c_str(), ifstream::in);
       getFromFile(input);
     }

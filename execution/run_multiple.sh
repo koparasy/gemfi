@@ -52,17 +52,20 @@ dmtcp_checkpoint ./../../build/X86/gem5.opt --debug-flags=FaultInjection --remot
 fi
 
 while true ;
-do
+do 
+	echo "Going to take Lock $my_core"
     lockfile $mutex #take lock
-    exp=($(ls all_exp))
-    if [ "${#exp[@]}" -eq 0 ];
+    exp=($(ls $all_exp))
+	echo "Lock TAKEN $my_core"
+    if [ "${#exp[@]}" -eq "0" ]; then
       rm -f $mutex
       exit
     fi
-    exp=${exp[0]}
-    mv $exp input   
+    expx=$all_exp${exp[0]}
+    echo "$expx"
+    mv $expx input   
     rm -f $mutex #free lock
-    echo "lock released"
+    echo "lock released $my_core"
 
     dmtcp_restart maincheckpoint.dmtcp &
     pids=$!
