@@ -152,7 +152,7 @@ def addCommonOptions(parser):
                       help="SimPoint interval in num of instructions")
 
                       
-    #fault Injection Options
+    #Fault injection Options
     parser.add_option("--fi-in",action="store",type="string",dest="fi_input",default=None,
     help="file to read input for fi_system")
     parser.add_option("--meta-in",action="store",type="string",dest="meta_file",default="",
@@ -164,7 +164,9 @@ def addCommonOptions(parser):
     parser.add_option("--checkpoint-on-fault",action="store",type="int",dest="checkpoint_on_fault",default=0,
     help="Checkpoint Before Injecting A fault")
     parser.add_option("--text-start",action="store", type="int", dest="text_start",default=0,
-    help=" Specify start of the .text section in the meta data file");
+    help=" Specify start of text segment of the executable");
+    parser.add_option("--file-type",action="store", type="int", dest="file_type",default=0,
+    help=" Specify fault configuration input file type (0 --> text, 1 --> binary)");
 
 
 

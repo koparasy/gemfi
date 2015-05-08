@@ -13,6 +13,14 @@ LoadStoreInjectedFault::LoadStoreInjectedFault(std::ifstream &os)
     fi_system->LoadStoreInjectedFaultQueue.insert(this);
 }
 
+LoadStoreInjectedFault::LoadStoreInjectedFault(unsigned int _time , unsigned char _bit )
+  : O3CPUInjectedFault(_time,_bit)
+{
+    setFaultType(InjectedFault::LoadStoreInjectedFault);
+    fi_system->LoadStoreInjectedFaultQueue.insert(this);
+}
+
+
 LoadStoreInjectedFault::~LoadStoreInjectedFault()
 {
 }

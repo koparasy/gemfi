@@ -9,5 +9,6 @@ class Fi_System(MemObject):
   meta_file=Param.String("","Input File Name");
   text_start=Param.Int(-1,"Text section offset in binary file");
   checkBeforeFI=Param.Bool(True," Checkpoint just before injecting a fault");
+  FileType=Param.Bool(False," Checkpoint just before injecting a fault");
   
   

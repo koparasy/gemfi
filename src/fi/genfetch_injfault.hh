@@ -18,6 +18,7 @@ class GeneralFetchInjectedFault : public O3CPUInjectedFault
 public:
 
   GeneralFetchInjectedFault(std::ifstream &os);
+  GeneralFetchInjectedFault( unsigned int _time , unsigned char _bit );
   ~GeneralFetchInjectedFault();
 
   virtual const char *description() const;

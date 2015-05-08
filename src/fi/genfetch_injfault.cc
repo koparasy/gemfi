@@ -12,6 +12,14 @@ GeneralFetchInjectedFault::GeneralFetchInjectedFault(std::ifstream &os)
   fi_system->fetchStageInjectedFaultQueue.insert(this);
 }
 
+GeneralFetchInjectedFault::GeneralFetchInjectedFault( unsigned int _time , unsigned char _bit)
+  : O3CPUInjectedFault(_time,_bit)
+{
+  setFaultType(InjectedFault::GeneralFetchInjectedFault);
+  fi_system->fetchStageInjectedFaultQueue.insert(this);
+}
+
+
 GeneralFetchInjectedFault::~GeneralFetchInjectedFault()
 {
 }

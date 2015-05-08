@@ -13,6 +13,15 @@ IEWStageInjectedFault::
   fi_system->iewStageInjectedFaultQueue.insert(this);
 }
 
+IEWStageInjectedFault::
+    IEWStageInjectedFault(unsigned int _time, unsigned char _bit)
+  : O3CPUInjectedFault(_time,_bit)
+{
+  setFaultType(InjectedFault::ExecutionInjectedFault);
+  fi_system->iewStageInjectedFaultQueue.insert(this);
+}
+
+
 IEWStageInjectedFault::~IEWStageInjectedFault()
 {
 }

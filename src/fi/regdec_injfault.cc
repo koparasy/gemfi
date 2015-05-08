@@ -16,7 +16,13 @@ using namespace std;
     setFaultType(InjectedFault::RegisterDecodingInjectedFault);
 }
 
-
+    RegisterDecodingInjectedFault::RegisterDecodingInjectedFault(unsigned int _time , unsigned char _bit )
+:O3CPUInjectedFault(_time,_bit)
+{
+    fi_system->decodeStageInjectedFaultQueue.insert(this);
+    setSrcOrDst(RegisterDecodingInjectedFault::SrcRegisterInjectedFault);
+    setFaultType(InjectedFault::RegisterDecodingInjectedFault);
+}
 
 RegisterDecodingInjectedFault::~RegisterDecodingInjectedFault()
 {

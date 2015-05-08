@@ -12,7 +12,10 @@ CPUInjectedFault::CPUInjectedFault(  ifstream &os)
   os>>t;
   setTContext(t);
 }
-
+CPUInjectedFault::CPUInjectedFault( unsigned int _time, unsigned char _bit )
+  :InjectedFault(_time,_bit){
+  setTContext(0);
+}
 
 CPUInjectedFault::~CPUInjectedFault()
 {

@@ -58,6 +58,7 @@ Fi_System *fi_system;
   setswitchcpu(p->fi_switch);
   fi_enable = 0;
   fi_system = this;
+  BinaryFile = p->FileType; 
   setmaincheckpoint(false);
   mainInjectedFaultQueue.setName("MainFaultQueue");
   mainInjectedFaultQueue.setHead(NULL);
@@ -79,12 +80,19 @@ Fi_System *fi_system;
   fi_fetch= false;
   fi_loadstore=false;
   fi_main= false;
+  totalNumFaults=0;
 
   allthreads = NULL;
 
   if(in_name.size() > 1){
-    input.open (in_name.c_str(), ifstream::in);
-    getFromFile(input);
+    if ( BinaryFile ){
+      input.open (in_name.c_str(), ifstream::in|ios::binary);
+      getFromBinaryFile(input);
+    }
+    else{
+      input.open (in_name.c_str(), ifstream::in);
+      getFromFile(input);
+    }
     input.close();
   }
 
@@ -159,7 +167,7 @@ Fi_System::startup()
   if (DTRACE(FaultInjection)) {
     std::cout << "Fi_System:startup()\n";
   }
-  dump();
+  //dump();
 }
 
   Fi_System *
@@ -181,6 +189,49 @@ Fi_System::getPort(const string &if_name, int idx)
 //Initialize faults from a file
 //Note that the conditions of how the faults are
 //stored in a file are very strict.
+void
+Fi_System:: getFromBinaryFile(std::ifstream &os){
+  do{
+    unsigned char type;
+    unsigned int time;
+    unsigned char bit;
+    os.read((char*) &(type), sizeof(unsigned char));
+    if (os.eof())
+      break;
+    os.read((char*)&(time), sizeof(int));
+    if (os.eof())
+      break;
+    os.read((char*)&(bit), sizeof(unsigned char));
+    if (os.eof())
+      break;
+    DPRINTF(FaultInjection,"TYPE : %d\n",type);
+    switch( type ){
+      case 1: 
+              DPRINTF(FaultInjection,"Fetch Instr: %d Bit : %d \n",time,(int) bit);
+              new GeneralFetchInjectedFault(time,bit);
+              break;
+      case 2:
+             DPRINTF(FaultInjection,"Decode Instr: %d Bit : %d \n",time,(int) bit);
+             new RegisterDecodingInjectedFault(time,bit);
+             break;
+      case 3:
+              DPRINTF(FaultInjection,"IEW Instr: %d Bit : %d \n",time,(int) bit);
+             new IEWStageInjectedFault(time,bit);
+             break;
+      case 4:
+              DPRINTF(FaultInjection,"LDS Instr: %d Bit : %d \n",time,(int) bit);
+             new LoadStoreInjectedFault(time,bit);
+             break;
+      default:
+             std::cout<<"Should Never reach here\n";
+             assert(NULL);
+             break;
+    }
+  }while ( 1 );
+
+}
+
+
 
 void
 Fi_System:: getFromFile(std::ifstream &os){
@@ -223,9 +274,9 @@ Fi_System:: getFromFile(std::ifstream &os){
       new LoadStoreInjectedFault(os);
     }
     else if (check.compare("END")==0){
-        DPRINTF(FaultInjection,"Finished Reading Files\n");
-        break;
-      }
+      DPRINTF(FaultInjection,"Finished Reading Files\n");
+      break;
+    }
     else{ 
       assert(0&&"THIS SHOULD NEVER HAPPEN WHEN PARSING FAULTS\n");
     }
@@ -280,21 +331,28 @@ Fi_System:: reset()
 {
 
   std:: stringstream s1;
-
+  totalNumFaults=0;
   delete_faults();
 
   if(in_name.size() > 1){
     if (DTRACE(FaultInjection)) {
       std::cout << "Fi_System::Reading New Faults \n";
     }
-    input.open (in_name.c_str(), ifstream::in);
-    getFromFile(input);
+    if ( BinaryFile ){
+      input.open (in_name.c_str(), ifstream::in|ios::binary);
+      getFromBinaryFile(input);
+    }
+    else{
+      input.open (in_name.c_str(), ifstream::in);
+      getFromFile(input);
+    }
+
     input.close();
 
     if (DTRACE(FaultInjection)) {
       std::cout << "~Fi_System::Reading New Faults \n";
     }
- //   dump();
+    //   dump();
   }
 }
 
@@ -523,9 +581,9 @@ void Fi_System::pause_fi(ThreadContext *tc,uint64_t threadid)
     fi_enable--;
     tc->setEnabledFIThread(NULL);
   }
-//  if( (number_of_pauses++)%100 == 99){
-//    DPRINTF(FaultInjection,"Paused one more time %d\n",number_of_pauses);
-// }
+  //  if( (number_of_pauses++)%100 == 99){
+  //    DPRINTF(FaultInjection,"Paused one more time %d\n",number_of_pauses);
+  // }
 }
 
 void Fi_System:: stop_fi(ThreadContext *tc, uint64_t req){
@@ -556,6 +614,9 @@ void Fi_System::dump_fi(ThreadContext *tc){
     fi_activation_iter->second->print_time();
   }
   fi_activation.clear();
+  DPRINTF(FaultInjection,"DUMPING NUMBER OF INSTRUCTIONS OF ALL THREADS\n");
+  allthreads->print_time();
+  DPRINTF(FaultInjection, "Total Num Of Faults %d\n",totalNumFaults);
   tc->setEnabledFIThread(NULL);
   tc->setEnabledFI(false);
   fi_enable = 0;
@@ -585,5 +646,5 @@ int Fi_System::checkpointOnFault(){
   if ( getCheckBeforeFI () )
     return dmtcp_checkpoint();
   return 0;
- 
+
 }

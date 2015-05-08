@@ -41,6 +41,29 @@ InjectedFault::InjectedFault(ifstream &os)
 
 }
 
+InjectedFault::InjectedFault(unsigned int _time, unsigned char _bit)
+{
+  char temp[100];
+  sprintf(temp,"all");
+  std::string _thread(temp);
+  setThread(_thread);
+  sprintf(temp,"Inst:%d",_time);
+  std::string _when(temp);
+  setWhen(_when);
+  sprintf(temp,"all");
+  std::string _where(temp);
+  setWhere(_where);
+  sprintf(temp,"Flip:%d",_bit);
+  std::string _what(temp);
+  setWhat(_what);
+  parseWhat(_what);
+  parseWhen(_when);
+  setFaultID();
+  setOccurrence(1);
+  setManifested(false);
+
+}
+
 
 
 InjectedFault::~InjectedFault()
@@ -267,11 +290,16 @@ InjectedFaultQueue::remove(InjectedFault *f)
 
   if (f->nxt==NULL) {//fault to be removed is the last one
     tail = f->prv;
+    if ( f -> prv != NULL)
+      tail->nxt=NULL;
+    else
+      tail = NULL;
   }
   else {
     f->nxt->prv = f->prv;
   }
 
+  free(f);
   return;
 
 }

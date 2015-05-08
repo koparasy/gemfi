@@ -11,7 +11,8 @@ class LoadStoreInjectedFault : public O3CPUInjectedFault
 {
 	public:
 
-		LoadStoreInjectedFault(std::ifstream &os);
+    LoadStoreInjectedFault(std::ifstream &os);
+		LoadStoreInjectedFault(unsigned int _time, unsigned char _bit);
 		~LoadStoreInjectedFault();
 
 		virtual StaticInstPtr process(StaticInstPtr inst) { std::cout << "O3CPUInjectedFault::manifest() -- virtual\n"; assert(0); return inst;};
