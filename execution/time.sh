@@ -32,7 +32,7 @@ do
   actual_size=${_size[0]}
   IFS=$OIFS
   echo "size $actual_size"
-  if [ "$actual_size" -gt "8000" ]; then
+  if [ "$actual_size" -gt "20000" ]; then
     echo "kill my child (size to big)"
     kill -15 $my_child
     if [ -d start ]; then

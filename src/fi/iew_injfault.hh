@@ -44,11 +44,11 @@ public:
    * thus flipping it.
    */
   bool process(bool v){
-     DPRINTF(FaultInjection, "===IEWStageInjectedFault::process(T)===\n");
-     DPRINTF(FaultInjection, "===\t\tboolean value===\n");
+ //    DPRINTF(FaultInjection, "===IEWStageInjectedFault::process(T)===\n");
+ //    DPRINTF(FaultInjection, "===\t\tboolean value===\n");
       v=!v;
     check4reschedule();
-    DPRINTF(FaultInjection, "~==IEWStageInjectedFault::process(T)===\n");
+  //  DPRINTF(FaultInjection, "~==IEWStageInjectedFault::process(T)===\n");
     return v;
   }
   
@@ -62,7 +62,7 @@ public:
   { 
     T retVal = v;
     
-    DPRINTF(FaultInjection, "===IEWStageInjectedFault::process(T)===\n");
+//    DPRINTF(FaultInjection, "===IEWStageInjectedFault::process(T)===\n");
     
    if(getValueType() == InjectedFault::FlipBit && getValue() > sizeof(T)*8){ //Make sure that the flipped bit is inside the affected structure!
       setValue(getValue()%(sizeof(T)*8)+1);
@@ -73,7 +73,7 @@ public:
     
     check4reschedule();
     
-    DPRINTF(FaultInjection, "~==IEWStageInjectedFault::process(T)===\n");
+//    DPRINTF(FaultInjection, "~==IEWStageInjectedFault::process(T)===\n");
     return retVal;
   }
 

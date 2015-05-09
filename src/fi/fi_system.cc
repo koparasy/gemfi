@@ -206,26 +206,20 @@ Fi_System:: getFromBinaryFile(std::ifstream &os){
     os.read((char*)&(bit), sizeof(unsigned char));
     if (os.eof())
       break;
-    DPRINTF(FaultInjection,"TYPE : %d\n",type);
     switch( type ){
       case 1: 
-              DPRINTF(FaultInjection,"Fetch Instr: %d Bit : %d \n",time,(int) bit);
               new GeneralFetchInjectedFault(time,bit);
               break;
       case 2:
-             DPRINTF(FaultInjection,"Decode Instr: %d Bit : %d \n",time,(int) bit);
              new RegisterDecodingInjectedFault(time,bit);
              break;
       case 3:
-              DPRINTF(FaultInjection,"IEW Instr: %d Bit : %d \n",time,(int) bit);
              new IEWStageInjectedFault(time,bit);
              break;
       case 4:
-              DPRINTF(FaultInjection,"LDS Instr: %d Bit : %d \n",time,(int) bit);
              new LoadStoreInjectedFault(time,bit);
              break;
       default:
-             std::cout<<"Should Never reach here\n";
              assert(NULL);
              break;
     }
