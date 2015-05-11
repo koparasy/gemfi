@@ -343,7 +343,7 @@ InjectedFault *InjectedFaultQueue::scan(std::string s , ThreadEnabledFault &this
                 p->setServicedAt(exec_time);
                 return(p);
               }
-              else if(exec_time > p->getTiming())
+              else 
                 flag = 0;
             }
             break;
@@ -353,7 +353,7 @@ InjectedFault *InjectedFaultQueue::scan(std::string s , ThreadEnabledFault &this
                 p->setServicedAt(exec_instr);
                 return(p);
               }
-              else if(exec_instr > p->getTiming())
+              else
                 flag = 0;
             }
             break;
