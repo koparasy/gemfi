@@ -566,12 +566,12 @@ void Fi_System::pause_fi(ThreadContext *tc,uint64_t threadid)
   Addr _tmpAddr  = TheISA::getFiThread(tc);
   fi_activation_iter = fi_activation.find(_tmpAddr);
   DPRINTF(FaultInjection,"Got Pause (#%d) Reguest: Thread_id:%llx, Task_id:%d\n",++number_of_pauses,_tmpAddr, threadid);
-  tc->getEnabledFIThread()->print_time();
-  tc->getEnabledFIThread()->reset_counters();
   if (fi_activation_iter == fi_activation.end()) {
     DPRINTF(FaultInjection,"I have not enabled fault injection going to ignore stop request\n");
   }
   else{ 
+    fi_activation_iter->second->print_time();
+    fi_activation_iter->second->reset_counters();
     fi_activation_iter->second->setMode(PAUSE);
     tc->setEnabledFI(false);
     fi_enable--;
