@@ -45,7 +45,7 @@ RegisterDecodingInjectedFault::inject(RegType type, int op, ThreadContext *tc){
 //   fi_system->rename_ckpt("decode_ckpt.dmtcp");
     tc->getEnabledFIThread()->setfaulty(1);
     int random =rand();
-//    DPRINTF(FaultInjection,"Random Value is %d\n",random);
+    DPRINTF(FaultInjection,"Random Value is %d Injecting ONE MORE FAULT\n",random);
     fi_system->scheduleswitch(tc);
     switch (type){
       case INT:
