@@ -426,6 +426,7 @@ class Fi_System : public MemObject
           DPRINTF(FaultInjection,"Decode:PCAddr:%llx Fault Inserted in thread %d at instruction %s \n",pcAddr,thread->getThreadId(),instr->getName());
           rename_ckpt("decode_ckpt.dmtcp");
           bool val = decodefault->process(instr);
+	  DPRINTF(FaultInjection,"Val returned %d pointer of fault is %p\n",val, decodefault);
           if ( val ){
             return decodefault;
           }
