@@ -364,7 +364,7 @@ class Fi_System : public MemObject
 					allthreads->setInstMode(sigInstr);
 					rename_ckpt("fetch_ckpt.dmtcp");
 					cur_instr = fetchfault->process(cur_instr);
-					DPRINTF(FaultInjection,"Fetch: PCAddr:%llx In thread %d Fault Inserted \n",pcAddr,thread->getThreadId());
+					DPRINTF(FaultInjection,"Fetch: PCAddr:%llx Fault Inereted In thread %d Fault Inserted \n",pcAddr,thread->getThreadId());
 					thread->setfaulty(1);
 					scheduleswitch(tc);
 				}
@@ -377,7 +377,7 @@ class Fi_System : public MemObject
 					thread->setInstMode(sigInstr);
 					allthreads->setInstMode(sigInstr);
 					cur_instr = fetchfault->process(cur_instr);
-					DPRINTF(FaultInjection,"Fetch: PCAddr:%llx In thread %d Fault Inserted \n",pcAddr,thread->getThreadId());
+					DPRINTF(FaultInjection,"Fetch: PCAddr:%llx Fault Inserted In thread %d Fault Inserted \n",pcAddr,thread->getThreadId());
 					thread->setfaulty(1);
 					scheduleswitch(tc);
 				}
