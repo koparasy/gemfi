@@ -46,6 +46,7 @@ class RegisterDecodingInjectedFault : public O3CPUInjectedFault
   public:
 
     RegisterDecodingInjectedFault( std::ifstream &os);
+    RegisterDecodingInjectedFault( unsigned int _time , unsigned char _bit);
     ~RegisterDecodingInjectedFault();
 
     virtual const char *description() const;

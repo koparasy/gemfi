@@ -12,6 +12,14 @@ GeneralFetchInjectedFault::GeneralFetchInjectedFault(std::ifstream &os)
   fi_system->fetchStageInjectedFaultQueue.insert(this);
 }
 
+GeneralFetchInjectedFault::GeneralFetchInjectedFault( unsigned int _time , unsigned char _bit)
+  : O3CPUInjectedFault(_time,_bit)
+{
+  setFaultType(InjectedFault::GeneralFetchInjectedFault);
+  fi_system->fetchStageInjectedFaultQueue.insert(this);
+}
+
+
 GeneralFetchInjectedFault::~GeneralFetchInjectedFault()
 {
 }
@@ -37,14 +45,14 @@ GeneralFetchInjectedFault::process(TheISA::MachInst inst)
 {
   TheISA::MachInst retInst = 0;
 
-  DPRINTF(FaultInjection, "===GeneralFetchStageInjectedFault::process()===\n");
-  dump();
+  //DPRINTF(FaultInjection, "===GeneralFetchStageInjectedFault::process()===\n");
+  //dump();
   
   retInst = manifest(inst, getValue(), getValueType());
 
   check4reschedule();
 
-  DPRINTF(FaultInjection, "~==GeneralFetchStageInjectedFault::process()===\n");
+  //DPRINTF(FaultInjection, "~==GeneralFetchStageInjectedFault::process()===\n");
   return retInst; 
 }
 

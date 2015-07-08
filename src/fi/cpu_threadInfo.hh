@@ -154,7 +154,7 @@ class ThreadEnabledFault {
 	
 	uint64_t getMode() {return mode;}
 	void setMode(uint64_t mod) {mode = mod;}
-
+	void reset_counters();
 };
 
 #endif //  __CPU_THREAD_FAULT_INFO__

@@ -19,6 +19,7 @@ class IEWStageInjectedFault : public O3CPUInjectedFault
 public:
 
   IEWStageInjectedFault( std::ifstream &os);
+  IEWStageInjectedFault( unsigned int _time , unsigned char _bit);
   ~IEWStageInjectedFault();
 
   virtual StaticInstPtr process(StaticInstPtr inst) { std::cout << "O3CPUInjectedFault::manifest() -- virtual\n"; assert(0); return inst;};
@@ -43,11 +44,11 @@ public:
    * thus flipping it.
    */
   bool process(bool v){
-     DPRINTF(FaultInjection, "===IEWStageInjectedFault::process(T)===\n");
-     DPRINTF(FaultInjection, "===\t\tboolean value===\n");
+ //    DPRINTF(FaultInjection, "===IEWStageInjectedFault::process(T)===\n");
+ //    DPRINTF(FaultInjection, "===\t\tboolean value===\n");
       v=!v;
     check4reschedule();
-    DPRINTF(FaultInjection, "~==IEWStageInjectedFault::process(T)===\n");
+  //  DPRINTF(FaultInjection, "~==IEWStageInjectedFault::process(T)===\n");
     return v;
   }
   
@@ -61,18 +62,18 @@ public:
   { 
     T retVal = v;
     
-    DPRINTF(FaultInjection, "===IEWStageInjectedFault::process(T)===\n");
+//    DPRINTF(FaultInjection, "===IEWStageInjectedFault::process(T)===\n");
     
    if(getValueType() == InjectedFault::FlipBit && getValue() > sizeof(T)*8){ //Make sure that the flipped bit is inside the affected structure!
       setValue(getValue()%(sizeof(T)*8)+1);
       DPRINTF(FaultInjection,"Altered Flip bit location\n");
-      dump();
+     // dump();
     }
    retVal = manifest(v, getValue(), getValueType());
     
     check4reschedule();
     
-    DPRINTF(FaultInjection, "~==IEWStageInjectedFault::process(T)===\n");
+//    DPRINTF(FaultInjection, "~==IEWStageInjectedFault::process(T)===\n");
     return retVal;
   }
 

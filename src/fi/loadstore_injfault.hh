@@ -11,7 +11,8 @@ class LoadStoreInjectedFault : public O3CPUInjectedFault
 {
 	public:
 
-		LoadStoreInjectedFault(std::ifstream &os);
+    LoadStoreInjectedFault(std::ifstream &os);
+		LoadStoreInjectedFault(unsigned int _time, unsigned char _bit);
 		~LoadStoreInjectedFault();
 
 		virtual StaticInstPtr process(StaticInstPtr inst) { std::cout << "O3CPUInjectedFault::manifest() -- virtual\n"; assert(0); return inst;};
@@ -23,26 +24,26 @@ class LoadStoreInjectedFault : public O3CPUInjectedFault
 
 		template <class T> 
 			T process(T v){
-				DPRINTF(FaultInjection,"===LoadStoreFault::Process(T)==\n");
+//				DPRINTF(FaultInjection,"===LoadStoreFault::Process(T)==\n");
 
 				T retval = v;
 				retval = manifest(v,getValue(),getValueType());
 
 				check4reschedule();
 
-				DPRINTF(FaultInjection,"~===LoadStoreFault::Process(T)===\n");
+//				DPRINTF(FaultInjection,"~===LoadStoreFault::Process(T)===\n");
 				return retval;
 			}
 
 		virtual TheISA::MachInst process(uint64_t v) { 
-			DPRINTF(FaultInjection,"===LoadStoreFault::Process(uint64_t)==\n");
+//			DPRINTF(FaultInjection,"===LoadStoreFault::Process(uint64_t)==\n");
 
 			uint64_t retval = v;
 			retval = manifest(v,getValue(),getValueType());
 
 			check4reschedule();
 
-			DPRINTF(FaultInjection,"~===LoadStoreFault::Process(uint64_4)===\n");
+//			DPRINTF(FaultInjection,"~===LoadStoreFault::Process(uint64_4)===\n");
 			return retval;
 		}
 

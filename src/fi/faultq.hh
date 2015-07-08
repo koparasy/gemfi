@@ -167,6 +167,7 @@ protected:
 public:
 
   InjectedFault(ifstream &os);
+  InjectedFault(unsigned int _time, unsigned char _bit);
   ~InjectedFault();
   
   virtual const char *description() const;

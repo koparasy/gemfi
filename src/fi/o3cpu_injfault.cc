@@ -16,6 +16,10 @@ O3CPUInjectedFault::O3CPUInjectedFault( std::ifstream &os)
 	setTContext(t);
 }
 
+O3CPUInjectedFault::O3CPUInjectedFault( unsigned int _time , unsigned char _bit)
+: InjectedFault(_time,_bit){
+	setTContext(0);
+}
 
 O3CPUInjectedFault::~O3CPUInjectedFault()
 {

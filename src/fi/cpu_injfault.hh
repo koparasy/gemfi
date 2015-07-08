@@ -21,6 +21,7 @@ private:
 
 public:
   CPUInjectedFault( ifstream &os); //initialize faults from the input fstream
+  CPUInjectedFault( unsigned int _time, unsigned char _bit ); //initialize faults from the input fstream
   ~CPUInjectedFault();
 
   void setTContext(int v) { _tcontext = v;}  //set hardware thread

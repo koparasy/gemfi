@@ -41,6 +41,29 @@ InjectedFault::InjectedFault(ifstream &os)
 
 }
 
+InjectedFault::InjectedFault(unsigned int _time, unsigned char _bit)
+{
+  char temp[100];
+  sprintf(temp,"all");
+  std::string _thread(temp);
+  setThread(_thread);
+  sprintf(temp,"Inst:%d",_time);
+  std::string _when(temp);
+  setWhen(_when);
+  sprintf(temp,"all");
+  std::string _where(temp);
+  setWhere(_where);
+  sprintf(temp,"Flip:%d",_bit);
+  std::string _what(temp);
+  setWhat(_what);
+  parseWhat(_what);
+  parseWhen(_when);
+  setFaultID();
+  setOccurrence(1);
+  setManifested(false);
+
+}
+
 
 
 InjectedFault::~InjectedFault()
@@ -217,12 +240,14 @@ InjectedFaultQueue::insert(InjectedFault *f)
       tail->nxt = f;
       f->prv = tail;
       tail = f;
+      f->nxt=NULL;
       return;
     }
     else if (p==head) {//element inserted in the beginning
       head->prv = f;
       f->nxt = head;
       head = f;
+      f->prv=NULL;
       return;
     }
     else {//element inserted between two other elements
@@ -265,11 +290,16 @@ InjectedFaultQueue::remove(InjectedFault *f)
 
   if (f->nxt==NULL) {//fault to be removed is the last one
     tail = f->prv;
+    if ( f -> prv != NULL)
+      tail->nxt=NULL;
+    else
+      tail = NULL;
   }
   else {
     f->nxt->prv = f->prv;
   }
 
+  free(f);
   return;
 
 }
@@ -313,7 +343,7 @@ InjectedFault *InjectedFaultQueue::scan(std::string s , ThreadEnabledFault &this
                 p->setServicedAt(exec_time);
                 return(p);
               }
-              else if(exec_time > p->getTiming())
+              else 
                 flag = 0;
             }
             break;
@@ -323,7 +353,7 @@ InjectedFault *InjectedFaultQueue::scan(std::string s , ThreadEnabledFault &this
                 p->setServicedAt(exec_instr);
                 return(p);
               }
-              else if(exec_instr > p->getTiming())
+              else
                 flag = 0;
             }
             break;

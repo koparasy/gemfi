@@ -25,6 +25,7 @@ private:
 public:
 
   O3CPUInjectedFault(std::ifstream &os);//initialize faults from the input fstream
+  O3CPUInjectedFault(unsigned int _time, unsigned char _bit);//initialize faults from the input fstream
   ~O3CPUInjectedFault();
 
   virtual const char *description() const;

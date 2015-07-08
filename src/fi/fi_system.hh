@@ -72,7 +72,8 @@ class Fi_System : public MemObject
     int text_start;	
     Addr StartingPCAddr, StopPCAddr;
     ifstream meta_input;
-
+    bool BinaryFile;
+    unsigned int totalNumFaults;
 
     class Fi_SystemEvent : public Event
   {
@@ -187,6 +188,7 @@ class Fi_System : public MemObject
     int get_fi_loadstore_counters(InjectedFault *p , ThreadEnabledFault &thread,std::string curCpu , uint64_t *exec_time , uint64_t *exec_instr );
 
     void getFromFile(std::ifstream &os);
+    void getFromBinaryFile(std::ifstream &os);
     bool getCheck(){return check_before_init;}
     bool getswitchcpu(){return switchcpu;}
     bool getMainCheckpoint(){return maincheckpoint;}
@@ -248,11 +250,19 @@ class Fi_System : public MemObject
               rename_ckpt("lds_ckpt.dmtcp");
               value = loadStoreFault->process(value);
               thread->setfaulty(1);
+              DPRINTF(FaultInjection,"Injecting Fault %d\n",++totalNumFaults);
               DPRINTF(FaultInjection,"LDS: PCAddr:%llx Fault Inserted in thread %d at instruction %s\n",pcAddr,thread->getThreadId(),ptr->getcurInstr()->getName());
               scheduleswitch(tc);
             }
-            else{
+            else if (succeed == 2)
               reset();
+            else{ 
+              value = loadStoreFault->process(value);
+              thread->setfaulty(1);
+              DPRINTF(FaultInjection,"Injecting Fault %d\n",++totalNumFaults);
+              DPRINTF(FaultInjection,"LDS: PCAddr:%llx Fault Inserted in thread %d at instruction %s\n",pcAddr,thread->getThreadId(),ptr->getcurInstr()->getName());
+              scheduleswitch(tc);
+
             }
 
           }
@@ -285,11 +295,21 @@ class Fi_System : public MemObject
             if ( succeed == 1){
               rename_ckpt("iew_ckpt.dmtcp");
               *value = iewFault->process(*value);
+              DPRINTF(FaultInjection,"Injecting Fault %d\n",++totalNumFaults);
               DPRINTF(FaultInjection,"IEW: PCAddr:%llx Fault Inserted in thread %d at instruction %s\n",pcAddr,thread->getThreadId(),ptr->getcurInstr()->getName());
               scheduleswitch(tc);
             }
-            else
+            else if ( succeed == 2 ){
               reset();
+              return ;
+            }
+            else{
+              *value = iewFault->process(*value);
+              DPRINTF(FaultInjection,"Injecting Fault %d\n",++totalNumFaults);
+              DPRINTF(FaultInjection,"IEW: PCAddr:%llx Fault Inserted in thread %d at instruction %s\n",pcAddr,thread->getThreadId(),ptr->getcurInstr()->getName());
+              scheduleswitch(tc);
+            }
+
           }
         }
 
@@ -311,12 +331,23 @@ class Fi_System : public MemObject
         if ( succeed == 1){
           rename_ckpt("fetch_ckpt.dmtcp");
           mainfault->process();
+          DPRINTF(FaultInjection,"Injecting Fault %d\n",++totalNumFaults);
           DPRINTF(FaultInjection,"MAIN: PCAddr:%llx Fault Inserted in thread %d at instruction \n",thread->getThreadId(),pcAddr);
           if(string(mainfault->description()).compare("RegisterInjectedFault") != 0)
             scheduleswitch(tc);
         }
-        else
+        else if (succeed == 2 ){
           reset();
+          return;
+        }
+        else{
+          mainfault->process();
+          DPRINTF(FaultInjection,"Injecting Fault %d\n",++totalNumFaults);
+          DPRINTF(FaultInjection,"MAIN: PCAddr:%llx Fault Inserted in thread %d at instruction \n",thread->getThreadId(),pcAddr);
+          if(string(mainfault->description()).compare("RegisterInjectedFault") != 0)
+            scheduleswitch(tc);
+
+        }
       }
 
     }	
@@ -347,12 +378,25 @@ class Fi_System : public MemObject
           allthreads->setInstMode(sigInstr);
           rename_ckpt("fetch_ckpt.dmtcp");
           cur_instr = fetchfault->process(cur_instr);
+          DPRINTF(FaultInjection,"Injecting Fault %d\n",++totalNumFaults);
           DPRINTF(FaultInjection,"Fetch: PCAddr:%llx In thread %d Fault Inserted \n",pcAddr,thread->getThreadId());
           thread->setfaulty(1);
           scheduleswitch(tc);
         }
-        else
+        else if ( succeed == 2 ){
           fi_system->reset();
+          return cur_instr;
+        }
+        else {
+          sigInstr = getSignificance(pcAddr);
+          thread->setInstMode(sigInstr);
+          allthreads->setInstMode(sigInstr);
+          cur_instr = fetchfault->process(cur_instr);
+          DPRINTF(FaultInjection,"Injecting Fault %d\n",++totalNumFaults);
+          DPRINTF(FaultInjection,"Fetch: PCAddr:%llx In thread %d Fault Inserted \n",pcAddr,thread->getThreadId());
+          thread->setfaulty(1);
+          scheduleswitch(tc);
+        }
       }
       return cur_instr;
     }
@@ -376,17 +420,27 @@ class Fi_System : public MemObject
 
       allthreads->increaseDecodedInstr(_name);
       while ((decodefault = reinterpret_cast<RegisterDecodingInjectedFault *>(decodeStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){
-        DPRINTF(FaultInjection,"Decode:PCAddr:%llx Fault Inserted in thread %d at instruction %s \n",pcAddr,thread->getThreadId(),instr->getName());
         int succeed = checkpointOnFault();
         if ( succeed == 1){
+          DPRINTF(FaultInjection,"Injecting Fault %d\n",++totalNumFaults);
+          DPRINTF(FaultInjection,"Decode:PCAddr:%llx Fault Inserted in thread %d at instruction %s \n",pcAddr,thread->getThreadId(),instr->getName());
           rename_ckpt("decode_ckpt.dmtcp");
           bool val = decodefault->process(instr);
+	  DPRINTF(FaultInjection,"Val returned %d pointer of fault is %p\n",val, decodefault);
           if ( val ){
             return decodefault;
           }
         }
-        else{
+        else if (succeed == 2 ){
           fi_system->reset();
+          return NULL;
+        }
+        else{
+          bool val = decodefault->process(instr);
+          if ( val ){
+            DPRINTF(FaultInjection,"Injecting Fault %d\n",++totalNumFaults);
+            return decodefault;
+          }
         }
       }	  
 

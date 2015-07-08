@@ -19,11 +19,12 @@ do
   sec=`echo $sec|sed 's/^0*//'`
   total_time=$((hour*3600+min*60+sec))
   IFS=$OIFS
-  if [ "$total_time" -gt "7200" ]; then
+  if [ "$total_time" -gt "14400" ]; then
     echo "kill my child"
     kill -15 $my_child
     cd start
     touch "killed"
+    echo "Time $total_time" > killed
     cd ..
   fi
   IFS=$'\t'
@@ -32,12 +33,13 @@ do
   actual_size=${_size[0]}
   IFS=$OIFS
   echo "size $actual_size"
-  if [ "$actual_size" -gt "8000" ]; then
+  if [ "$actual_size" -gt "20000" ]; then
     echo "kill my child (size to big)"
     kill -15 $my_child
     if [ -d start ]; then
       cd start
-      touch "oversized experiments"
+      touch "oversized_experiments"
+      echo "$actual_size" >oversized_experiments
       cd ..
     fi
   fi
