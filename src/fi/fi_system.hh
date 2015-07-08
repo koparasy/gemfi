@@ -72,6 +72,7 @@ class Fi_System : public MemObject
     int text_start;	
     Addr StartingPCAddr, StopPCAddr;
     ifstream meta_input;
+    ofstream stream;
 
 
     class Fi_SystemEvent : public Event
@@ -442,7 +443,7 @@ class Fi_System : public MemObject
       int sigInstr = getSignificance(pcAddr);
       thread->setInstMode(sigInstr);
       allthreads->setInstMode(sigInstr);
-
+    
       //      if (sigInstr)
       //        return NULL;
       if(FullSystem && TheISA::inUserMode(tc)){	
@@ -450,6 +451,13 @@ class Fi_System : public MemObject
       }
       else
         return NULL;
+
+
+      if ( sigInstr )
+       stream.write("1",1);
+      else
+       stream.write("0",1);
+
 
       allthreads->increaseDecodedInstr(_name);
       while ((decodefault = reinterpret_cast<RegisterDecodingInjectedFault *>(decodeStageInjectedFaultQueue.scan(_name, *thread, pcAddr))) != NULL){

@@ -87,7 +87,7 @@ Fi_System::Fi_System(Params *p)
         input.close();
     }
 
-
+    stream.open("InstrStream.bin", std::ios::out|std::ios::binary);
 
 
 }
@@ -702,6 +702,7 @@ void Fi_System:: stop_fi(ThreadContext *tc, uint64_t req){
         DPRINTF(FaultInjection,"~===Fault Injection Deactivation Instruction===\n");
         fi_enable--;
     }
+    stream.close();
 }
 
 
