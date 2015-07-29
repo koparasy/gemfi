@@ -1364,9 +1364,6 @@ DefaultFetch<Impl>::fetch(bool &status_change)
 			}
 
 
-			//ALTERCODE
-			//inject fault on decoded instruction
-						//~ALTERCODE
       if ( staticInst->getFaultInjected())
           decoder[tid]->erase(staticInst);
 
@@ -1375,6 +1372,7 @@ DefaultFetch<Impl>::fetch(bool &status_change)
 						thisPC, nextPC, true);
 			ppFetch->notify(instruction);
 			numInst++;
+			//ALTERCODE
             RegisterDecodingInjectedFault *fi_fault;
             if(enabled_fi){
       				fi_fault = fi_system -> decode_fault(curr_tc,curr_thread,staticInst,thisPC.instAddr());
@@ -1383,6 +1381,7 @@ DefaultFetch<Impl>::fetch(bool &status_change)
             else
               instruction->setRegDecFault(NULL);
 
+						//~ALTERCODE
 
 #if TRACING_ON
 			if (DTRACE(O3PipeView)) {
